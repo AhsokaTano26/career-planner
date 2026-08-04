@@ -1,0 +1,245 @@
+# 生涯规划系统 · 推荐/计划接口 OpenAPI 定义（用于导入 Apifox 项目 8662286）
+# 说明：
+#   - 推荐接口（run/latest/feedback）的请求参数与返回结果在此完整定义；
+#   - /api/v1/planning/plans/generate 生成计划草案时调用推荐数据（recommendations/latest 的结果）；
+#   - Demo 无登录态，接口统一增加可选 studentId 查询参数（缺省 1001）。
+# 导入方式：Apifox -> 项目设置 -> 导入数据 -> OpenAPI/Swagger -> 选择本文件。
+openapi: 3.1.0
+info:
+  title: 生涯规划系统 · 推荐与计划接口定义
+  description: |
+    推荐 Recommendations 与计划 Planning 模块的接口定义。
+    请求参数：Demo 无登录态，统一增加可选 studentId（缺省 1001）。
+    返回结果：线上结构 + 增强字段（name/type/reason 等）。
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8080
+    description: 本地 Demo
+
+paths:
+  /api/v1/recommendations/run:
+    post:
+      summary: 生成推荐
+      description: 触发一次推荐计算并落库（recommendation_run / recommendation_result），响应空对象。
+      operationId: runRecommendation
+      parameters:
+        - $ref: '#/components/parameters/StudentIdParam'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEmpty'
+
+  /api/v1/recommendations/latest:
+    get:
+      summary: 查询推荐结果
+      description: 返回该学生的 3-5 个推荐方向（线上字段 directionId/score/rank/confidence + 增强字段 name/type/reason）。
+      operationId: getRecommendations
+      parameters:
+        - $ref: '#/components/parameters/StudentIdParam'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, message, data]
+                properties:
+                  code:
+                    type: integer
+                    example: 0
+                  message:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    required: [results]
+                    properties:
+                      results:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RecommendationItem'
+
+  /api/v1/recommendations/{id}/feedback:
+    post:
+      summary: 推荐反馈
+      description: 对某条推荐结果提交反馈（写 recommendation_feedback），响应空对象。
+      operationId: feedbackRecommendation
+      parameters:
+        - name: id
+          in: path
+          required: false
+          description: 推荐结果ID（recommendation_result.id）。可留空：留空时自动使用最近一次推荐结果ID（Demo 兜底）；建议填写 55。
+          example: 55
+          schema:
+            type: integer
+            example: 55
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedbackType:
+                  type: string
+                  enum: [LIKE, DISLIKE, INVALID]
+                  description: 反馈类型
+                comment:
+                  type: string
+                  description: 反馈意见
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEmpty'
+
+  /api/v1/planning/plans/generate:
+    post:
+      summary: AI生成计划草案
+      description: |
+        生成学期计划草案。数据来源：调用推荐接口（recommendations/latest）的推荐结果，
+        取排名第一的方向作为主目标，并按方向类型套用任务模板生成月度任务。
+        Demo 阶段由规则模板生成（不调用大模型），落库后返回草案。
+      operationId: generatePlanDraft
+      parameters:
+        - $ref: '#/components/parameters/StudentIdParam'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, message, data]
+                properties:
+                  code:
+                    type: integer
+                    example: 0
+                  message:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/PlanDraft'
+
+components:
+  parameters:
+    StudentIdParam:
+      name: studentId
+      in: query
+      required: false
+      description: 学生ID（Demo 无登录态，缺省 1001）
+      example: 1001
+      schema:
+        type: integer
+        example: 1001
+
+  schemas:
+    ApiResponseEmpty:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: success
+        data:
+          type: object
+          example: {}
+
+    RecommendationItem:
+      type: object
+      required: [directionId, score, rank, confidence]
+      properties:
+        directionId:
+          type: integer
+          description: 方向ID（career_direction.id）
+          example: 2
+        name:
+          type: string
+          description: 方向名称（增强字段）
+          example: 数据科学与算法工程师
+        type:
+          type: string
+          description: 方向类型（增强字段）
+          example: 数据算法
+        score:
+          type: number
+          format: double
+          description: 匹配度评分（0-1）
+          example: 0.9765
+        rank:
+          type: integer
+          description: 排序名次
+          example: 1
+        confidence:
+          type: string
+          enum: [HIGH, MEDIUM, LOW]
+          description: 置信度
+          example: HIGH
+        reason:
+          type: string
+          description: 推荐理由（增强字段，Demo 为模板拼接）
+          example: 根据你的职业价值观匹配100%、实践经历匹配100%、兴趣匹配98%，综合匹配度 98%，推荐关注【数据科学与算法工程师】方向。
+
+    PlanDraft:
+      type: object
+      properties:
+        studentId:
+          type: integer
+          example: 1001
+        direction:
+          type: object
+          description: 推荐方向（来自 recommendations/latest 的第一名）
+          properties:
+            directionId:
+              type: integer
+            name:
+              type: string
+            type:
+              type: string
+            score:
+              type: number
+        goal:
+          type: object
+          description: 目标（student_goal）
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+            goalType:
+              type: string
+              enum: [MAIN, BACKUP]
+        semester:
+          type: string
+          description: 学期（semester_plan）
+          example: 2026-2027学年第1学期
+        status:
+          type: string
+          description: 计划状态（DRAFT 草案待确认）
+          enum: [DRAFT]
+          example: DRAFT
+        tasks:
+          type: array
+          description: 月度任务（plan_task）
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              month:
+                type: string
+                example: 2026-09
+              title:
+                type: string
+              status:
+                type: string
+                enum: [TODO, DOING, DONE, DELAY, ABANDON]
+                example: TODO

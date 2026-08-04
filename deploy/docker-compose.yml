@@ -1,0 +1,45 @@
+# 部署编排（第一版 Demo 最小骨架，后续补充完整配置）
+# 服务清单与《开发设计说明书》一致：nginx / career-core / career-ai / mysql / backup
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  career-core:
+    build: ../career-core
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "8080:8080"
+
+  career-ai:
+    build: ../career-ai
+    depends_on:
+      - career-core
+    ports:
+      - "8000:8000"
+
+  nginx:
+    image: nginx:stable
+    depends_on:
+      - career-core
+      - career-ai
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d:ro
+
+volumes:
+  mysql-data:
