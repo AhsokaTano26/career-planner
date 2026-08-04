@@ -1,0 +1,4 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "python.defaultInterpreterPath": "C:\\Users\\uio8k\\.local\\bin\\python.exe"
+}
