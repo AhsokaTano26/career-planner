@@ -41,7 +41,7 @@ public class RecommendationController {
         return ApiResponse.success(Collections.emptyMap());
     }
 
-    /** 查询推荐结果：{ results: [ {directionId, name, type, score, rank, confidence, reason} ] } */
+    /** 查询推荐结果：{ results: [ {directionId, name, type, score, rank, confidence(归一化概率), reason} ] } */
     @GetMapping("/latest")
     public ApiResponse<Map<String, Object>> getLatest(
             @RequestParam(value = "studentId", required = false) Long studentId) {

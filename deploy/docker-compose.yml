@@ -28,6 +28,10 @@ services:
     build: ../career-ai
     depends_on:
       - career-core
+    environment:
+      LLM_API_KEY: ${LLM_API_KEY}
+      LLM_BASE_URL: ${LLM_BASE_URL}
+      LLM_MODEL: ${LLM_MODEL}
     ports:
       - "8000:8000"
 

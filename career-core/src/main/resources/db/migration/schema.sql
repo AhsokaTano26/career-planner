@@ -48,18 +48,36 @@ CREATE TABLE IF NOT EXISTS student_experience (
 
 -- 方向库（career_direction）
 -- type 为方向类型（技术研发/数据算法/产品管理 等），供接口2返回“type”字段
+-- personality_tags 为霍兰德（Holland RIASEC）人格类型标签（如 R,I,C，逗号分隔），
+-- 用于“人格类型→方向”映射：方向配置该列后，推荐引擎可计算学生人格与方向的契合度。
 CREATE TABLE IF NOT EXISTS career_direction (
-    id             BIGINT       NOT NULL AUTO_INCREMENT,
-    direction_code VARCHAR(32)  NOT NULL COMMENT '方向编码',
-    name           VARCHAR(64)  NOT NULL COMMENT '方向名称',
-    type           VARCHAR(32)  DEFAULT NULL COMMENT '方向类型',
-    status         VARCHAR(16)  DEFAULT 'ACTIVE' COMMENT '状态（ACTIVE 启用 / INACTIVE 停用）',
-    content        TEXT         DEFAULT NULL COMMENT '方向内容说明',
-    version_no     INT          DEFAULT 1 COMMENT '方向版本',
-    created_at     DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    id               BIGINT       NOT NULL AUTO_INCREMENT,
+    direction_code   VARCHAR(32)  NOT NULL COMMENT '方向编码',
+    name             VARCHAR(64)  NOT NULL COMMENT '方向名称',
+    type             VARCHAR(32)  DEFAULT NULL COMMENT '方向类型',
+    status           VARCHAR(16)  DEFAULT 'ACTIVE' COMMENT '状态（ACTIVE 启用 / INACTIVE 停用）',
+    content          TEXT         DEFAULT NULL COMMENT '方向内容说明',
+    personality_tags VARCHAR(64)  DEFAULT NULL COMMENT '霍兰德人格类型标签（RIASEC 编码，逗号分隔）',
+    version_no       INT          DEFAULT 1 COMMENT '方向版本',
+    created_at       DATETIME     DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uk_direction_code (direction_code)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '职业方向库';
+
+-- 对已存在的 career_direction 表补充 personality_tags 列（幂等：列存在则跳过）
+-- 说明：schema.sql 幂等执行，新库由上方 CREATE TABLE 直接建列；旧库走下方条件 ALTER。
+SET @col_exists = (
+    SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'career_direction'
+      AND COLUMN_NAME = 'personality_tags'
+);
+SET @ddl = IF(@col_exists = 0,
+    'ALTER TABLE career_direction ADD COLUMN personality_tags VARCHAR(64) DEFAULT NULL COMMENT ''霍兰德人格类型标签（RIASEC 编码，逗号分隔）'' AFTER content',
+    'SELECT 1');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- 方向维度权重与目标值（direction_dimension_weight）
 -- 六维目标值 target_value 与全局权重 weight 存放于配置表，避免写死（设计说明书 9.2）
@@ -93,7 +111,7 @@ CREATE TABLE IF NOT EXISTS recommendation_result (
     direction_id      BIGINT       NOT NULL,
     score             DECIMAL(6,4) DEFAULT NULL COMMENT '匹配度评分（0-1）',
     `rank`            INT          DEFAULT NULL COMMENT '排序名次（rank 为 MySQL 保留字，需反引号）',
-    explanation_json  JSON         DEFAULT NULL COMMENT '推荐解释/理由（Demo：预置模板拼接，非大模型生成）',
+    explanation_json  JSON         DEFAULT NULL COMMENT '推荐解释/理由（优先 career-ai 大模型生成，失败回退规则模板拼接）',
     created_at        DATETIME     DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_result_run (run_id)

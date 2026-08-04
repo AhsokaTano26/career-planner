@@ -14,10 +14,10 @@ INSERT INTO student_profile (id, user_id, student_no, major_category, grade, cla
 ON DUPLICATE KEY UPDATE student_no = VALUES(student_no), major_category = VALUES(major_category),
     grade = VALUES(grade), class_name = VALUES(class_name);
 
--- 画像快照：学生 1001 的六维画像（维度数值 0-100）
+-- 画像快照：学生 1001 的六维画像（维度数值 0-100）+ 霍兰德人格类型（personality，RIASEC 编码）
 INSERT INTO profile_snapshot (id, student_id, source_version, dimension_json, summary) VALUES
     (1, 1001, 'ASSESSMENT_V1',
-     '{"interest":82,"values":70,"academic":85,"ability":76,"orientation":80,"experience":60}',
+     '{"interest":82,"values":70,"academic":85,"ability":76,"orientation":80,"experience":60,"personality":"IRC"}',
      '对软件工程与算法方向兴趣浓厚，学业基础扎实，具备较强的编程与逻辑能力，实践经历尚在积累中。')
 ON DUPLICATE KEY UPDATE dimension_json = VALUES(dimension_json), summary = VALUES(summary);
 
@@ -31,17 +31,19 @@ INSERT INTO student_experience (id, student_id, type, title, start_date, descrip
 ON DUPLICATE KEY UPDATE type = VALUES(type), title = VALUES(title), start_date = VALUES(start_date), description = VALUES(description);
 
 -- 方向库（DIR009 为 INACTIVE，用于验证规则过滤仅取 ACTIVE）
-INSERT INTO career_direction (id, direction_code, name, type, status, content) VALUES
-    (1, 'DIR001', '软件开发工程师',   '技术研发', 'ACTIVE',   '从事后端/全栈软件开发，负责业务系统设计与实现。'),
-    (2, 'DIR002', '数据科学与算法工程师', '数据算法', 'ACTIVE', '面向大数据与机器学习，负责算法设计与模型落地。'),
-    (3, 'DIR003', '产品经理',         '产品管理', 'ACTIVE',   '负责产品规划、需求分析与项目推进。'),
-    (4, 'DIR004', '网络安全工程师',   '技术研发', 'ACTIVE',   '负责系统安全防护、渗透测试与安全运营。'),
-    (5, 'DIR005', '游戏开发工程师',   '技术研发', 'ACTIVE',   '从事游戏客户端/服务端开发与游戏逻辑实现。'),
-    (6, 'DIR006', '测试开发工程师',   '技术研发', 'ACTIVE',   '负责自动化测试框架与质量保障体系建设。'),
-    (7, 'DIR007', '前端开发工程师',   '技术研发', 'ACTIVE',   '从事 Web 前端界面开发与交互实现。'),
-    (8, 'DIR008', '数据分析师',       '数据算法', 'ACTIVE',   '负责业务数据分析、报表与决策支持。'),
-    (9, 'DIR009', '项目管理',         '项目管理', 'INACTIVE', '负责项目计划、进度与资源协调管理。')
-ON DUPLICATE KEY UPDATE name = VALUES(name), type = VALUES(type), status = VALUES(status), content = VALUES(content);
+-- personality_tags 为霍兰德（RIASEC）人格类型标签，用于“人格类型→方向”映射（R现实型/I研究型/A艺术型/S社会型/E企业型/C常规型）
+INSERT INTO career_direction (id, direction_code, name, type, status, content, personality_tags) VALUES
+    (1, 'DIR001', '软件开发工程师',   '技术研发', 'ACTIVE',   '从事后端/全栈软件开发，负责业务系统设计与实现。', 'R,I,C'),
+    (2, 'DIR002', '数据科学与算法工程师', '数据算法', 'ACTIVE', '面向大数据与机器学习，负责算法设计与模型落地。', 'I,R,C'),
+    (3, 'DIR003', '产品经理',         '产品管理', 'ACTIVE',   '负责产品规划、需求分析与项目推进。', 'E,S,A'),
+    (4, 'DIR004', '网络安全工程师',   '技术研发', 'ACTIVE',   '负责系统安全防护、渗透测试与安全运营。', 'I,R,C'),
+    (5, 'DIR005', '游戏开发工程师',   '技术研发', 'ACTIVE',   '从事游戏客户端/服务端开发与游戏逻辑实现。', 'A,I,R'),
+    (6, 'DIR006', '测试开发工程师',   '技术研发', 'ACTIVE',   '负责自动化测试框架与质量保障体系建设。', 'C,I,R'),
+    (7, 'DIR007', '前端开发工程师',   '技术研发', 'ACTIVE',   '从事 Web 前端界面开发与交互实现。', 'A,I,C'),
+    (8, 'DIR008', '数据分析师',       '数据算法', 'ACTIVE',   '负责业务数据分析、报表与决策支持。', 'I,C,E'),
+    (9, 'DIR009', '项目管理',         '项目管理', 'INACTIVE', '负责项目计划、进度与资源协调管理。', 'E,S,C')
+ON DUPLICATE KEY UPDATE name = VALUES(name), type = VALUES(type), status = VALUES(status),
+    content = VALUES(content), personality_tags = VALUES(personality_tags);
 
 -- 方向维度权重与目标值（全局权重沿用设计说明书 9.2：兴趣0.20/价值观0.15/能力0.25/学业0.15/倾向0.20/经历0.05）
 INSERT INTO direction_dimension_weight (id, direction_id, dimension, target_value, weight, version_no) VALUES

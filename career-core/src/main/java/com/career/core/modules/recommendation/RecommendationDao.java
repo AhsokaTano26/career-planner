@@ -28,7 +28,8 @@ public class RecommendationDao {
             rs.getString("name"),
             rs.getString("type"),
             rs.getString("status"),
-            rs.getString("content"));
+            rs.getString("content"),
+            rs.getString("personality_tags"));
 
     private static final RowMapper<DirectionWeight> WEIGHT_MAPPER = (rs, i) -> new DirectionWeight(
             rs.getString("dimension"),
@@ -38,7 +39,7 @@ public class RecommendationDao {
     /** 查询全部方向库 */
     public List<CareerDirection> findAllDirections() {
         return jdbc.query(
-                "SELECT id, direction_code, name, type, status, content FROM career_direction ORDER BY id ASC",
+                "SELECT id, direction_code, name, type, status, content, personality_tags FROM career_direction ORDER BY id ASC",
                 DIRECTION_MAPPER);
     }
 

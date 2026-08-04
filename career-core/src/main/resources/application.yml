@@ -22,6 +22,15 @@ spring:
     time-zone: Asia/Shanghai
     date-format: yyyy-MM-dd HH:mm:ss
 
+# career-ai（FastAPI 智能服务）接入配置
+career:
+  ai:
+    enabled: true                 # 是否启用 AI 解释；关闭或调用失败时自动回退规则模板
+    base-url: http://127.0.0.1:8000
+    connect-timeout-ms: 2000      # 连接超时（毫秒）：AI 服务不可用时快速回退，不拖慢推荐接口
+    timeout-ms: 15000             # 读取超时（毫秒）：真实 LLM 生成解释需数秒，须放宽
+    model: deepseek-v4-pro        # 期望使用的模型名（实际由 career-ai 侧 LLM_MODEL 决定，此处仅作记录）
+
 # Demo 阶段不做日志审计、限流等中间件，保持最小可用
 logging:
   level:

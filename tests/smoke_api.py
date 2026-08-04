@@ -8,15 +8,19 @@ import urllib.request
 
 BASE = "http://127.0.0.1:8080/api/v1"
 
+# 推荐接口已接入 career-ai 大模型生成解释（每条方向一次 LLM 调用），/latest 可能耗时数十秒，
+# 因此请求超时放宽到 120s（原 5s 会因 LLM 延迟超时）。
+TIMEOUT = 120
+
 
 def get(path):
-    with urllib.request.urlopen(BASE + path, timeout=5) as r:
+    with urllib.request.urlopen(BASE + path, timeout=TIMEOUT) as r:
         return r.status, json.loads(r.read().decode("utf-8"))
 
 
 def post(path):
     req = urllib.request.Request(BASE + path, data=b"", method="POST")
-    with urllib.request.urlopen(req, timeout=5) as r:
+    with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
         return r.status, json.loads(r.read().decode("utf-8"))
 
 

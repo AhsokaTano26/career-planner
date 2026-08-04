@@ -1,0 +1,5 @@
+# Created at 2026-08-04T17:44:24.019
+Boot Manifest-JAR contains absolute paths in classpath 'D:\Zht20241287\career-planner\career-core\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

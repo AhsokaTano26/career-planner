@@ -1,0 +1,7 @@
+# career-ai 依赖（与 .venv 保持一致）
+fastapi>=0.141
+uvicorn>=0.52
+httpx>=0.28
+pydantic>=2.13
+python-dotenv>=1.2
+pytest>=8.0

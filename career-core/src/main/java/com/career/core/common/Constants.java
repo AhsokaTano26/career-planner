@@ -34,6 +34,31 @@ public final class Constants {
             DIM_ORIENTATION, "发展倾向",
             DIM_EXPERIENCE, "实践经历");
 
+    /** 画像快照 dimension_json 中记录霍兰德人格类型的键（值为 RIASEC 编码串，如 "IRC"） */
+    public static final String PROFILE_PERSONALITY_KEY = "personality";
+
+    /** 霍兰德（Holland RIASEC）六种人格类型编码 */
+    public static final String HOLLAND_REALISTIC = "R";        // 现实型
+    public static final String HOLLAND_INVESTIGATIVE = "I";    // 研究型
+    public static final String HOLLAND_ARTISTIC = "A";         // 艺术型
+    public static final String HOLLAND_SOCIAL = "S";           // 社会型
+    public static final String HOLLAND_ENTERPRISING = "E";     // 企业型
+    public static final String HOLLAND_CONVENTIONAL = "C";     // 常规型
+
+    /** 霍兰德全部编码（RIASEC） */
+    public static final List<String> HOLLAND_CODES = List.of(
+            HOLLAND_REALISTIC, HOLLAND_INVESTIGATIVE, HOLLAND_ARTISTIC,
+            HOLLAND_SOCIAL, HOLLAND_ENTERPRISING, HOLLAND_CONVENTIONAL);
+
+    /** 霍兰德编码中文名（用于展示/提示词） */
+    public static final Map<String, String> HOLLAND_NAMES = Map.of(
+            HOLLAND_REALISTIC, "现实型(R)",
+            HOLLAND_INVESTIGATIVE, "研究型(I)",
+            HOLLAND_ARTISTIC, "艺术型(A)",
+            HOLLAND_SOCIAL, "社会型(S)",
+            HOLLAND_ENTERPRISING, "企业型(E)",
+            HOLLAND_CONVENTIONAL, "常规型(C)");
+
     /** 推荐引擎规则版本号 */
     public static final String RULE_VERSION = "RULE_V1";
 }
