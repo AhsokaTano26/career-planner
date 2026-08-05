@@ -1,21 +1,164 @@
-# 生涯规划系统 · 推荐接口 OpenAPI 定义（用于导入 Apifox 项目 8662286）
+# 生涯规划系统 · 画像与推荐接口 OpenAPI 定义
 # 说明：
+#   - Apifox 是接口契约的唯一最新来源，本文件只是仓库内的同步快照；
+#   - 学生画像接口按后端负责人统一后的 Apifox 路径定义；
 #   - 推荐接口（run/latest/feedback）的请求参数与返回结果在此完整定义；
 #   - Demo 无登录态，接口统一增加可选 studentId 查询参数（缺省 1001）。
-# 导入方式：Apifox -> 项目设置 -> 导入数据 -> OpenAPI/Swagger -> 选择本文件。
+#   - 如本文件与 Apifox 不一致，以 Apifox 为准并更新本文件；不要反向批量导入覆盖 Apifox。
 openapi: 3.1.0
 info:
-  title: 生涯规划系统 · 推荐接口定义
+  title: 生涯规划系统 · 画像与推荐接口定义
   description: |
-    推荐 Recommendations 模块的接口定义。
+    学生画像 Profiles 与推荐 Recommendations 模块的接口定义。
     请求参数：Demo 无登录态，统一增加可选 studentId（缺省 1001）。
     返回结果：线上结构 + 增强字段（name/type/reason 等）。
-  version: 1.0.0
+  version: 1.1.0
 servers:
   - url: http://127.0.0.1:8080
     description: 本地 Demo
 
 paths:
+  /api/v1/students/me/profile/latest:
+    get:
+      tags: [学生画像]
+      summary: 查看最新画像
+      operationId: getLatestStudentProfile
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/StudentIdParam'
+      responses:
+        '200':
+          description: 成功；尚无画像时 data 为 {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/students/me/profile/versions:
+    get:
+      tags: [学生画像]
+      summary: 查看历史画像
+      operationId: getStudentProfileVersions
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/StudentIdParam'
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseProfileVersions'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/profile-snapshots/{snapshotId}:
+    get:
+      tags: [学生画像]
+      summary: 查看指定画像快照
+      operationId: getProfileSnapshot
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SnapshotIdPath'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/StudentIdParam'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/students/me/profile/refresh:
+    post:
+      tags: [学生画像]
+      summary: 重新计算画像
+      description: 使用最新测评和学生资料确定性计算六维画像，并新增一个快照版本。
+      operationId: refreshStudentProfile
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/IdempotencyKeyHeader'
+        - $ref: '#/components/parameters/StudentIdParam'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/v1/profile-snapshots/{snapshotId}/feedback:
+    post:
+      tags: [学生画像]
+      summary: 画像反馈
+      operationId: feedbackProfileSnapshot
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SnapshotIdPath'
+        - $ref: '#/components/parameters/RequestIdHeader'
+        - $ref: '#/components/parameters/IdempotencyKeyHeader'
+        - $ref: '#/components/parameters/StudentIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileFeedbackRequest'
+            example:
+              feedbackType: PARTIAL
+              comment: 学习能力描述与我实际情况基本一致
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEmpty'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /api/v1/recommendations/run:
     post:
       summary: 生成推荐
@@ -99,7 +242,41 @@ paths:
                 $ref: '#/components/schemas/ApiResponseEmpty'
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   parameters:
+    RequestIdHeader:
+      name: X-Request-Id
+      in: header
+      required: true
+      description: 请求追踪ID，Apifox 可填写 {{$uuid}}
+      schema:
+        type: string
+        format: uuid
+
+    IdempotencyKeyHeader:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: 写请求幂等键，Apifox 可填写 {{$uuid}}
+      schema:
+        type: string
+        format: uuid
+
+    SnapshotIdPath:
+      name: snapshotId
+      in: path
+      required: true
+      description: 画像快照ID
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+
     StudentIdParam:
       name: studentId
       in: query
@@ -110,7 +287,41 @@ components:
         type: integer
         example: 1001
 
+  responses:
+    BadRequest:
+      description: 参数或业务状态不合法
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseError'
+    Unauthorized:
+      description: 未登录或 Token 无效
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseError'
+    NotFound:
+      description: 画像快照或学生档案不存在
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseError'
+
   schemas:
+    ApiResponseError:
+      type: object
+      required: [code, message, data]
+      properties:
+        code:
+          type: integer
+          example: 40401
+        message:
+          type: string
+          example: 画像快照不存在
+        data:
+          type: object
+          example: {}
+
     ApiResponseEmpty:
       type: object
       properties:
@@ -123,6 +334,176 @@ components:
         data:
           type: object
           example: {}
+
+    ApiResponseProfile:
+      type: object
+      required: [code, message, data]
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: success
+        data:
+          oneOf:
+            - $ref: '#/components/schemas/ProfileSnapshot'
+            - type: object
+              maxProperties: 0
+
+    ApiResponseProfileVersions:
+      type: object
+      required: [code, message, data]
+      properties:
+        code:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: success
+        data:
+          type: object
+          required: [items, page, size, total]
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProfileVersionSummary'
+            page:
+              type: integer
+              example: 1
+            size:
+              type: integer
+              example: 20
+            total:
+              type: integer
+              example: 2
+
+    ProfileSnapshot:
+      type: object
+      required:
+        [snapshotId, studentId, versionNo, sourceVersion, dimensions, summary,
+         strengths, explorationQuestions, completeness, generatedAt]
+      properties:
+        snapshotId:
+          type: integer
+          format: int64
+          example: 2
+        studentId:
+          type: integer
+          format: int64
+          example: 1001
+        versionNo:
+          type: integer
+          example: 2
+        sourceVersion:
+          type: string
+          example: PROFILE_RULE_V1
+        dimensions:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ProfileDimensionResult'
+        summary:
+          type: string
+          example: 当前画像完整度为 90%。相对突出的维度为学业基础、兴趣。建议补充实践经历相关信息。
+        strengths:
+          type: array
+          items:
+            type: string
+        explorationQuestions:
+          type: array
+          items:
+            type: string
+        completeness:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 90
+        generatedAt:
+          type: string
+          format: date-time
+        personality:
+          type: string
+          nullable: true
+          example: IRC
+        experiences:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              title:
+                type: string
+              startDate:
+                type: string
+                format: date
+                nullable: true
+              description:
+                type: string
+                nullable: true
+
+    ProfileVersionSummary:
+      type: object
+      required: [snapshotId, versionNo, sourceVersion, summary, completeness, generatedAt]
+      properties:
+        snapshotId:
+          type: integer
+          format: int64
+        versionNo:
+          type: integer
+        sourceVersion:
+          type: string
+        summary:
+          type: string
+        completeness:
+          type: number
+        generatedAt:
+          type: string
+          format: date-time
+
+    ProfileDimensionResult:
+      type: object
+      required: [code, name, evidenceCount, sources, available]
+      properties:
+        code:
+          type: string
+          enum:
+            [INTEREST, WORK_VALUES, ACADEMIC_FOUNDATION, ABILITY,
+             DEVELOPMENT_TENDENCY, PRACTICAL_EXPERIENCE]
+        name:
+          type: string
+        rawScore:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 100
+        normalizedScore:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 100
+        evidenceCount:
+          type: integer
+          minimum: 0
+        sources:
+          type: array
+          items:
+            type: string
+        available:
+          type: boolean
+
+    ProfileFeedbackRequest:
+      type: object
+      required: [feedbackType]
+      properties:
+        feedbackType:
+          type: string
+          enum: [MATCH, PARTIAL, MISMATCH]
+          description: 符合、部分符合、不符合
+        comment:
+          type: string
+          maxLength: 500
 
     RecommendationItem:
       type: object

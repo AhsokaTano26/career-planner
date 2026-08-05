@@ -28,10 +28,53 @@ CREATE TABLE IF NOT EXISTS profile_snapshot (
     source_version VARCHAR(64) DEFAULT NULL COMMENT '画像来源版本',
     dimension_json JSON        DEFAULT NULL COMMENT '六维画像数据（JSON）',
     summary        VARCHAR(500) DEFAULT NULL COMMENT '画像摘要',
+    version_no     INT         NOT NULL DEFAULT 1 COMMENT '学生画像版本号，从1递增',
+    completeness   DECIMAL(5,2) DEFAULT NULL COMMENT '必填资料和必答题完成度（0-100）',
     created_at     DATETIME    DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
-    KEY idx_snapshot_student (student_id)
+    KEY idx_snapshot_student (student_id),
+    KEY idx_snapshot_student_version (student_id, version_no)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '画像快照';
+
+-- 兼容已存在的 Demo 数据库：幂等补齐画像版本号和完整度字段。
+SET @col_exists = (
+    SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'profile_snapshot'
+      AND COLUMN_NAME = 'version_no'
+);
+SET @ddl = IF(@col_exists = 0,
+    'ALTER TABLE profile_snapshot ADD COLUMN version_no INT NOT NULL DEFAULT 1 COMMENT ''学生画像版本号，从1递增'' AFTER summary',
+    'SELECT 1');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @col_exists = (
+    SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'profile_snapshot'
+      AND COLUMN_NAME = 'completeness'
+);
+SET @ddl = IF(@col_exists = 0,
+    'ALTER TABLE profile_snapshot ADD COLUMN completeness DECIMAL(5,2) DEFAULT NULL COMMENT ''必填资料和必答题完成度（0-100）'' AFTER version_no',
+    'SELECT 1');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+-- 画像反馈只记录学生感受，不自动修改画像分数。
+CREATE TABLE IF NOT EXISTS profile_snapshot_feedback (
+    id            BIGINT       NOT NULL AUTO_INCREMENT,
+    snapshot_id   BIGINT       NOT NULL COMMENT '画像快照ID',
+    student_id    BIGINT       NOT NULL COMMENT '提交反馈的学生ID',
+    feedback_type VARCHAR(16)  NOT NULL COMMENT 'MATCH/PARTIAL/MISMATCH',
+    comment       VARCHAR(500) DEFAULT NULL,
+    created_at    DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_profile_feedback_snapshot (snapshot_id),
+    KEY idx_profile_feedback_student (student_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '学生画像反馈';
 
 -- 学生经历（student_experience）—— 六维中的“经历”明细
 CREATE TABLE IF NOT EXISTS student_experience (

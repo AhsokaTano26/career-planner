@@ -3,6 +3,7 @@ package com.career.core.modules.recommendation;
 import com.career.core.common.BadRequestException;
 import com.career.core.common.Constants;
 import com.career.core.integration.ai.AiExplainClient;
+import com.career.core.modules.profile.ProfileDimension;
 import com.career.core.modules.student.ProfileSnapshot;
 import com.career.core.modules.student.StudentProfileDao;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -167,9 +168,20 @@ public class RecommendationService {
             Map<String, Object> raw = objectMapper.readValue(json, new TypeReference<LinkedHashMap<String, Object>>() {
             });
             Map<String, Double> dims = new LinkedHashMap<>();
-            for (Map.Entry<String, Object> e : raw.entrySet()) {
-                if (e.getValue() instanceof Number n) {
-                    dims.put(e.getKey(), n.doubleValue());
+            for (ProfileDimension dimension : ProfileDimension.values()) {
+                Object value = raw.get(dimension.canonicalCode());
+                if (value == null) {
+                    value = raw.get(dimension.legacyCode());
+                }
+                if (value instanceof Number number) {
+                    dims.put(dimension.legacyCode(), number.doubleValue());
+                    continue;
+                }
+                if (value instanceof Map<?, ?> detail) {
+                    Object score = detail.get("normalizedScore");
+                    if (score instanceof Number number) {
+                        dims.put(dimension.legacyCode(), number.doubleValue());
+                    }
                 }
             }
             return dims;

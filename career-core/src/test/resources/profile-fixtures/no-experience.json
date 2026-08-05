@@ -1,0 +1,33 @@
+{
+  "name": "no-experience",
+  "completedRequiredItems": 9,
+  "totalRequiredItems": 10,
+  "evidence": {
+    "INTEREST": [
+      {"source": "HOLLAND", "score": 80, "weight": 1}
+    ],
+    "WORK_VALUES": [
+      {"source": "WORK_VALUES_SCALE", "score": 73, "weight": 1}
+    ],
+    "ACADEMIC_FOUNDATION": [
+      {"source": "ACADEMIC_FORM", "score": 84, "weight": 1}
+    ],
+    "ABILITY": [
+      {"source": "ABILITY_ASSESSMENT", "score": 78, "weight": 1}
+    ],
+    "DEVELOPMENT_TENDENCY": [
+      {"source": "TENDENCY_SCALE", "score": 69, "weight": 1}
+    ]
+  },
+  "expectedScores": {
+    "INTEREST": 80,
+    "WORK_VALUES": 73,
+    "ACADEMIC_FOUNDATION": 84,
+    "ABILITY": 78,
+    "DEVELOPMENT_TENDENCY": 69
+  },
+  "expectedCompleteness": 90,
+  "missingDimensions": [
+    "PRACTICAL_EXPERIENCE"
+  ]
+}

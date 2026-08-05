@@ -1,0 +1,37 @@
+{
+  "name": "complete",
+  "completedRequiredItems": 12,
+  "totalRequiredItems": 12,
+  "evidence": {
+    "INTEREST": [
+      {"source": "HOLLAND", "score": 80, "weight": 1},
+      {"source": "INTEREST_FORM", "score": 90, "weight": 1}
+    ],
+    "WORK_VALUES": [
+      {"source": "WORK_VALUES_SCALE", "score": 70, "weight": 1}
+    ],
+    "ACADEMIC_FOUNDATION": [
+      {"source": "ACADEMIC_FORM", "score": 82, "weight": 1}
+    ],
+    "ABILITY": [
+      {"source": "ABILITY_SELF_REPORT", "score": 76, "weight": 1},
+      {"source": "ABILITY_ASSESSMENT", "score": 84, "weight": 3}
+    ],
+    "DEVELOPMENT_TENDENCY": [
+      {"source": "TENDENCY_SCALE", "score": 78, "weight": 1}
+    ],
+    "PRACTICAL_EXPERIENCE": [
+      {"source": "EXPERIENCE_FORM", "score": 65, "weight": 1}
+    ]
+  },
+  "expectedScores": {
+    "INTEREST": 85,
+    "WORK_VALUES": 70,
+    "ACADEMIC_FOUNDATION": 82,
+    "ABILITY": 82,
+    "DEVELOPMENT_TENDENCY": 78,
+    "PRACTICAL_EXPERIENCE": 65
+  },
+  "expectedCompleteness": 100,
+  "missingDimensions": []
+}
