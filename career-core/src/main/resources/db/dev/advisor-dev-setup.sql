@@ -361,3 +361,12 @@ INSERT IGNORE INTO stage_review (id, student_id, cycle, status, content_json, ai
 INSERT IGNORE INTO advisor_comment (id, student_id, advisor_id, content, advice_type, suggested_task, retest_reason) VALUES
 ('GC-001', 'S1001', 'A1001', '建议 10 月聚焦数据结构主线,减少并行任务。', 'COMMENT', NULL, NULL),
 ('GC-002', 'S1002', 'A1001', '建议补充一次霍兰德复测,确认兴趣是否变化。', 'SUGGEST_RETEST', NULL, '方向兴趣变化较大');
+
+-- 对齐字符串 ID 序列(手工种子已占用前缀编号,写入接口从 100 起,避免主键冲突)
+UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'advisor_student_relation';
+UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'advisor_comment';
+UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'idempotency_record';
+-- 账号/档案/经历序列推进到 2000/2000/100,避免 DataInitializer 或新注册撞手工种子 ID
+UPDATE id_sequence SET next_val = 2000 WHERE seq_name = 'sys_user';
+UPDATE id_sequence SET next_val = 2000 WHERE seq_name = 'student_profile';
+UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'student_experience';

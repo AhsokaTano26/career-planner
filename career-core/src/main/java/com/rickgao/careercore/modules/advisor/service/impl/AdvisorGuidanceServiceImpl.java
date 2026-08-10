@@ -58,7 +58,7 @@ public class AdvisorGuidanceServiceImpl implements AdvisorGuidanceService {
         advisorScopeService.assertAssigned(advisorId, studentId);
         validate(request);
         ApiResponse<GuidanceCommentVO> response = idempotencyService.execute(
-                advisorId, endpoint, idempotencyKey,
+                advisorId, endpoint, idempotencyKey, GuidanceCommentVO.class,
                 () -> {
                     AdvisorComment comment = new AdvisorComment();
                     comment.setId(idGenerator.advisorCommentId());
