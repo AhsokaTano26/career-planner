@@ -313,19 +313,22 @@ public class AdvisorStudentServiceImpl implements AdvisorStudentService {
             }
         }
         Comparator<AdvisorStudentVO> comparator = switch (field) {
-            case "name" -> Comparator.comparing(AdvisorStudentVO::getName, Comparator.nullsLast(String::compareTo));
-            case "className" -> Comparator.comparing(AdvisorStudentVO::getClassName, Comparator.nullsLast(String::compareTo));
-            case "completeness" -> Comparator.comparing(AdvisorStudentVO::getCompleteness, Comparator.nullsLast(Integer::compareTo));
-            case "planRate" -> Comparator.comparing(AdvisorStudentVO::getPlanRate, Comparator.nullsLast(Integer::compareTo));
-            case "lastReview" -> Comparator.comparing(AdvisorStudentVO::getLastReview, Comparator.nullsLast(LocalDate::compareTo));
-            default -> Comparator.comparing(
-                    (AdvisorStudentVO v) -> aggregates.get(v.getId()) == null ? null : aggregates.get(v.getId()).createdAt,
-                    Comparator.nullsLast(LocalDateTime::compareTo));
+            case "name" -> nullsLastComparator(AdvisorStudentVO::getName, desc);
+            case "className" -> nullsLastComparator(AdvisorStudentVO::getClassName, desc);
+            case "completeness" -> nullsLastComparator(AdvisorStudentVO::getCompleteness, desc);
+            case "planRate" -> nullsLastComparator(AdvisorStudentVO::getPlanRate, desc);
+            case "lastReview" -> nullsLastComparator(AdvisorStudentVO::getLastReview, desc);
+            default -> nullsLastComparator(
+                    v -> aggregates.get(v.getId()) == null ? null : aggregates.get(v.getId()).createdAt, desc);
         };
-        if (desc) {
-            comparator = comparator.reversed();
-        }
         list.sort(comparator);
+    }
+
+    /** 可空字段排序:null 恒排最后;desc 仅反转非空值比较,不反转 null 位置 */
+    private <T extends Comparable<? super T>> Comparator<AdvisorStudentVO> nullsLastComparator(
+            Function<AdvisorStudentVO, T> keyFn, boolean desc) {
+        Comparator<T> valueComparator = desc ? Comparator.reverseOrder() : Comparator.naturalOrder();
+        return Comparator.comparing(keyFn, Comparator.nullsLast(valueComparator));
     }
 
     // ---------- 详情组装 ----------
