@@ -94,7 +94,7 @@
                g.updated_at,
                g.version_no
         FROM student_goal g
-        LEFT JOIN career_direction cd ON cd.code = g.direction_id
+        LEFT JOIN career_direction cd ON cd.id = g.direction_id
         WHERE g.student_id IN
         <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
             #{sid}

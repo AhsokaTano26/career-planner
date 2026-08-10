@@ -35,17 +35,6 @@ CREATE TABLE IF NOT EXISTS profile_snapshot (
     KEY idx_snapshot_student (student_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='画像快照(dev 最小结构)';
 
-CREATE TABLE IF NOT EXISTS career_direction (
-    id         VARCHAR(32) NOT NULL,
-    code       VARCHAR(64) NOT NULL,
-    name       VARCHAR(100) NOT NULL,
-    path       VARCHAR(20) NOT NULL,
-    status     VARCHAR(20) NOT NULL DEFAULT 'PUBLISHED',
-    created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY uk_direction_code (code)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='方向库(dev 最小结构)';
-
 CREATE TABLE IF NOT EXISTS recommendation_run (
     id                   VARCHAR(32) NOT NULL,
     student_id           VARCHAR(32) NOT NULL,
@@ -240,11 +229,14 @@ INSERT IGNORE INTO assessment_session (id, student_id, questionnaire_version_id,
 ('AS1004', 'S1004', 'QV1', 'SCORED', 'req-s1004-1'),
 ('AS1006', 'S1006', 'QV1', 'DRAFT', 'req-s1006-1');
 
--- 方向库
-INSERT IGNORE INTO career_direction (id, code, name, path, status) VALUES
-('D001', 'employment_backend', '后端开发工程师', 'employment', 'PUBLISHED'),
-('D002', 'data_analysis',      '数据分析师',       'employment', 'PUBLISHED'),
-('D003', 'graduate_software',  '计算机技术考研',   'graduate',   'PUBLISHED');
+-- 方向库(生产表由 admin-config.sql 创建,此处仅补种子;id 即方向编码)
+INSERT IGNORE INTO career_direction (id, name, path, status, intro, target_json, min_ability, min_academic) VALUES
+('employment_backend', '后端开发工程师', 'employment', 'PUBLISHED', '面向软件系统服务端设计、开发与运维的就业方向。',
+ '{"interest":70,"values":70,"ability":70,"academic":70,"tendency":70,"practice":70}', 65, 50),
+('data_analysis',      '数据分析师',       'employment', 'PUBLISHED', '面向数据采集、清洗、分析与可视化表达的就业方向。',
+ '{"interest":70,"values":70,"ability":70,"academic":70,"tendency":70,"practice":70}', 55, 50),
+('graduate_software',  '计算机技术考研',   'graduate',   'PUBLISHED', '面向国内计算机相关专业考研升学路径。',
+ '{"interest":70,"values":70,"ability":70,"academic":70,"tendency":70,"practice":70}', 60, 70);
 
 -- 画像快照
 INSERT IGNORE INTO profile_snapshot (id, student_id, source_version, dimension_json, summary, strengths_json, explore_json, feedback_json, version_no, completeness, created_at) VALUES
@@ -371,3 +363,4 @@ UPDATE id_sequence SET next_val = 2000 WHERE seq_name = 'sys_user';
 UPDATE id_sequence SET next_val = 2000 WHERE seq_name = 'student_profile';
 UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'student_experience';
 UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'student_whitelist';
+UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'recommendation_weight';
