@@ -40,13 +40,14 @@ public class IdempotencyService {
      * 成功请求保存首次响应;相同 key 再次调用直接重放;
      * 仍在处理中返回 409;业务失败清理占位记录,允许同 key 重试。
      */
-    public <T> ApiResponse<T> execute(String userId, String endpoint, String key, IdempotentSupplier<ApiResponse<T>> action) {
+    public <T> ApiResponse<T> execute(String userId, String endpoint, String key, Class<T> dataType,
+                                      IdempotentSupplier<ApiResponse<T>> action) {
         if (!StringUtils.hasText(key)) {
             throw new BizException(ResultCode.VALIDATION_ERROR, "缺少 Idempotency-Key 请求头");
         }
         IdempotencyRecord existing = mapper.findByUserEndpointKey(userId, endpoint, key);
         if (existing != null) {
-            return handleExisting(existing);
+            return handleExisting(existing, dataType);
         }
         IdempotencyRecord record = new IdempotencyRecord();
         record.setId(idGenerator.idempotencyId());
@@ -60,7 +61,7 @@ public class IdempotencyService {
             // 并发竞争:另一请求已插入,回读后按状态处理
             IdempotencyRecord raced = mapper.findByUserEndpointKey(userId, endpoint, key);
             if (raced != null) {
-                return handleExisting(raced);
+                return handleExisting(raced, dataType);
             }
             throw new BizException(ResultCode.STATE_CONFLICT, "重复请求处理中,请稍后重试");
         }
@@ -80,10 +81,18 @@ public class IdempotencyService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> ApiResponse<T> handleExisting(IdempotencyRecord record) {
+    private <T> ApiResponse<T> handleExisting(IdempotencyRecord record, Class<T> dataType) {
         if (STATUS_SUCCESS.equals(record.getStatus()) && StringUtils.hasText(record.getResponseBody())) {
             try {
-                return objectMapper.readValue(record.getResponseBody(), ApiResponse.class);
+                ApiResponse<?> raw = objectMapper.readValue(record.getResponseBody(), ApiResponse.class);
+                Object data = raw.getData();
+                if (data != null && !dataType.isInstance(data)) {
+                    data = objectMapper.convertValue(data, dataType);
+                }
+                @SuppressWarnings("unchecked")
+                ApiResponse<T> response = new ApiResponse<>(
+                        raw.getCode(), raw.getMessage(), (T) data, raw.getTraceId(), raw.getTimestamp());
+                return response;
             } catch (IOException e) {
                 log.error("幂等响应反序列化失败, id={}", record.getId(), e);
                 throw new BizException(ResultCode.INTERNAL_ERROR, "幂等记录异常,请更换 Idempotency-Key 重试");

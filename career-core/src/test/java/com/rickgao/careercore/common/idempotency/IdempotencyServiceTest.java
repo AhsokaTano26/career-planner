@@ -36,14 +36,14 @@ class IdempotencyServiceTest {
     @Test
     void execute_missingKey_throwsValidationError() {
         BizException ex = assertThrows(BizException.class,
-                () -> service.execute("A1", "/guidance", null, ApiResponse::ok));
+                () -> service.execute("A1", "/guidance", null, String.class, ApiResponse::ok));
         assertEquals(ResultCode.VALIDATION_ERROR, ex.getResultCode());
     }
 
     @Test
     void execute_newRequest_runsActionAndMarksSuccess() {
         when(mapper.findByUserEndpointKey(anyString(), anyString(), anyString())).thenReturn(null);
-        ApiResponse<String> result = service.execute("A1", "/guidance", "key-1",
+        ApiResponse<String> result = service.execute("A1", "/guidance", "key-1", String.class,
                 () -> ApiResponse.ok("ok"));
         assertEquals("ok", result.getData());
         verify(mapper).insert(any(IdempotencyRecord.class));
@@ -59,7 +59,7 @@ class IdempotencyServiceTest {
         when(mapper.findByUserEndpointKey(anyString(), anyString(), anyString())).thenReturn(record);
 
         AtomicInteger calls = new AtomicInteger();
-        ApiResponse<String> result = service.execute("A1", "/guidance", "key-1",
+        ApiResponse<String> result = service.execute("A1", "/guidance", "key-1", String.class,
                 () -> {
                     calls.incrementAndGet();
                     return ApiResponse.ok("never");
@@ -77,7 +77,7 @@ class IdempotencyServiceTest {
         when(mapper.findByUserEndpointKey(anyString(), anyString(), anyString())).thenReturn(record);
 
         BizException ex = assertThrows(BizException.class,
-                () -> service.execute("A1", "/guidance", "key-1", ApiResponse::ok));
+                () -> service.execute("A1", "/guidance", "key-1", String.class, ApiResponse::ok));
         assertEquals(ResultCode.STATE_CONFLICT, ex.getResultCode());
     }
 
@@ -86,7 +86,7 @@ class IdempotencyServiceTest {
         when(mapper.findByUserEndpointKey(anyString(), anyString(), anyString())).thenReturn(null);
         IllegalStateException boom = new IllegalStateException("boom");
         assertThrows(IllegalStateException.class,
-                () -> service.execute("A1", "/guidance", "key-1",
+                () -> service.execute("A1", "/guidance", "key-1", String.class,
                         () -> {
                             throw boom;
                         }));
@@ -102,7 +102,7 @@ class IdempotencyServiceTest {
         doThrow(new DuplicateKeyException("dup"))
                 .when(mapper).insert(any(IdempotencyRecord.class));
 
-        ApiResponse<String> result = service.execute("A1", "/guidance", "key-1",
+        ApiResponse<String> result = service.execute("A1", "/guidance", "key-1", String.class,
                 () -> ApiResponse.ok("never"));
         assertEquals("duplicated", result.getData());
     }

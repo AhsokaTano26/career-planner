@@ -42,9 +42,9 @@ class AdvisorGuidanceServiceImplTest {
     void setUp() {
         when(idGenerator.advisorCommentId()).thenReturn("GC-100");
         // 幂等服务桩:直接执行回调,幂等内部逻辑由 IdempotencyServiceTest 覆盖
-        when(idempotencyService.execute(anyString(), anyString(), anyString(), any()))
+        when(idempotencyService.execute(anyString(), anyString(), anyString(), any(), any()))
                 .thenAnswer(inv -> {
-                    IdempotentSupplier<ApiResponse<GuidanceCommentVO>> supplier = inv.getArgument(3);
+                    IdempotentSupplier<ApiResponse<GuidanceCommentVO>> supplier = inv.getArgument(4);
                     return supplier.get();
                 });
     }
