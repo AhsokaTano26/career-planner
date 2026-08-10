@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.advisor.mapper.AdvisorStudentQueryMapper">
+
+    <select id="selectFilteredStudentIds" resultType="string">
+        SELECT r.student_id
+        FROM advisor_student_relation r
+        JOIN student_profile sp ON sp.user_id = r.student_id
+        LEFT JOIN sys_user u ON u.id = r.student_id
+        WHERE r.advisor_id = #{advisorId}
+          AND r.deleted = 0
+        <if test="path != null">
+            AND sp.development_intention = #{path}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (sp.name LIKE CONCAT('%', #{keyword}, '%')
+                 OR sp.class_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR u.student_no LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="directionId != null">
+            AND EXISTS (
+                SELECT 1 FROM student_goal g1
+                WHERE g1.student_id = r.student_id
+                  AND g1.goal_type = 'PRIMARY'
+                  AND g1.status = 'ACTIVE'
+                  AND g1.direction_id = #{directionId}
+            )
+        </if>
+        <if test="hasGoal != null">
+            <choose>
+                <when test="hasGoal">
+                    AND EXISTS (
+                        SELECT 1 FROM student_goal g2
+                        WHERE g2.student_id = r.student_id
+                          AND g2.goal_type = 'PRIMARY'
+                          AND g2.status = 'ACTIVE'
+                    )
+                </when>
+                <otherwise>
+                    AND NOT EXISTS (
+                        SELECT 1 FROM student_goal g3
+                        WHERE g3.student_id = r.student_id
+                          AND g3.goal_type = 'PRIMARY'
+                          AND g3.status = 'ACTIVE'
+                    )
+                </otherwise>
+            </choose>
+        </if>
+        <if test="reviewedThisMonth != null and reviewedThisMonth">
+            AND EXISTS (
+                SELECT 1 FROM stage_review rv1
+                WHERE rv1.student_id = r.student_id
+                  AND rv1.status = 'SUBMITTED'
+                  AND rv1.submitted_at &gt;= #{monthStart}
+            )
+        </if>
+        <if test="longNoReview != null and longNoReview">
+            AND NOT EXISTS (
+                SELECT 1 FROM stage_review rv2
+                WHERE rv2.student_id = r.student_id
+                  AND rv2.status = 'SUBMITTED'
+                  AND rv2.submitted_at &gt;= #{thirtyDaysAgo}
+            )
+        </if>
+        <if test="guidanceRequested != null and guidanceRequested">
+            AND EXISTS (
+                SELECT 1 FROM stage_review rv3
+                WHERE rv3.student_id = r.student_id
+                  AND rv3.status = 'SUBMITTED'
+                  AND rv3.advisor_requested = 1
+                  AND (rv3.advisor_reply IS NULL OR rv3.advisor_reply = '')
+            )
+        </if>
+        ORDER BY r.created_at DESC
+    </select>
+
+    <select id="selectAssessedStudentIds" resultType="string">
+        SELECT DISTINCT student_id
+        FROM assessment_session
+        WHERE status = 'SCORED'
+          AND student_id IN
+        <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+    </select>
+
+    <select id="selectActiveGoals" resultType="com.rickgao.careercore.modules.advisor.query.ActiveGoalRow">
+        SELECT g.student_id,
+               g.goal_type,
+               g.direction_id,
+               cd.name AS direction_name,
+               g.name  AS goal_name,
+               g.chosen_at,
+               g.updated_at,
+               g.version_no
+        FROM student_goal g
+        LEFT JOIN career_direction cd ON cd.code = g.direction_id
+        WHERE g.student_id IN
+        <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+          AND g.status = 'ACTIVE'
+        ORDER BY g.goal_type
+    </select>
+
+    <select id="selectPlanRate" resultType="com.rickgao.careercore.modules.advisor.query.PlanRateRow">
+        SELECT pt.student_id,
+               COUNT(*) AS total_tasks,
+               SUM(CASE WHEN pt.status = 'DONE' THEN 1 ELSE 0 END) AS done_tasks
+        FROM plan_task pt
+        JOIN semester_plan sp ON sp.id = pt.plan_id AND sp.status = 'CONFIRMED'
+        WHERE pt.student_id IN
+        <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+        GROUP BY pt.student_id
+    </select>
+
+    <select id="selectLastReview" resultType="com.rickgao.careercore.modules.advisor.query.LastReviewRow">
+        SELECT student_id, MAX(submitted_at) AS last_review_at
+        FROM stage_review
+        WHERE status = 'SUBMITTED'
+          AND student_id IN
+        <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+        GROUP BY student_id
+    </select>
+
+    <select id="selectPendingGuidanceStudentIds" resultType="string">
+        SELECT DISTINCT student_id
+        FROM stage_review
+        WHERE status = 'SUBMITTED'
+          AND advisor_requested = 1
+          AND (advisor_reply IS NULL OR advisor_reply = '')
+          AND student_id IN
+        <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+    </select>
+
+    <select id="selectGoalChangeCounts" resultType="com.rickgao.careercore.modules.advisor.query.GoalChangeRow">
+        SELECT g.student_id, COUNT(*) AS change_count
+        FROM goal_version gv
+        JOIN student_goal g ON g.id = gv.goal_id
+        WHERE g.student_id IN
+        <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+          AND gv.created_at &gt;= #{since}
+        GROUP BY g.student_id
+    </select>
+
+    <select id="selectProfileBasics" resultType="com.rickgao.careercore.modules.advisor.query.ProfileRow">
+        SELECT user_id AS student_id, name, class_name, completeness, development_intention, updated_at
+        FROM student_profile
+        WHERE user_id IN
+        <foreach collection="studentIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+    </select>
+
+    <select id="selectLatestSnapshot" resultType="com.rickgao.careercore.modules.advisor.query.SnapshotRow">
+        SELECT id, student_id, source_version, dimension_json, summary, strengths_json, explore_json,
+               feedback_json, version_no, completeness, created_at
+        FROM profile_snapshot
+        WHERE student_id = #{studentId}
+        ORDER BY version_no DESC, created_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectLatestRun" resultType="com.rickgao.careercore.modules.advisor.query.RunRow">
+        SELECT r.id, r.student_id, r.profile_snapshot_id, r.rule_version, r.status, r.generated_at,
+               ps.version_no AS profile_version
+        FROM recommendation_run r
+        LEFT JOIN profile_snapshot ps ON ps.id = r.profile_snapshot_id
+        WHERE r.student_id = #{studentId}
+        ORDER BY r.created_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectResultsByRunId" resultType="com.rickgao.careercore.modules.advisor.query.ResultRow">
+        SELECT run_id, direction_id, score, `rank`, confidence, reasons_json, strengths_json,
+               gaps_json, semester_actions_json, feedback_json
+        FROM recommendation_result
+        WHERE run_id = #{runId}
+        ORDER BY `rank` ASC
+    </select>
+
+    <select id="selectLatestConfirmedPlan" resultType="com.rickgao.careercore.modules.advisor.query.PlanRow">
+        SELECT id, student_id, version_no, status, source, goal_summary, semester_goals_json,
+               monthly_tasks_json, notes_json, confirmed_at, updated_at
+        FROM semester_plan
+        WHERE student_id = #{studentId}
+          AND status = 'CONFIRMED'
+        ORDER BY created_at DESC, version_no DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectTasksByPlanId" resultType="com.rickgao.careercore.modules.advisor.query.TaskRow">
+        SELECT id, plan_id, student_id, month, title, task_type, est_hours, status,
+               deadline, ability_tags_json, note, created_at
+        FROM plan_task
+        WHERE plan_id = #{planId}
+        ORDER BY month ASC, created_at ASC
+    </select>
+
+    <select id="selectCheckinsByTaskIds" resultType="com.rickgao.careercore.modules.advisor.query.CheckinRow">
+        SELECT id, task_id, done_desc, gains, difficulties, proof_url, checked_in_at
+        FROM task_checkin
+        WHERE task_id IN
+        <foreach collection="taskIds" item="tid" open="(" separator="," close=")">
+            #{tid}
+        </foreach>
+        ORDER BY checked_in_at ASC
+    </select>
+
+    <select id="selectSubmittedReviews" resultType="com.rickgao.careercore.modules.advisor.query.ReviewRow">
+        SELECT id, student_id, cycle, status, content_json, ai_summary, ai_suggest_json,
+               advisor_requested, advisor_reply, submitted_at
+        FROM stage_review
+        WHERE student_id = #{studentId}
+          AND status = 'SUBMITTED'
+        ORDER BY submitted_at DESC
+    </select>
+
+    <select id="countAssignedStudents" resultType="int">
+        SELECT COUNT(*)
+        FROM advisor_student_relation
+        WHERE advisor_id = #{advisorId}
+          AND deleted = 0
+    </select>
+
+    <select id="countAssessedStudents" resultType="int">
+        SELECT COUNT(DISTINCT r.student_id)
+        FROM advisor_student_relation r
+        JOIN assessment_session s ON s.student_id = r.student_id AND s.status = 'SCORED'
+        WHERE r.advisor_id = #{advisorId}
+          AND r.deleted = 0
+    </select>
+
+    <select id="countPlanMadeStudents" resultType="int">
+        SELECT COUNT(DISTINCT r.student_id)
+        FROM advisor_student_relation r
+        JOIN semester_plan p ON p.student_id = r.student_id AND p.status = 'CONFIRMED'
+        WHERE r.advisor_id = #{advisorId}
+          AND r.deleted = 0
+    </select>
+
+    <select id="countReviewedThisMonthStudents" resultType="int">
+        SELECT COUNT(DISTINCT r.student_id)
+        FROM advisor_student_relation r
+        JOIN stage_review rv ON rv.student_id = r.student_id
+                            AND rv.status = 'SUBMITTED'
+                            AND rv.submitted_at &gt;= #{monthStart}
+        WHERE r.advisor_id = #{advisorId}
+          AND r.deleted = 0
+    </select>
+
+    <select id="selectPathCounts" resultType="com.rickgao.careercore.modules.advisor.query.PathCountRow">
+        SELECT COALESCE(NULLIF(sp.development_intention, ''), 'undecided') AS path,
+               COUNT(*) AS count
+        FROM advisor_student_relation r
+        LEFT JOIN student_profile sp ON sp.user_id = r.student_id
+        WHERE r.advisor_id = #{advisorId}
+          AND r.deleted = 0
+        GROUP BY COALESCE(NULLIF(sp.development_intention, ''), 'undecided')
+    </select>
+
+    <select id="selectCompletionRates" resultType="com.rickgao.careercore.modules.advisor.query.PlanRateRow">
+        SELECT pt.student_id,
+               COUNT(*) AS total_tasks,
+               SUM(CASE WHEN pt.status = 'DONE' THEN 1 ELSE 0 END) AS done_tasks
+        FROM advisor_student_relation r
+        JOIN plan_task pt ON pt.student_id = r.student_id
+        JOIN semester_plan sp ON sp.id = pt.plan_id AND sp.status = 'CONFIRMED'
+        WHERE r.advisor_id = #{advisorId}
+          AND r.deleted = 0
+        GROUP BY pt.student_id
+    </select>
+
+</mapper>
