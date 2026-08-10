@@ -166,9 +166,11 @@ class AdvisorStudentServiceImplTest {
 
         List<AttentionStudentVO> result = service.listAttention("A1001");
 
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
         assertEquals("S1002", result.get(0).getStudent().getId());
         assertEquals(List.of("已申请辅导员指导", "长期未复盘", "多次调整目标"), result.get(0).getReasons());
+        assertEquals("S1004", result.get(1).getStudent().getId());
+        assertEquals(List.of("长期未复盘"), result.get(1).getReasons());
     }
 
     @Test
@@ -251,7 +253,9 @@ class AdvisorStudentServiceImplTest {
         when(queryMapper.selectLastReview(any())).thenReturn(List.of(
                 review("S1001", LocalDateTime.of(2026, 8, 2, 9, 0)),
                 review("S1002", LocalDateTime.of(2026, 6, 20, 15, 0)),
-                review("S1004", LocalDateTime.of(2026, 7, 1, 10, 0))));
+                review("S1003", LocalDateTime.of(2026, 8, 5, 10, 0)),
+                review("S1004", LocalDateTime.of(2026, 7, 1, 10, 0)),
+                review("S1006", LocalDateTime.of(2026, 8, 6, 10, 0))));
         when(queryMapper.selectPendingGuidanceStudentIds(any())).thenReturn(List.of("S1002"));
         when(queryMapper.selectGoalChangeCounts(any(), any())).thenReturn(List.of(change("S1002", 3L)));
         when(queryMapper.selectProfileBasics(any())).thenReturn(List.of(
