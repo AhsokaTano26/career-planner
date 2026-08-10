@@ -11,7 +11,7 @@ spring:
     init:
       # 应用启动时执行建表与种子脚本(幂等)
       mode: always
-      schema-locations: classpath:db/schema.sql
+      schema-locations: classpath:db/schema.sql,classpath:db/advisor.sql
       data-locations: classpath:db/data.sql
       continue-on-error: false
   jackson:

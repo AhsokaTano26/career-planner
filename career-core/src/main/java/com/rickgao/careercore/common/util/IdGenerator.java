@@ -60,4 +60,16 @@ public class IdGenerator {
     public String auditLogId() {
         return next("operation_audit_log", "AL", 4);
     }
+
+    public String advisorRelationId() {
+        return next("advisor_student_relation", "AR-", 3);
+    }
+
+    public String advisorCommentId() {
+        return next("advisor_comment", "GC-", 3);
+    }
+
+    public String idempotencyId() {
+        return next("idempotency_record", "IDEM-", 4);
+    }
 }
