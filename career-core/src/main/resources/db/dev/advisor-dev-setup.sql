@@ -370,3 +370,4 @@ UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'idempotency_record';
 UPDATE id_sequence SET next_val = 2000 WHERE seq_name = 'sys_user';
 UPDATE id_sequence SET next_val = 2000 WHERE seq_name = 'student_profile';
 UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'student_experience';
+UPDATE id_sequence SET next_val = 100 WHERE seq_name = 'student_whitelist';
