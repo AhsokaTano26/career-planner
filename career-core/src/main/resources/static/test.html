@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>career-core 接口测试页</title>
+<style>
+  :root { --primary:#2563eb; --border:#e5e7eb; --bg:#f8fafc; --ok:#16a34a; --err:#dc2626; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Microsoft YaHei", system-ui, sans-serif; background:var(--bg); color:#1f2937; }
+  header { background:#0f172a; color:#fff; padding:12px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  header h1 { font-size:18px; margin:0; }
+  .base-url { font-size:12px; opacity:.75; }
+  #userBadge { margin-left:auto; font-size:13px; background:#1e3a5f; padding:4px 10px; border-radius:999px; }
+  main { display:grid; grid-template-columns: 1fr 1fr; gap:16px; padding:16px; max-width:1400px; margin:0 auto; }
+  @media (max-width:900px){ main { grid-template-columns:1fr; } }
+  section { background:#fff; border:1px solid var(--border); border-radius:10px; padding:16px; }
+  section h2 { margin:0 0 12px; font-size:16px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+  .row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+  label { font-size:12px; color:#6b7280; min-width:52px; }
+  input, select, textarea { padding:6px 8px; border:1px solid var(--border); border-radius:6px; font-size:13px; flex:1; min-width:90px; }
+  textarea { font-family:Consolas,monospace; font-size:12px; }
+  button { background:var(--primary); color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:13px; cursor:pointer; }
+  button:hover { opacity:.9; }
+  button.sec { background:#475569; }
+  button.danger { background:var(--err); }
+  .group { border-top:1px dashed var(--border); margin-top:12px; padding-top:12px; }
+  .group h3 { font-size:13px; margin:0 0 8px; color:#374151; }
+  #result { grid-column:1 / -1; }
+  #result pre { background:#0f172a; color:#7dd3fc; padding:12px; border-radius:8px; overflow:auto; max-height:340px; font-size:12px; white-space:pre-wrap; word-break:break-all; }
+  .badge { font-size:11px; padding:2px 8px; border-radius:4px; }
+  .badge.ok { background:#dcfce7; color:var(--ok); }
+  .badge.err { background:#fee2e2; color:var(--err); }
+  .hint { font-size:11px; color:#9ca3af; margin-left:4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>career-core 接口测试页</h1>
+  <span class="base-url">Base: http://localhost:8080/api/v1</span>
+  <span id="userBadge">未登录</span>
+</header>
+<main>
+  <!-- ============ 认证与账号 ============ -->
+  <section>
+    <h2>认证与账号 (9)</h2>
+
+    <div class="group">
+      <h3>注册 / 登录</h3>
+      <div class="row">
+        <label>学号</label><input id="r_studentNo" value="2026011309" placeholder="2026011309">
+        <label>姓名</label><input id="r_name" value="张同学">
+      </div>
+      <div class="row">
+        <label>班级</label><input id="r_className" value="计科2601">
+        <label>校验码</label><input id="r_verifyCode" value="202609">
+      </div>
+      <div class="row">
+        <button onclick="register()">POST /auth/register</button>
+      </div>
+      <div class="row">
+        <label>账号</label><input id="l_account" value="2026011309">
+        <label>密码</label><input id="l_password" value="202609">
+      </div>
+      <div class="row">
+        <button onclick="login()">POST /auth/login</button>
+        <button class="sec" onclick="me()">GET /auth/me</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>令牌</h3>
+      <div class="row">
+        <button onclick="refresh()">POST /auth/refresh</button>
+        <button class="danger" onclick="logout()">POST /auth/logout</button>
+        <span class="hint" id="tokenInfo"></span>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>隐私授权</h3>
+      <div class="row">
+        <label>版本</label><input id="c_version" value="v1.0" style="max-width:120px">
+        <button onclick="consent()">POST /auth/privacy-consent</button>
+        <button class="sec" onclick="consentStatus()">GET /auth/privacy-consent/status</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>密码</h3>
+      <div class="row">
+        <label>原密码</label><input id="p_old" value="202609">
+        <label>新密码</label><input id="p_new" value="NewPass2026!">
+      </div>
+      <div class="row"><button onclick="changePassword()">PATCH /auth/me/password</button></div>
+      <div class="row">
+        <label>学号</label><input id="pr_studentNo" value="2026011309" style="max-width:140px">
+        <label>新密码</label><input id="pr_new" value="Temp@2026">
+      </div>
+      <div class="row">
+        <label>原因</label><input id="pr_reason" value="忘记密码">
+        <button onclick="resetPassword()">POST /auth/password/reset (管理员)</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 学生档案 ============ -->
+  <section>
+    <h2>学生档案 (8)</h2>
+
+    <div class="group">
+      <h3>档案</h3>
+      <div class="row">
+        <button onclick="getProfile()">GET /students/me</button>
+        <button class="sec" onclick="completeness()">GET /students/me/completeness</button>
+      </div>
+      <div class="row">
+        <textarea id="profileUpdate" rows="6" placeholder='JSON 分步保存字段,未提交字段不覆盖'>{
+  "basic": {"gender": "女", "birthday": "2008-06-20", "phone": "13812340001"},
+  "academic": {"math": 3, "english": 4, "programming": 3, "note": "英语较好,编程在学"},
+  "interestPrefs": ["编程", "数据分析"],
+  "abilitySelf": {"programming": 3, "math": 3, "english": 4, "communication": 3, "organization": 3},
+  "values": ["成长", "地域"],
+  "developmentIntention": "graduate",
+  "constraints": ["希望留在重庆"]
+}</textarea>
+      </div>
+      <div class="row"><button onclick="updateProfile()">PATCH /students/me (分步保存)</button></div>
+    </div>
+
+    <div class="group">
+      <h3>经历</h3>
+      <div class="row">
+        <button onclick="listExperiences()">GET /students/me/experiences</button>
+        <label>page</label><input id="e_page" value="1" style="max-width:60px">
+        <label>size</label><input id="e_size" value="10" style="max-width:60px">
+      </div>
+      <div class="row">
+        <label>类别</label><select id="e_type">
+          <option>竞赛</option><option>项目</option><option>学生工作</option><option>志愿服务</option>
+        </select>
+        <label>名称</label><input id="e_title" value="数学建模校赛">
+      </div>
+      <div class="row">
+        <label>开始</label><input id="e_start" value="2026-05">
+        <label>结束</label><input id="e_end" value="2026-06">
+      </div>
+      <div class="row">
+        <label>描述</label><input id="e_desc" value="三人组队,负责建模与论文撰写">
+      </div>
+      <div class="row">
+        <button onclick="createExperience()">POST 新增经历</button>
+        <label>ID</label><input id="e_id" placeholder="EXP-xxx" style="max-width:110px">
+        <button onclick="updateExperience()">PATCH 修改</button>
+        <button class="danger" onclick="deleteExperience()">DELETE 删除</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>删除本人信息</h3>
+      <div class="row">
+        <label>原因</label><input id="d_reason" value="不再使用该系统">
+        <button class="danger" onclick="deletionRequest()">POST /students/me/deletion-request</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 结果 ============ -->
+  <section id="result">
+    <h2>响应日志</h2>
+    <pre id="output">点击上方按钮调用接口…</pre>
+  </section>
+</main>
+
+<script>
+const BASE = '/api/v1';
+let AT = localStorage.getItem('cc_at') || '';
+let RT = localStorage.getItem('cc_rt') || '';
+let CURRENT_USER = null;
+
+function getToken() { return AT; }
+function setTokens(at, rt) { AT = at; RT = rt; localStorage.setItem('cc_at', at||''); localStorage.setItem('cc_rt', rt||''); }
+
+async function api(method, path, body, withAuth=true) {
+  const headers = {'Content-Type': 'application/json'};
+  if (withAuth && AT) headers['Authorization'] = 'Bearer ' + AT;
+  const resp = await fetch(BASE + path, {
+    method, headers,
+    body: body !== undefined ? JSON.stringify(body) : undefined
+  });
+  let json;
+  try { json = await resp.json(); } catch (e) { json = { code:'PARSE_ERROR', message: await resp.text() }; }
+  return { status: resp.status, json };
+}
+
+function log(title, status, json) {
+  const out = document.getElementById('output');
+  const cls = status >= 200 && status < 300 ? 'ok' : 'err';
+  out.innerHTML = `<span class="badge ${cls}">${title} — HTTP ${status} code=${json.code}</span>\n` +
+                  `<span class="badge ${cls}">message=${json.message}</span>\n\n` +
+                  JSON.stringify(json, null, 2) + '\n\n' + out.innerHTML;
+  return json;
+}
+
+function onToken(json) {
+  const d = json.data;
+  if (d && d.accessToken) {
+    setTokens(d.accessToken, d.refreshToken);
+    CURRENT_USER = d.user;
+    document.getElementById('userBadge').textContent =
+      `已登录: ${d.user.name} (${d.user.role}) ${d.user.id}`;
+    document.getElementById('tokenInfo').textContent = '令牌已保存';
+  }
+}
+
+async function register() {
+  const body = {
+    studentNo: v('r_studentNo'), name: v('r_name'), className: v('r_className'), verifyCode: v('r_verifyCode')
+  };
+  const r = await api('POST', '/auth/register', body, false);
+  const json = log('注册', r.status, r.json); if (r.status<300) onToken(json);
+}
+async function login() {
+  const body = { account: v('l_account'), password: v('l_password') };
+  const r = await api('POST', '/auth/login', body, false);
+  const json = log('登录', r.status, r.json); if (r.status<300) onToken(json);
+}
+async function refresh() {
+  const r = await api('POST', '/auth/refresh', { refreshToken: RT }, false);
+  const json = log('刷新令牌', r.status, r.json); if (r.status<300) onToken(json);
+}
+async function logout() {
+  const r = await api('POST', '/auth/logout');
+  const json = log('退出登录', r.status, r.json);
+  if (r.status<300) { setTokens('',''); CURRENT_USER=null; document.getElementById('userBadge').textContent='未登录'; }
+}
+async function me() { const r = await api('GET', '/auth/me'); log('当前用户', r.status, r.json); }
+async function consent() { const r = await api('POST', '/auth/privacy-consent', { version: v('c_version') }); log('同意授权', r.status, r.json); }
+async function consentStatus() { const r = await api('GET', '/auth/privacy-consent/status'); log('授权状态', r.status, r.json); }
+async function changePassword() {
+  const r = await api('PATCH', '/auth/me/password', { oldPassword: v('p_old'), newPassword: v('p_new') });
+  log('修改密码', r.status, r.json);
+}
+async function resetPassword() {
+  const r = await api('POST', '/auth/password/reset', { studentNo: v('pr_studentNo'), newPassword: v('pr_new'), reason: v('pr_reason') });
+  log('管理员重置密码', r.status, r.json);
+}
+async function getProfile() { const r = await api('GET', '/students/me'); log('获取档案', r.status, r.json); }
+async function completeness() { const r = await api('GET', '/students/me/completeness'); log('完整度明细', r.status, r.json); }
+async function updateProfile() {
+  let body; try { body = JSON.parse(v('profileUpdate')); } catch(e) { log('分步保存', 400, {code:'CLIENT', message:'JSON 解析失败: '+e.message}); return; }
+  const r = await api('PATCH', '/students/me', body); log('分步保存', r.status, r.json);
+}
+async function listExperiences() {
+  const r = await api('GET', `/students/me/experiences?page=${v('e_page')||1}&size=${v('e_size')||10}`);
+  log('经历列表', r.status, r.json);
+}
+async function createExperience() {
+  const body = { type: v('e_type'), title: v('e_title'), startDate: v('e_start'), endDate: v('e_end')||null, description: v('e_desc') };
+  const r = await api('POST', '/students/me/experiences', body);
+  log('新增经历', r.status, r.json);
+}
+async function updateExperience() {
+  const id = v('e_id'); if(!id){ log('修改经历',400,{code:'CLIENT',message:'请填写经历 ID'}); return; }
+  const body = { type: v('e_type'), title: v('e_title'), startDate: v('e_start'), endDate: v('e_end')||null, description: v('e_desc') };
+  const r = await api('PATCH', `/students/me/experiences/${id}`, body);
+  log('修改经历', r.status, r.json);
+}
+async function deleteExperience() {
+  const id = v('e_id'); if(!id){ log('删除经历',400,{code:'CLIENT',message:'请填写经历 ID'}); return; }
+  const r = await api('DELETE', `/students/me/experiences/${id}`);
+  log('删除经历', r.status, r.json);
+}
+async function deletionRequest() {
+  const r = await api('POST', '/students/me/deletion-request', { reason: v('d_reason') });
+  log('申请删除本人信息', r.status, r.json);
+}
+function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+</script>
+</body>
+</html>

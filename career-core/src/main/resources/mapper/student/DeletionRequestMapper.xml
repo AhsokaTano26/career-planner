@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.student.mapper.DeletionRequestMapper">
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.student.entity.DeletionRequest">
+        INSERT INTO deletion_request (id, user_id, reason, status, created_at)
+        VALUES (#{id}, #{userId}, #{reason}, #{status}, NOW())
+    </insert>
+
+</mapper>

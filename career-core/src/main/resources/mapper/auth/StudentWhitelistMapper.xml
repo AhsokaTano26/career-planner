@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.auth.mapper.StudentWhitelistMapper">
+
+    <resultMap id="WhitelistMap" type="com.rickgao.careercore.modules.auth.entity.StudentWhitelist">
+        <id property="id" column="id"/>
+        <result property="studentNo" column="student_no"/>
+        <result property="name" column="name"/>
+        <result property="className" column="class_name"/>
+        <result property="verifyCode" column="verify_code"/>
+        <result property="used" column="used"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findByStudentNo" resultMap="WhitelistMap">
+        SELECT id, student_no, name, class_name, verify_code, used, created_at, updated_at
+        FROM student_whitelist
+        WHERE student_no = #{studentNo}
+    </select>
+
+    <update id="markUsed">
+        UPDATE student_whitelist
+        SET used = 1, updated_at = NOW()
+        WHERE student_no = #{studentNo}
+    </update>
+
+</mapper>
