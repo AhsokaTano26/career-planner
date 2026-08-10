@@ -80,4 +80,8 @@ public class IdGenerator {
     public String whitelistId() {
         return next("student_whitelist", "WL-", 3);
     }
+
+    public String weightId() {
+        return next("recommendation_weight", "WGT-", 3);
+    }
 }
