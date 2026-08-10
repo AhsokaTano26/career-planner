@@ -72,4 +72,12 @@ public class IdGenerator {
     public String idempotencyId() {
         return next("idempotency_record", "IDEM-", 4);
     }
+
+    public String adminRelationId() {
+        return next("advisor_student_relation", "REL-", 3);
+    }
+
+    public String whitelistId() {
+        return next("student_whitelist", "WL-", 3);
+    }
 }

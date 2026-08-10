@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminRelationMapper">
+
+    <select id="selectRelationPage" resultType="com.rickgao.careercore.modules.admin.vo.AdvisorRelationVO">
+        SELECT r.id, r.advisor_id, a.name AS advisor_name, r.student_id, s.name AS student_name, r.created_at
+        FROM advisor_student_relation r
+        JOIN sys_user a ON a.id = r.advisor_id
+        JOIN sys_user s ON s.id = r.student_id
+        WHERE r.deleted = 0
+        <if test="advisorId != null">
+            AND r.advisor_id = #{advisorId}
+        </if>
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countRelations" resultType="long">
+        SELECT COUNT(*)
+        FROM advisor_student_relation
+        WHERE deleted = 0
+        <if test="advisorId != null">
+            AND advisor_id = #{advisorId}
+        </if>
+    </select>
+
+    <select id="findById" resultType="com.rickgao.careercore.modules.advisor.entity.AdvisorStudentRelation">
+        SELECT id, advisor_id, student_id, created_at, updated_at, deleted
+        FROM advisor_student_relation
+        WHERE id = #{id}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="findByAdvisorAndStudentIncludingDeleted"
+            resultType="com.rickgao.careercore.modules.advisor.entity.AdvisorStudentRelation">
+        SELECT id, advisor_id, student_id, created_at, updated_at, deleted
+        FROM advisor_student_relation
+        WHERE advisor_id = #{advisorId}
+          AND student_id = #{studentId}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.advisor.entity.AdvisorStudentRelation">
+        INSERT INTO advisor_student_relation (id, advisor_id, student_id)
+        VALUES (#{id}, #{advisorId}, #{studentId})
+    </insert>
+
+    <update id="softDeleteById">
+        UPDATE advisor_student_relation
+        SET deleted = 1, updated_at = NOW()
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <update id="restoreById">
+        UPDATE advisor_student_relation
+        SET deleted = 0, updated_at = NOW()
+        WHERE id = #{id}
+          AND deleted = 1
+    </update>
+
+</mapper>
