@@ -9,3 +9,6 @@ CI-CD.pdf
 
 # Claude Code local settings
 .claude/
+
+# Runtime uploads (curricula PDF/Word, etc.)
+data/
