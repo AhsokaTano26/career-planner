@@ -104,4 +104,8 @@ public class IdGenerator {
     public String courseAbilityTagId() {
         return next("course_ability_tag", "CAT-", 3);
     }
+
+    public String exportJobId() {
+        return next("export_job", "EX-", 3);
+    }
 }
