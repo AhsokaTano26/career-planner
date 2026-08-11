@@ -48,7 +48,7 @@ class AdminLogServiceImplTest {
         vo.setId("LOG-001");
         when(mapper.countOperationLogs(eq("导出"), any(), any(), any())).thenReturn(1L);
         when(mapper.selectOperationLogPage(eq("导出"), any(), any(), any(),
-                eq("created_at"), eq("DESC"), eq(0), eq(20)))
+                eq("l.created_at"), eq("DESC"), eq(0), eq(20)))
                 .thenReturn(List.of(vo));
         PageResult<OperationLogVO> result = service.listOperationLogs("导出", null, null, null, 1, 20, null);
         assertEquals("info", result.getList().get(0).getLevel());
