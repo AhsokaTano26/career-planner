@@ -84,4 +84,24 @@ public class IdGenerator {
     public String weightId() {
         return next("recommendation_weight", "WGT-", 3);
     }
+
+    public String curriculumJobId() {
+        return next("curriculum_import_job", "CJ-", 3);
+    }
+
+    public String curriculumItemId() {
+        return next("curriculum_import_item", "IT-", 3);
+    }
+
+    public String curriculumVersionId() {
+        return next("curriculum_version", "CV-", 3);
+    }
+
+    public String courseId() {
+        return next("course", "CRS-", 3);
+    }
+
+    public String courseAbilityTagId() {
+        return next("course_ability_tag", "CAT-", 3);
+    }
 }
