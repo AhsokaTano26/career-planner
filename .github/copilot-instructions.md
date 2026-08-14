@@ -47,7 +47,7 @@
 
 - **端口**：3306（监听 127.0.0.1）
 - **库名**：`career_core`（utf8mb4）
-- **应用账号**：`career` / `career123`（拥有 career_core 全部权限）
+- **应用账号**：默认 `career` / 密码经环境变量注入（`$env:DB_USERNAME` / `$env:DB_PASSWORD`，缺省 `career123` 供本地直启；`application.yml` 已改为 `${DB_PASSWORD:career123}`，不硬编码入库）
 - **root**：空密码（仅本机）
 - **配置**：`D:\devtools\mysql\my.ini`（basedir/datadir 见该文件，`datadir=D:\devtools\mysql\data`，`mysqlx=0`）
 - **手动启动**（非 Windows 服务）：
@@ -76,11 +76,16 @@
 - **保留字**：MySQL 8+ 中 `rank` 为保留字，SQL 需写成 `` `rank` ``。
 - **下载源**：archive.apache.org 很慢，Maven 用 dlcdn.apache.org；MySQL 版本须到 dev.mysql.com 下载页查当前版本（2026-08 为 26.7.0）。
 - **Apifox**：MCP 服务只读（无法直接写线上文档）；接口定义以 `docs/openapi/career-core-apis.yaml` 供导入。
+- **Apifox CLI 与开发环境排坑**：涉及 Apifox CLI 拉取/整理接口（中文乱码、uv 托管解释器、`.ps1`/`.cmd` 调用、PowerShell 转义等）时，先读 `docs/Apifox-CLI与开发环境排坑记录.md`。要点速记：
+  - CLI 真实路径用 `C:\Users\uio8k\AppData\Roaming\npm\apifox.cmd`（Python 跨进程调用必须用 `.cmd`，`.ps1` 无法被 subprocess 执行）。
+  - CLI 输出落盘用 `cmd /c "... > file"` 保留原始 UTF-8 字节，避免 PowerShell 按 GBK 解码致中文乱码；Python 侧 `subprocess.run(...).stdout.decode("utf-8-sig")`。
+  - Python 解释器由 uv 托管（PEP 668），**不要 `pip install`**；脚本优先纯标准库（json/subprocess），运行用 `& "C:/Users/uio8k/.local/bin/python.exe" script.py`。
+  - 生成含反引号的 Markdown 文档用 Python f-string，不要在 PowerShell 字符串插值里混用 `` `$ `` 转义。
+  - 全量接口清单：`docs/openapi/career-core-apis-live-summary.md`；可复跑脚本：`docs/scripts/organize_apifox_apis.py`（项目 ID 8662286，主分支 127 个接口）。
 - **无 winget / Docker**：安装软件一律手动下载 ZIP/安装包解压配置。
 
 ## 8. 开发约定（每次回答都要遵守）
 
-- **统一响应**：所有接口返回 `{code,message,data}`；`code=0` 成功；**错误响应 `data` 必须为 `{}`（非 null）**，不可为 null。
 - **接口与鉴权**：统一前缀 `/api/v1`；Demo 无登录态，`studentId` 为可选参数、缺省取 1001；涉及接口改动前先对照 `docs/接口设计.md` 与 `docs/openapi/career-core-apis.yaml`。
 - **分层结构**：后端在 `career-core` 的 `modules/<模块>` 下，每个模块 = Controller + Service + Dao(JdbcTemplate)，包名 `com.career.core.modules.*`；公共类在 `com.career.core.common`。
 - **数据库约定**：表/字段 snake_case、主键 bigint 自增、通用列 `created_at/updated_at`；**优先沿用现有表结构，不轻易新增表/字段**；MySQL 保留字（如 `rank`）需反引号。

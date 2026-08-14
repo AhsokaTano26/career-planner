@@ -27,13 +27,15 @@
 ## 三、数据库
 
 - 数据库名：`career_core`
-- 账号：`career` / `career123`
+- 账号：`career`（可经 `$env:DB_USERNAME` 覆盖）/ 密码经 `$env:DB_PASSWORD` 注入（缺省 `career123` 供本地直启，不硬编码入库）
 - 建表与种子数据脚本：`src/main/resources/db/schema.sql`、`data.sql`
   - 应用启动时通过 `spring.sql.init` 自动幂等执行（可重复启动）
-  - 也可手动执行：
-    ```
-    mysql -ucareer -pcareer123 --default-character-set=utf8mb4 career_core < schema.sql
-    mysql -ucareer -pcareer123 --default-character-set=utf8mb4 career_core < data.sql
+  - 也可手动执行（连接参数经环境变量注入，缺省供本地直启）：
+    ```powershell
+    $env:DB_USERNAME ??= 'career'
+    $env:DB_PASSWORD ??= 'career123'
+    mysql -u"$env:DB_USERNAME" -p"$env:DB_PASSWORD" --default-character-set=utf8mb4 career_core < schema.sql
+    mysql -u"$env:DB_USERNAME" -p"$env:DB_PASSWORD" --default-character-set=utf8mb4 career_core < data.sql
     ```
 - 种子数据：学生 1001（完整画像）、1002（无画像快照）、9 个方向（1 个 INACTIVE 用于验证规则过滤）
 
