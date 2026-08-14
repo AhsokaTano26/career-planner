@@ -4,3 +4,12 @@
 # Source requirement and design documents (kept locally)
 生涯规划系统开发设计说明书_MVP_V1.0.docx
 生涯规划系统需求规格说明书_MVP_V1.0.docx
+
+# Environment secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# VS Code workspace secrets (Apifox access token etc., never commit)
+.vscode/mcp.json
+
