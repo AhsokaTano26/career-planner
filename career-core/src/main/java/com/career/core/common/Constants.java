@@ -59,6 +59,6 @@ public final class Constants {
             HOLLAND_ENTERPRISING, "企业型(E)",
             HOLLAND_CONVENTIONAL, "常规型(C)");
 
-    /** 推荐引擎规则版本号 */
-    public static final String RULE_VERSION = "RULE_V1";
+    /** 推荐引擎规则版本号（线上示例 R1.0） */
+    public static final String RULE_VERSION = "R1.0";
 }

@@ -4,6 +4,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -32,7 +34,8 @@ public class StudentProfileDao {
             rs.getLong("student_id"),
             rs.getString("source_version"),
             rs.getString("dimension_json"),
-            rs.getString("summary"));
+            rs.getString("summary"),
+            toLocalDateTime(rs.getTimestamp("created_at")));
 
     private static final RowMapper<StudentExperience> EXPERIENCE_MAPPER = (rs, i) -> new StudentExperience(
             rs.getLong("id"),
@@ -54,10 +57,23 @@ public class StudentProfileDao {
     /** 查询学生最新画像快照（按 id 倒序取最新一条） */
     public ProfileSnapshot findLatestSnapshot(Long studentId) {
         List<ProfileSnapshot> list = jdbc.query(
-                "SELECT id, student_id, source_version, dimension_json, summary " +
+                "SELECT id, student_id, source_version, dimension_json, summary, created_at " +
                         "FROM profile_snapshot WHERE student_id = ? ORDER BY id DESC LIMIT 1",
                 SNAPSHOT_MAPPER, studentId);
         return list.isEmpty() ? null : list.get(0);
+    }
+
+    /** 查询学生历史画像快照（按 id 倒序，分页） */
+    public List<ProfileSnapshot> findSnapshots(Long studentId, int page, int size) {
+        int offset = (Math.max(page, 1) - 1) * Math.max(size, 1);
+        return jdbc.query(
+                "SELECT id, student_id, source_version, dimension_json, summary, created_at " +
+                        "FROM profile_snapshot WHERE student_id = ? ORDER BY id DESC LIMIT ? OFFSET ?",
+                SNAPSHOT_MAPPER, studentId, size, offset);
+    }
+
+    private static LocalDateTime toLocalDateTime(Timestamp ts) {
+        return ts == null ? null : ts.toLocalDateTime();
     }
 
     /** 查询学生经历列表 */

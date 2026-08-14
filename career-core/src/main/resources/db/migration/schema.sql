@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS recommendation_run (
     student_id         BIGINT      NOT NULL,
     profile_snapshot_id BIGINT     DEFAULT NULL COMMENT '关联画像快照',
     rule_version       VARCHAR(32) DEFAULT NULL COMMENT '规则版本',
-    status             VARCHAR(16) DEFAULT 'DONE',
+    status             VARCHAR(16) DEFAULT 'SUCCESS' COMMENT '状态（RUNNING/SUCCESS/DEGRADED/FAILED）',
     created_at         DATETIME    DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_run_student (student_id)
@@ -109,20 +109,20 @@ CREATE TABLE IF NOT EXISTS recommendation_result (
     id                BIGINT       NOT NULL AUTO_INCREMENT,
     run_id            BIGINT       NOT NULL COMMENT '推荐批次ID',
     direction_id      BIGINT       NOT NULL,
-    score             DECIMAL(6,4) DEFAULT NULL COMMENT '匹配度评分（0-1）',
+    score             DECIMAL(6,4) DEFAULT NULL COMMENT '匹配度评分（0-100）',
     `rank`            INT          DEFAULT NULL COMMENT '排序名次（rank 为 MySQL 保留字，需反引号）',
-    explanation_json  JSON         DEFAULT NULL COMMENT '推荐解释/理由（优先 career-ai 大模型生成，失败回退规则模板拼接）',
+    explanation_json  JSON         DEFAULT NULL COMMENT '结构化解释（reasons/strengths/gaps/semesterActions）',
     created_at        DATETIME     DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY idx_result_run (run_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '推荐结果';
 
 -- 推荐反馈（recommendation_feedback）
--- 承接 POST /api/v1/recommendations/{id}/feedback（result_id 指向 recommendation_result.id）
+-- 承接 POST /api/v1/recommendation-results/{resultId}/feedback（result_id 指向 recommendation_result.id）
 CREATE TABLE IF NOT EXISTS recommendation_feedback (
     id            BIGINT       NOT NULL AUTO_INCREMENT,
     result_id     BIGINT       NOT NULL COMMENT '推荐结果ID（recommendation_result.id）',
-    feedback_type VARCHAR(32)  DEFAULT NULL COMMENT '反馈类型（如 LIKE/DISLIKE/INVALID）',
+    feedback_type VARCHAR(32)  DEFAULT NULL COMMENT '反馈类型（HELPFUL/NEUTRAL/MISMATCH/NOT_INTERESTED）',
     comment       VARCHAR(500) DEFAULT NULL COMMENT '反馈意见',
     created_at    DATETIME     DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),

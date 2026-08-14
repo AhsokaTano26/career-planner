@@ -12,21 +12,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- * 接口2「获取推荐方向列表」服务。
+ * 推荐模块服务（按线上 Apifox「方向推荐」5 个接口实现）。
+ * <p>
  * Demo 精简逻辑说明：
- *   1. 规则引擎过滤 + 结构化评分；评分叠加霍兰德人格契合度软加分（见 RecommendationEngine）。
- *   2. 推荐理由优先调用 career-ai（FastAPI + 大模型）生成自然语言解释；
- *      AI 失败/超时/未启用时回退规则模板（RecommendationEngine.buildReason）。
- *   3. confidence 改用归一化概率表达（softmax，0-1，结果集内求和约等于 1）。
- *   4. 推荐结果不足 3 个时返回实际数量，不强制补齐；相同学生多次调用结果一致（评分确定性）。
+ *   1. 规则引擎过滤 + 结构化评分（六维加权 + 霍兰德人格契合度软加分，见 RecommendationEngine）。
+ *   2. 内部评分保持 0-1（career-ai 按 0-1 解释）；对外 DTO 转百分制（score 0-100）、
+ *      confidence 由概率表达改为 HIGH/MEDIUM/LOW 枚举。
+ *   3. 推荐理由优先调用 career-ai 大模型生成自然语言解释；失败/超时/未启用时回退规则模板（数组）。
+ *   4. 同步生成：落库后 status=SUCCESS 直接返回；线上定义允许 RUNNING 轮询，Demo 阶段不实现异步。
  */
 @Service
 public class RecommendationService {
@@ -34,9 +36,6 @@ public class RecommendationService {
     private static final Logger log = LoggerFactory.getLogger(RecommendationService.class);
 
     private static final int TOP_N = 5;
-
-    /** 置信度归一化概率的 softmax 温度（Demo 常量；越小概率区分度越大） */
-    private static final double CONFIDENCE_TEMPERATURE = 0.1;
 
     private final StudentProfileDao studentDao;
     private final RecommendationDao recommendationDao;
@@ -57,30 +56,25 @@ public class RecommendationService {
     }
 
     /**
-     * 为学生生成推荐方向列表（3-5 个）。
+     * 生成推荐批次（POST /runs）：评分、落库、返回批次。
      *
-     * @param studentId 学生ID（对应 student_profile.user_id）
-     * @return 推荐方向列表；学生无画像快照时返回空列表（不报错）
+     * @param studentId  学生ID（对应 student_profile.user_id）
+     * @param pathFilter 发展路径过滤（Demo 阶段忽略，仅保留参数位置）
+     * @return 推荐批次
      */
-    public List<RecommendationDto> recommend(Long studentId) {
-        // 1. 无画像快照 → 无法评分，返回空列表
+    public RecommendationRunDto run(Long studentId, String pathFilter) {
         ProfileSnapshot snapshot = studentDao.findLatestSnapshot(studentId);
         if (snapshot == null || snapshot.dimensionJson() == null || snapshot.dimensionJson().isBlank()) {
-            return List.of();
+            // 无画像快照无法评分 → 400（避免返回 runId 为 null 的批次，契约中 runId 为必填）
+            throw new BadRequestException("学生画像未生成，无法生成推荐");
         }
         Map<String, Double> studentDims = parseDims(snapshot.dimensionJson());
         String personality = parsePersonality(snapshot.dimensionJson());
 
-        // 2. 规则过滤：仅启用方向作为候选
         List<CareerDirection> candidates = engine.filterActive(recommendationDao.findAllDirections());
-
-        // 3. 结构化评分（权重/目标值来自配置表 direction_dimension_weight；叠加霍兰德人格契合度软加分）
-        List<RecommendationEngine.ScoredDirection> scoredList = candidates.stream()
-                .map(d -> engine.score(d, studentDims, recommendationDao.findWeightsByDirection(d.id(), 1), personality))
-                .toList();
-
-        // 4. 按评分降序取前 5（评分相同时按方向ID升序，保证多次调用结果一致）
-        List<RecommendationEngine.ScoredDirection> top = scoredList.stream()
+        List<RecommendationEngine.ScoredDirection> top = candidates.stream()
+                .map(d -> engine.score(d, studentDims,
+                        recommendationDao.findWeightsByDirection(d.id(), 1), personality))
                 .sorted(Comparator
                         .comparingDouble((RecommendationEngine.ScoredDirection s) -> s.score())
                         .reversed()
@@ -88,78 +82,192 @@ public class RecommendationService {
                 .limit(TOP_N)
                 .toList();
 
-        // 5. confidence 归一化概率表达：对 Top 结果评分做 softmax，结果集内求和约等于 1
-        List<Double> confidences = normalizedConfidence(top);
-
-        // 6. 持久化推荐批次与结果（Demo：每次调用生成一批，便于追溯），并组装响应
-        long runId = recommendationDao.insertRun(studentId, snapshot.id(), Constants.RULE_VERSION, "DONE");
+        long runId = recommendationDao.insertRun(studentId, snapshot.id(), Constants.RULE_VERSION, "SUCCESS");
         AtomicInteger rank = new AtomicInteger(1);
-        List<RecommendationDto> dtos = new ArrayList<>();
-        for (int i = 0; i < top.size(); i++) {
-            RecommendationEngine.ScoredDirection s = top.get(i);
-            // 替换点：优先 career-ai 大模型生成解释，失败回退引擎模板
-            String reason = explain(s, personality);
+        List<RecommendationResultDto> results = new ArrayList<>();
+        for (RecommendationEngine.ScoredDirection s : top) {
             int r = rank.getAndIncrement();
-            recommendationDao.insertResult(runId, s.direction().id(), s.score(), r, toJson(reason));
-            // 线上字段 directionId/score/rank/confidence + 增强字段 name/type/reason
-            dtos.add(new RecommendationDto(s.direction().id(), s.direction().name(),
-                    s.direction().type(), s.score(), r, confidences.get(i), reason));
+            String aiReason = explain(s, personality);
+            RecommendationResultDto dto = toResultDto(s, r, aiReason);
+            // 结构化解释落库（Demo 精简点：explanation_json 由单个 reason 字符串改为结构化对象）
+            recommendationDao.insertResult(runId, s.direction().id(), dto.score(), r, toExplanationJson(dto, aiReason));
+            results.add(dto);
         }
-        return dtos;
+        return new RecommendationRunDto(String.valueOf(runId), snapshot.id().intValue(),
+                Constants.RULE_VERSION, nowIso(), "SUCCESS", results);
+    }
+
+    /** 最新推荐结果（GET /latest）：学生无批次时返回 null（由 Controller 转 404） */
+    public RecommendationRunDto getLatest(Long studentId) {
+        RecommendationDao.RunRow runRow = recommendationDao.findLatestRun(studentId);
+        if (runRow == null) {
+            return null;
+        }
+        return toRunDto(runRow);
+    }
+
+    /** 推荐批次历史（GET /recommendations）：分页返回批次列表（仅返回批次元数据，结果置空） */
+    public List<RecommendationRunDto> getHistory(Long studentId, int page, int size) {
+        return recommendationDao.findRunsByStudent(studentId, page, size).stream()
+                .map(this::toRunMetaDto)
+                .toList();
+    }
+
+    /** 推荐批次详情（GET /recommendation-runs/{runId}）：不存在则返回 null（由 Controller 转 404） */
+    public RecommendationRunDto getRunDetail(String runId) {
+        long id;
+        try {
+            id = Long.parseLong(runId);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        RecommendationDao.RunRow runRow = recommendationDao.findRunById(id);
+        return runRow == null ? null : toRunDto(runRow);
     }
 
     /**
-     * 生成推荐理由：优先调用 career-ai（LLM）生成自然语言解释；失败/超时/未启用时回退规则模板。
-     * 后续迭代：可在此叠加降级策略（如仅 Top1 走 AI、批量调用等）。
+     * 推荐反馈（POST /recommendation-results/{resultId}/feedback）。
+     * 线上 feedbackType 枚举：HELPFUL / NEUTRAL / MISMATCH / NOT_INTERESTED。
      */
+    public void feedback(Long resultId, String feedbackType, String comment) {
+        if (!recommendationDao.existsResult(resultId)) {
+            throw new BadRequestException("推荐结果不存在：" + resultId);
+        }
+        recommendationDao.insertFeedback(resultId, feedbackType, comment);
+    }
+
+    /** 反馈（兼容空 resultId：自动使用最近一次推荐结果） */
+    public void feedbackLatest(String feedbackType, String comment) {
+        Long latestId = recommendationDao.findLatestResultId();
+        if (latestId == null) {
+            throw new BadRequestException("暂无推荐结果，请先调用 /students/me/recommendations/runs 生成推荐");
+        }
+        feedback(latestId, feedbackType, comment);
+    }
+
+    // ---------- 内部工具 ----------
+
+    /** 生成推荐理由：优先 career-ai（LLM）自然语言；失败回退规则模板（数组） */
     private String explain(RecommendationEngine.ScoredDirection scored, String personality) {
         try {
             return aiExplainClient.explain(scored, personality);
         } catch (Exception e) {
-            // 降级路径：AI 不可用属预期情况，WARN 仅记录原因，不打印完整堆栈（调试时改 DEBUG 即可）
             log.warn("career-ai 解释生成失败，回退规则模板理由。directionId={}，原因={}",
                     scored.direction().id(), e.toString());
-            return engine.buildReason(scored.direction(), scored);
+            return null;
         }
     }
 
-    /** 置信度归一化概率（softmax over 评分，温度 CONFIDENCE_TEMPERATURE），结果集内求和约等于 1 */
-    private List<Double> normalizedConfidence(List<RecommendationEngine.ScoredDirection> top) {
-        double[] exps = new double[top.size()];
-        double sum = 0.0;
-        for (int i = 0; i < top.size(); i++) {
-            exps[i] = Math.exp(top.get(i).score() / CONFIDENCE_TEMPERATURE);
-            sum += exps[i];
-        }
-        List<Double> confidences = new ArrayList<>(top.size());
-        for (int i = 0; i < top.size(); i++) {
-            confidences.add(round4(sum > 0 ? exps[i] / sum : 0.0));
-        }
-        return confidences;
+    /** 组装线上 RecommendationResultDto（内部 score 0-1 → 对外百分制 0-100） */
+    private RecommendationResultDto toResultDto(RecommendationEngine.ScoredDirection s, int rank, String aiReason) {
+        double percent = round1(s.score() * 100.0);
+        String confidence = engine.confidenceOf(s.score());
+        List<String> reasons = aiReason != null && !aiReason.isBlank()
+                ? List.of(aiReason)                       // AI 自然语言解释（单条）
+                : engine.buildReasons(s);                 // 模板维度理由（数组）
+        List<String> strengths = engine.buildStrengths(s);
+        List<String> gaps = engine.buildGaps(s);
+        List<String> semesterActions = engine.buildSemesterActions(s.direction());
+        return new RecommendationResultDto(s.direction().directionCode(), rank, percent, confidence,
+                reasons, strengths, gaps, semesterActions, null);
     }
 
-    private double round4(double v) {
-        return Math.round(v * 10000.0) / 10000.0;
+    /** RunRow → RecommendationRunDto（含结果明细） */
+    private RecommendationRunDto toRunDto(RecommendationDao.RunRow runRow) {
+        // 方向 id → 方向编码 映射（避免每条结果单独查库）
+        Map<Long, CareerDirection> dirById = recommendationDao.findAllDirections().stream()
+                .collect(Collectors.toMap(CareerDirection::id, Function.identity()));
+        List<RecommendationResultDto> results = recommendationDao.findResultsByRunId(runRow.id()).stream()
+                .map(row -> toResultDtoFromRow(row, dirById))
+                .toList();
+        return new RecommendationRunDto(String.valueOf(runRow.id()), (int) runRow.profileSnapshotId(),
+                runRow.ruleVersion(), runRow.createdAt() == null ? null : runRow.createdAt().toString(),
+                runRow.status(), results);
     }
 
-    /**
-     * 推荐反馈（Demo 最小实现：直接写入 recommendation_feedback，不做内容校验）。
-     * 后续迭代可据此做反馈回流调优，或触发 AI 分析。
-     */
-    public void feedback(Long resultId, String feedbackType, String comment) {
-        recommendationDao.insertFeedback(resultId, feedbackType, comment);
+    /** RunRow → 批次元数据（历史列表：不展开 results） */
+    private RecommendationRunDto toRunMetaDto(RecommendationDao.RunRow runRow) {
+        return new RecommendationRunDto(String.valueOf(runRow.id()), (int) runRow.profileSnapshotId(),
+                runRow.ruleVersion(), runRow.createdAt() == null ? null : runRow.createdAt().toString(),
+                runRow.status(), List.of());
     }
 
-    /**
-     * 推荐反馈（兼容空 id：自动使用最近一次推荐结果）。
-     * Demo 便捷：Apifox 调试时 id 留空也可直接提交；正式环境应要求 id 必填，此兜底可移除。
-     */
-    public void feedbackLatest(String feedbackType, String comment) {
-        Long latestId = recommendationDao.findLatestResultId();
-        if (latestId == null) {
-            throw new BadRequestException("暂无推荐结果，请先调用 recommendations/run 生成推荐");
+    /** 从落库结果行重建 DTO（explanation_json 若为结构化对象则优先使用，否则回退模板重算） */
+    private RecommendationResultDto toResultDtoFromRow(RecommendationDao.ResultRow row,
+                                                       Map<Long, CareerDirection> dirById) {
+        CareerDirection direction = dirById.get(row.directionId());
+        String directionCode = direction == null ? String.valueOf(row.directionId()) : direction.directionCode();
+        Explanation explanation = parseExplanation(row.explanationJson());
+        return new RecommendationResultDto(
+                directionCode,
+                row.rank(),
+                round1(row.score()),
+                confidenceOfPercent(row.score()),
+                explanation.reasons(),
+                explanation.strengths(),
+                explanation.gaps(),
+                explanation.semesterActions().isEmpty() && direction != null
+                        ? engine.buildSemesterActions(direction)
+                        : explanation.semesterActions(),
+                null);
+    }
+
+    /** 结构化解释 JSON 落库：{ reasons: [...], strengths: [...], gaps: [...], semesterActions: [...], aiReason: ... } */
+    private String toExplanationJson(RecommendationResultDto dto, String aiReason) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("reasons", dto.reasons());
+        m.put("strengths", dto.strengths());
+        m.put("gaps", dto.gaps());
+        m.put("semesterActions", dto.semesterActions());
+        m.put("aiReason", aiReason);
+        try {
+            return objectMapper.writeValueAsString(m);
+        } catch (Exception e) {
+            return "{}";
         }
-        feedback(latestId, feedbackType, comment);
+    }
+
+    /** 结构化解释（落库/回读） */
+    private record Explanation(List<String> reasons, List<String> strengths,
+                               List<String> gaps, List<String> semesterActions) {
+    }
+
+    /** 从落库 explanation_json 解析结构化解释（reasons/strengths/gaps/semesterActions） */
+    private Explanation parseExplanation(String explanationJson) {
+        if (explanationJson == null || explanationJson.isBlank()) {
+            return new Explanation(List.of(), List.of(), List.of(), List.of());
+        }
+        try {
+            Map<String, Object> m = objectMapper.readValue(explanationJson,
+                    new TypeReference<LinkedHashMap<String, Object>>() {
+                    });
+            return new Explanation(
+                    stringList(m.get("reasons")),
+                    stringList(m.get("strengths")),
+                    stringList(m.get("gaps")),
+                    stringList(m.get("semesterActions")));
+        } catch (Exception e) {
+            log.debug("解析 explanation_json 失败，忽略", e);
+            return new Explanation(List.of(), List.of(), List.of(), List.of());
+        }
+    }
+
+    private List<String> stringList(Object value) {
+        if (value instanceof List<?> list) {
+            return list.stream().map(Object::toString).toList();
+        }
+        return List.of();
+    }
+
+    /** 百分制分数 → 置信度枚举（历史/详情回读时用） */
+    private String confidenceOfPercent(double percent) {
+        if (percent >= 80.0) {
+            return "HIGH";
+        }
+        if (percent >= 60.0) {
+            return "MEDIUM";
+        }
+        return "LOW";
     }
 
     private Map<String, Double> parseDims(String json) {
@@ -175,11 +283,10 @@ public class RecommendationService {
             return dims;
         } catch (Exception e) {
             log.warn("解析画像快照 dimension_json 失败", e);
-            return Collections.emptyMap();
+            return Map.of();
         }
     }
 
-    /** 提取画像中的霍兰德人格类型（RIASEC 编码串），无则返回 null */
     private String parsePersonality(String json) {
         try {
             Map<String, Object> raw = objectMapper.readValue(json, new TypeReference<LinkedHashMap<String, Object>>() {
@@ -192,11 +299,11 @@ public class RecommendationService {
         }
     }
 
-    private String toJson(String reason) {
-        try {
-            return objectMapper.writeValueAsString(reason);
-        } catch (Exception e) {
-            return "\"" + reason + "\"";
-        }
+    private double round1(double v) {
+        return Math.round(v * 10.0) / 10.0;
+    }
+
+    private String nowIso() {
+        return java.time.LocalDateTime.now().toString();
     }
 }

@@ -1,24 +1,24 @@
 package com.career.core.modules.planning;
 
-import com.career.core.modules.recommendation.RecommendationDto;
+import com.career.core.common.BadRequestException;
+import com.career.core.modules.recommendation.CareerDirection;
+import com.career.core.modules.recommendation.RecommendationDao;
+import com.career.core.modules.recommendation.RecommendationRunDto;
 import com.career.core.modules.recommendation.RecommendationService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * 计划模块服务。
+ * 计划模块服务（按线上 Apifox「目标计划」PlanDraft 结构实现）。
+ * <p>
  * Demo 精简逻辑说明：
- *   1. plans/generate 的数据来源：调用推荐接口（RecommendationService.recommend）的推荐结果，
- *      取排名第一的方向作为主目标——即“生成计划草案需要调用推荐数据”。
- *   2. Demo 阶段由规则模板生成任务，不调用大模型（后续迭代替换为 career-ai plan_generator）。
- *   3. 生成后落库（student_goal / semester_plan / plan_task），返回草案，不做异步处理。
+ *   1. 数据来源：优先请求体 directionId；未传时调用推荐接口（/students/me/recommendations/latest）取排名第一方向。
+ *   2. Demo 阶段由规则模板生成任务（不调用大模型），useAi=true 亦回退模板（后续迭代替换为 career-ai plan_generator）。
+ *   3. 草案落库（student_goal / semester_plan / plan_task）后返回，不做异步处理。
  */
 @Service
 public class PlanningService {
@@ -27,76 +27,104 @@ public class PlanningService {
     private static final String DEFAULT_SEMESTER = "2026-2027学年第1学期";
 
     private final RecommendationService recommendationService;
+    private final RecommendationDao recommendationDao;
     private final PlanningDao planningDao;
 
-    public PlanningService(RecommendationService recommendationService, PlanningDao planningDao) {
+    public PlanningService(RecommendationService recommendationService,
+                           RecommendationDao recommendationDao,
+                           PlanningDao planningDao) {
         this.recommendationService = recommendationService;
+        this.recommendationDao = recommendationDao;
         this.planningDao = planningDao;
     }
 
     /**
-     * 生成学期计划草案（调用推荐数据）。
+     * 生成学期计划草案。
      *
-     * @param studentId 学生ID
-     * @return 计划草案 Map；无推荐结果时返回空 Map
+     * @param studentId   学生ID
+     * @param directionId 目标方向编码（可空：为空则取最新推荐第一名）
+     * @param useAi       是否调用 AI（Demo 阶段忽略，规则模板）
+     * @return PlanDraftDto；无法确定目标方向时返回 null（Controller 转 400）
      */
-    public Map<String, Object> generatePlanDraft(Long studentId) {
-        // 1. 调用推荐数据（Demo：规则引擎结果；正式接入 career-ai 前复用同一数据源）
-        List<RecommendationDto> recs = recommendationService.recommend(studentId);
-        if (recs.isEmpty()) {
-            return Collections.emptyMap();
+    public PlanDraftDto generatePlanDraft(Long studentId, String directionId, boolean useAi) {
+        // 1. 确定目标方向编码：优先入参；否则取最新推荐第一名
+        String dirCode = directionId;
+        if (dirCode == null || dirCode.isBlank()) {
+            RecommendationRunDto latest = recommendationService.getLatest(studentId);
+            if (latest != null && latest.results() != null && !latest.results().isEmpty()) {
+                dirCode = latest.results().get(0).directionId();
+            }
         }
-        RecommendationDto top = recs.get(0);
-
-        // 2. 以排名第一方向生成主目标并落库
-        String goalTitle = "以「" + top.name() + "」为主攻方向的发展计划";
-        long goalId = planningDao.insertGoal(studentId, top.directionId(), goalTitle, "MAIN", "ACTIVE");
-
-        // 3. 生成学期计划草案并落库
-        long planId = planningDao.insertPlan(studentId, goalId, DEFAULT_SEMESTER, "AI", "DRAFT");
-
-        // 4. 按方向类型套用任务模板生成月度任务并落库
-        List<String> titles = taskTemplatesFor(top.type());
-        LocalDate month = LocalDate.of(2026, 9, 1);
-        List<Map<String, Object>> tasks = new ArrayList<>();
-        for (int i = 0; i < titles.size(); i++) {
-            String m = month.plusMonths(i).format(MONTH_FMT);
-            long taskId = planningDao.insertTask(planId, m, titles.get(i), "TODO");
-            Map<String, Object> t = new LinkedHashMap<>();
-            t.put("id", taskId);
-            t.put("month", m);
-            t.put("title", titles.get(i));
-            t.put("status", "TODO");
-            tasks.add(t);
+        if (dirCode == null || dirCode.isBlank()) {
+            throw new BadRequestException("无法确定目标方向，请传入 directionId 或先生成推荐");
+        }
+        CareerDirection direction = recommendationDao.findDirectionByCode(dirCode);
+        if (direction == null) {
+            throw new BadRequestException("方向不存在：" + dirCode);
         }
 
-        // 5. 组装响应
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("studentId", studentId);
-        data.put("direction", Map.of(
-                "directionId", top.directionId(), "name", top.name(),
-                "type", top.type(), "score", top.score()));
-        data.put("goal", Map.of("id", goalId, "title", goalTitle, "goalType", "MAIN"));
-        data.put("semester", DEFAULT_SEMESTER);
-        data.put("status", "DRAFT");
-        data.put("tasks", tasks);
-        return data;
+        // 2. 以目标方向生成主目标并落库（direction_id 关联 career_direction.id）
+        String goalSummary = "本学期围绕【" + direction.name() + "】方向打好基础："
+                + "巩固核心课程，完成 1 个可运行的小项目，并在过程中明确后续主攻领域。";
+        long goalId = planningDao.insertGoal(studentId, direction.id(), "以「" + direction.name() + "」为主攻方向的发展计划",
+                "MAIN", "ACTIVE");
+        long planId = planningDao.insertPlan(studentId, goalId, DEFAULT_SEMESTER, useAi ? "AI" : "TEMPLATE", "DRAFT");
+
+        // 3. 套用任务模板生成月度任务并落库
+        List<PlanDraftDto.MonthlyTaskDto> monthlyTasks = buildMonthlyTasks(planId, direction.type());
+
+        // 4. 组装 PlanDraft 响应
+        return new PlanDraftDto(
+                goalSummary,
+                List.of(
+                        new PlanDraftDto.SemesterGoalDto("巩固专业核心课程与编程基础", "programming_basic"),
+                        new PlanDraftDto.SemesterGoalDto("完成 1 个可运行的小项目", "project_basic")),
+                monthlyTasks,
+                List.of("任务可随课程安排与兴趣变化调整。"));
     }
 
-    /** 任务模板（按方向类型选择，Demo 预置；后续替换为大模型生成） */
-    private List<String> taskTemplatesFor(String type) {
+    /** 月度任务（按方向类型选择模板，Demo 预置；后续替换为大模型生成） */
+    private List<PlanDraftDto.MonthlyTaskDto> buildMonthlyTasks(long planId, String type) {
+        List<String[]> template = taskTemplatesFor(type);
+        LocalDate month = LocalDate.of(2026, 9, 1);
+        List<PlanDraftDto.MonthlyTaskDto> tasks = new ArrayList<>();
+        for (int i = 0; i < template.size(); i++) {
+            String[] item = template.get(i);
+            String m = month.plusMonths(i).format(MONTH_FMT);
+            planningDao.insertTask(planId, m, item[0], "TODO");
+            tasks.add(new PlanDraftDto.MonthlyTaskDto(m, item[0], item[1], Double.parseDouble(item[2])));
+        }
+        return tasks;
+    }
+
+    /** 任务模板：[标题, 任务类型, 预计小时数] */
+    private List<String[]> taskTemplatesFor(String type) {
         if (type == null) {
-            return List.of("明确主攻方向并制定学习路线", "完成一项实践项目", "阶段复盘与调整");
+            return List.of(
+                    new String[]{"明确主攻方向并制定学习路线", "CAREER", "6"},
+                    new String[]{"完成一项实践项目", "PRACTICE", "12"},
+                    new String[]{"阶段复盘与调整", "REVIEW", "4"});
         }
-        switch (type) {
-            case "数据算法":
-                return List.of("学习 Python 与数据分析基础", "完成一个数据分析小项目", "系统学习机器学习入门", "阶段复盘并确定下一步");
-            case "技术研发":
-                return List.of("巩固编程语言与数据结构基础", "完成一个课程/开源项目", "学习主攻方向核心框架", "阶段复盘并明确主攻领域");
-            case "产品管理":
-                return List.of("学习产品方法与需求分析", "完成一份产品分析报告", "参与一次项目协作实践", "阶段复盘并调整计划");
-            default:
-                return List.of("明确主攻方向并制定学习路线", "完成一项实践项目", "阶段复盘与调整");
-        }
+        return switch (type) {
+            case "数据算法" -> List.of(
+                    new String[]{"学习 Python 与数据分析基础", "LEARNING", "12"},
+                    new String[]{"完成一个数据分析小项目", "PRACTICE", "12"},
+                    new String[]{"系统学习机器学习入门", "LEARNING", "10"},
+                    new String[]{"阶段复盘并确定下一步", "REVIEW", "4"});
+            case "技术研发" -> List.of(
+                    new String[]{"巩固编程语言与数据结构基础", "LEARNING", "12"},
+                    new String[]{"完成一个课程/开源项目", "PRACTICE", "12"},
+                    new String[]{"学习主攻方向核心框架", "LEARNING", "10"},
+                    new String[]{"阶段复盘并明确主攻领域", "REVIEW", "4"});
+            case "产品管理" -> List.of(
+                    new String[]{"学习产品方法与需求分析", "LEARNING", "8"},
+                    new String[]{"完成一份产品分析报告", "PRACTICE", "8"},
+                    new String[]{"参与一次项目协作实践", "PRACTICE", "10"},
+                    new String[]{"阶段复盘并调整计划", "REVIEW", "4"});
+            default -> List.of(
+                    new String[]{"明确主攻方向并制定学习路线", "CAREER", "6"},
+                    new String[]{"完成一项实践项目", "PRACTICE", "12"},
+                    new String[]{"阶段复盘与调整", "REVIEW", "4"});
+        };
     }
 }

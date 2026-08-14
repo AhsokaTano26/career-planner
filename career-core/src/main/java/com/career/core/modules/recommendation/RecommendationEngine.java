@@ -37,6 +37,17 @@ public class RecommendationEngine {
     /** 差距提示阈值：单维差距 >= 10%（学生分低于目标值 10 分及以上）时在理由中提示“建议加强” */
     private static final double GAP_THRESHOLD = 0.10;
 
+    /** 匹配优势阈值：单维匹配度 >= 85% 时计入“优势” */
+    private static final double STRENGTH_THRESHOLD = 0.85;
+
+    /** 置信度分档（百分制）：>= 80 HIGH，>= 60 MEDIUM，否则 LOW */
+    private static final double CONFIDENCE_HIGH = 80.0;
+    private static final double CONFIDENCE_MEDIUM = 60.0;
+
+    /** 未分类方向的兜底行动建议 */
+    private static final List<String> DEFAULT_ACTIONS = List.of(
+            "明确主攻方向并制定学习路线", "完成一项实践项目", "阶段复盘与调整");
+
     /** 评分结果：方向 + 综合得分 + 各维度匹配度 + 各维度差距(0-1，仅含学生缺失/低于目标值) + 霍兰德契合度(-1 表示无人格/方向标签数据) */
     public record ScoredDirection(CareerDirection direction, double score, Map<String, Double> matches,
                                   Map<String, Double> gaps, double hollandMatch) {
@@ -138,6 +149,79 @@ public class RecommendationEngine {
             sb.append("建议加强：").append(String.join("、", gapDims)).append("。");
         }
         return sb.toString();
+    }
+
+    /**
+     * 推荐理由（数组）：每个维度一条短句，按匹配度降序取 Top3。
+     * 线上字段 reasons 为 string[]，此处对应模板回退；AI 成功时由调用方替换为自然语言解释（单条）。
+     */
+    public List<String> buildReasons(ScoredDirection scored) {
+        return scored.matches().entrySet().stream()
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .limit(3)
+                .map(e -> Constants.DIMENSION_NAMES.getOrDefault(e.getKey(), e.getKey())
+                        + "匹配" + Math.round(e.getValue() * 100) + "%")
+                .toList();
+    }
+
+    /**
+     * 匹配优势（数组）：匹配度达到 85% 的维度，按匹配度降序。
+     * 线上字段 strengths 为 string[]（模板生成，Demo 精简点）。
+     */
+    public List<String> buildStrengths(ScoredDirection scored) {
+        List<String> strengths = scored.matches().entrySet().stream()
+                .filter(e -> e.getValue() >= STRENGTH_THRESHOLD)
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .map(e -> Constants.DIMENSION_NAMES.getOrDefault(e.getKey(), e.getKey())
+                        + "表现较好")
+                .toList();
+        return strengths.isEmpty() ? List.of() : strengths;
+    }
+
+    /**
+     * 主要差距（数组）：差距达到阈值的维度，按差距降序。
+     * 线上字段 gaps 为 string[]（模板生成，Demo 精简点）。
+     */
+    public List<String> buildGaps(ScoredDirection scored) {
+        List<String> gaps = scored.gaps().entrySet().stream()
+                .filter(e -> e.getValue() >= GAP_THRESHOLD)
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .map(e -> Constants.DIMENSION_NAMES.getOrDefault(e.getKey(), e.getKey())
+                        + "需要加强")
+                .toList();
+        return gaps.isEmpty() ? List.of() : gaps;
+    }
+
+    /**
+     * 本学期探索建议（数组）：按方向类型预置行动建议（模板，Demo 精简点，后续可替换为大模型生成）。
+     * 线上字段 semesterActions 为 string[]。
+     */
+    public List<String> buildSemesterActions(CareerDirection direction) {
+        String type = direction.type();
+        if (type == null) {
+            return DEFAULT_ACTIONS;
+        }
+        return switch (type) {
+            case "数据算法" -> List.of("学习 Python 与数据分析基础", "完成一个数据分析小项目");
+            case "技术研发" -> List.of("巩固编程语言与数据结构基础", "完成一个课程/开源项目");
+            case "产品管理" -> List.of("学习产品方法与需求分析", "完成一份产品分析报告");
+            default -> DEFAULT_ACTIONS;
+        };
+    }
+
+    /**
+     * 置信度枚举：按百分制综合得分映射 HIGH / MEDIUM / LOW。
+     * 线上字段 confidence 为 string（Demo 精简点：替代原先 softmax 归一化概率表达）。
+     */
+    public String confidenceOf(double score01) {
+        double percent = score01 * 100.0;
+        if (percent >= CONFIDENCE_HIGH) {
+            return "HIGH";
+        }
+        if (percent >= CONFIDENCE_MEDIUM) {
+            return "MEDIUM";
+        }
+        return "LOW";
     }
 
     /**

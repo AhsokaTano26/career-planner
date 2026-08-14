@@ -26,6 +26,13 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(40001, e.getMessage());
     }
 
+    /** 资源不存在 → 404（契约定义：画像/推荐详情/反馈等） */
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponse<Map<String, Object>> handleNotFound(NotFoundException e) {
+        return ApiResponse.error(40400, e.getMessage());
+    }
+
     /** 未匹配到任何 Controller 的路径 → 404（否则会被兜底 500 误伤） */
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

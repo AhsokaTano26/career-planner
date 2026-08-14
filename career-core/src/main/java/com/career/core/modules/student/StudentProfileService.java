@@ -7,19 +7,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 接口1「获取学生画像」服务。
+ * 学生画像服务（按线上 Apifox「学生画像」模块 ProfileSnapshot 结构实现）。
+ * <p>
  * Demo 精简逻辑说明：
  *   1. 直接查库返回，不做缓存（后续可加 Redis/本地缓存）。
- *   2. 学生不存在或画像未生成 → 返回空对象而非报错。
- *   3. 数据完整度 = 非空字段数 / 总字段数（六维），简单计算。
+ *   2. 学生不存在或画像未生成 → 返回 null（由 Controller 返回空对象），而非报错。
+ *   3. version 复用 profile_snapshot.id 作为画像版本号（Demo 精简点：线上为独立版本号列，此处无该列）。
+ *   4. strengths/explore 由六维得分简单推导（>=80 优势 / <70 待探索），后续可替换为大模型生成。
  */
 @Service
 public class StudentProfileService {
@@ -35,68 +36,114 @@ public class StudentProfileService {
     }
 
     /**
-     * 查询学生六维画像及数据完整度。
+     * 查询学生最新画像快照。
      *
      * @param studentId 学生ID（对应 student_profile.user_id）
-     * @return 画像数据 Map；学生不存在或画像未生成时返回空 Map
+     * @return ProfileSnapshotDto；学生不存在或画像未生成时返回 null
      */
-    public Map<String, Object> getProfile(Long studentId) {
-        // 1. 学生不存在 → 空对象
+    public ProfileSnapshotDto getLatestProfile(Long studentId) {
         StudentProfile student = dao.findStudentByUserId(studentId);
         if (student == null) {
-            return Collections.emptyMap();
+            return null;
         }
-
-        // 2. 画像未生成（无快照或快照无维度数据）→ 空对象
         ProfileSnapshot snapshot = dao.findLatestSnapshot(studentId);
         if (snapshot == null || snapshot.dimensionJson() == null || snapshot.dimensionJson().isBlank()) {
-            return Collections.emptyMap();
+            return null;
         }
+        return toDto(snapshot);
+    }
 
-        // 3. 解析六维画像 JSON
-        Map<String, Object> dimensions = parseDimensions(snapshot.dimensionJson());
+    /** 画像版本列表（历史快照，分页） */
+    public List<ProfileSnapshotDto> getVersions(Long studentId, int page, int size) {
+        return dao.findSnapshots(studentId, page, size).stream()
+                .filter(s -> s.dimensionJson() != null && !s.dimensionJson().isBlank())
+                .map(this::toDto)
+                .toList();
+    }
 
-        // 4. 完整度 = 非空字段数 / 总字段数（Demo 简单算法，后续可替换为加权完整度）
+    private ProfileSnapshotDto toDto(ProfileSnapshot snapshot) {
+        Map<String, Double> dims = parseDimensions(snapshot.dimensionJson());
+        List<ProfileSnapshotDto.DimensionValueDto> dimensions = buildDimensionValues(dims);
         int nonNullCount = 0;
         for (String dim : Constants.ALL_DIMENSIONS) {
-            if (dimensions.get(dim) != null) {
+            if (dims.get(dim) != null) {
                 nonNullCount++;
             }
         }
-        double completeness = BigDecimal.valueOf(nonNullCount * 100.0 / Constants.ALL_DIMENSIONS.size())
-                .setScale(2, RoundingMode.HALF_UP)
-                .doubleValue();
-
-        // 5. 组装返回结构（线上结构为主 + 增强字段）
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("dimensions", dimensions);          // 线上字段
-        data.put("summary", snapshot.summary());      // 线上字段
-        data.put("version", snapshot.sourceVersion()); // 线上字段
-        // 以下为增强字段（线上未定义，保留原验收能力）：
-        data.put("completeness", completeness);
-        data.put("studentId", studentId);
-        data.put("experiences", buildExperiences(dao.findExperiences(studentId)));
-        return data;
+        int completeness = (int) Math.round(nonNullCount * 100.0 / Constants.ALL_DIMENSIONS.size());
+        return new ProfileSnapshotDto(
+                snapshot.id() == null ? null : "PS-" + snapshot.id(),
+                snapshot.id() == null ? 0 : snapshot.id().intValue(),
+                snapshot.createdAt() == null ? null : snapshot.createdAt().toString(),
+                snapshot.sourceVersion(),
+                completeness,
+                dimensions,
+                snapshot.summary(),
+                buildStrengths(dims),
+                buildExplore(dims),
+                null);
     }
 
-    private Map<String, Object> parseDimensions(String json) {
+    /** 六维得分对象 → 数组（线上 DimensionValue[]：key/name/score） */
+    private List<ProfileSnapshotDto.DimensionValueDto> buildDimensionValues(Map<String, Double> dims) {
+        List<ProfileSnapshotDto.DimensionValueDto> list = new ArrayList<>();
+        for (String dim : Constants.ALL_DIMENSIONS) {
+            Double score = dims.get(dim);
+            if (score != null) {
+                list.add(new ProfileSnapshotDto.DimensionValueDto(
+                        toOnlineKey(dim),
+                        Constants.DIMENSION_NAMES.getOrDefault(dim, dim),
+                        score));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 内部维度编码 → 线上 DimensionValue.key 枚举。
+     * 线上 key 枚举为 interest/values/ability/academic/tendency/practice；
+     * 内部沿用 orientation（发展倾向）/experience（实践经历），对外映射为 tendency/practice。
+     */
+    private String toOnlineKey(String dim) {
+        return switch (dim) {
+            case Constants.DIM_ORIENTATION -> "tendency";
+            case Constants.DIM_EXPERIENCE -> "practice";
+            default -> dim;
+        };
+    }
+
+    /** 优势（Demo 精简点）：得分 >= 80 的维度，按得分降序 */
+    private List<String> buildStrengths(Map<String, Double> dims) {
+        return dims.entrySet().stream()
+                .filter(e -> e.getValue() >= 80.0)
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .map(e -> Constants.DIMENSION_NAMES.getOrDefault(e.getKey(), e.getKey()) + "表现较好")
+                .toList();
+    }
+
+    /** 待探索（Demo 精简点）：得分 < 70 的维度，按得分升序 */
+    private List<String> buildExplore(Map<String, Double> dims) {
+        return dims.entrySet().stream()
+                .filter(e -> e.getValue() < 70.0)
+                .sorted((a, b) -> Double.compare(a.getValue(), b.getValue()))
+                .map(e -> Constants.DIMENSION_NAMES.getOrDefault(e.getKey(), e.getKey()) + "有待积累")
+                .toList();
+    }
+
+    private Map<String, Double> parseDimensions(String json) {
         try {
-            return objectMapper.readValue(json, new TypeReference<LinkedHashMap<String, Object>>() {
+            Map<String, Object> raw = objectMapper.readValue(json, new TypeReference<LinkedHashMap<String, Object>>() {
             });
+            Map<String, Double> dims = new LinkedHashMap<>();
+            for (Map.Entry<String, Object> e : raw.entrySet()) {
+                if (e.getValue() instanceof Number n) {
+                    dims.put(e.getKey(), n.doubleValue());
+                }
+            }
+            return dims;
         } catch (Exception e) {
             log.warn("解析画像快照 dimension_json 失败，studentId 见调用方", e);
             return Collections.emptyMap();
         }
-    }
-
-    private List<Map<String, Object>> buildExperiences(List<StudentExperience> experiences) {
-        return experiences.stream().map(e -> {
-            Map<String, Object> m = new LinkedHashMap<>();
-            m.put("type", e.type());
-            m.put("title", e.title());
-            m.put("startDate", e.startDate() == null ? null : e.startDate().toString());
-            m.put("description", e.description());
-            return m;
-        }).toList();
     }
 }
