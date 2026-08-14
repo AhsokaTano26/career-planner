@@ -13,3 +13,10 @@
 # VS Code workspace secrets (Apifox access token etc., never commit)
 .vscode/mcp.json
 
+# Build artifacts (never commit)
+**/target/
+
+# Python cache (never commit)
+**/__pycache__/
+*.pyc
+
