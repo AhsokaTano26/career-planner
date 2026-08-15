@@ -20,7 +20,14 @@ public record TaskDto(
         String checkedInAt,
         TaskCheckinDto checkin) {
 
-    /** 任务打卡（线上 TaskCheckin） */
-    public record TaskCheckinDto(String checkedInAt, String note) {
+    /** 任务打卡（线上 TaskCheckin：id/taskId/doneDesc 必填） */
+    public record TaskCheckinDto(
+            String id,
+            String taskId,
+            String doneDesc,
+            String gains,
+            String difficulties,
+            String proofUrl,
+            String checkedInAt) {
     }
 }

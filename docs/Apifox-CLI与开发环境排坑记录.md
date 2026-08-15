@@ -221,6 +221,31 @@ Invoke-WebRequest -Uri "http://127.0.0.1:8080/api/v1/students/me/profile/latest?
 
 ---
 
+## 9. `test-case run` 不替换 path 变量（2026-08-15）
+
+> CLI 2.2.9 直接跑单接口测试用例时，URL 中 `{taskId}` 不会被替换成实际值，导致请求打到字面路径返回 400。这是 CLI 行为，不是接口问题。
+
+**现象**：`apifox test-case run <id> -e <envId>` 输出的请求 URL 仍是 `PATCH http://127.0.0.1:8080/api/v1/tasks/{taskId}`（字面量），返回 400；JSON 报告里 collection 的 `url.variable` 为空、`url.path` 仍含 `{taskId}`。`--env-var` / `--global-var` / `--variables` 注入均不生效（报告 globals/environment 为空）。
+
+**可靠跑法**（基于线上测试用例，绕开 CLI 缺陷）：
+
+```bash
+# 1) 生成 JSON 报告，拿到 CLI 自己构造的 collection 段
+apifox test-case run <id> --project 8662286 -e <envId> -r json --out-dir <dir> --out-file <name>
+
+# 2) 从报告 JSON 提取 collection 段另存为 collection.json
+
+# 3) 用 Python 把 collection 中 url.path 的 {taskId} 替换为实际值，url.variable 置空
+#    参考脚本：docs/scripts/fix_collection_task.py
+
+# 4) 用 apifox run 执行修正后的 collection
+apifox run <collection.json> -r cli,json
+```
+
+**实测**：`PATCH /api/v1/tasks/T163` → 200 OK（481B，完整 Task 对象）。参考用例「更新任务-正向 (PATCH /tasks/{taskId})」id=404389855（endpoint 497109142），本地环境 47907998；PATCH body 用契约 `TaskStatusUpdate`（`status` 必填）。
+
+---
+
 ## 汇总速查表
 
 | 问题 | 一句话解决 |
@@ -233,4 +258,5 @@ Invoke-WebRequest -Uri "http://127.0.0.1:8080/api/v1/students/me/profile/latest?
 | apifox 真实路径 | `C:\Users\uio8k\AppData\Roaming\npm\apifox.cmd` |
 | 后端启动报 UnsupportedClassVersionError | 用 JDK 25 绝对路径启动：`& "D:\devtools\jdk25\jdk-25.0.2\bin\java.exe" -jar ...` |
 | Apifox 报 ECONNREFUSED 8080 | 后端没启动：先起 MySQL（3306）再起后端（8080），见第 8 节 |
+| `test-case run` URL 仍是 `{taskId}` → 400 | CLI 不替换 path 变量：报告取 collection 段 → 替换 path → `apifox run` 执行，见第 9 节 |
 

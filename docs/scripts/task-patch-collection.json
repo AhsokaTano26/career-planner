@@ -1,0 +1,52 @@
+{
+  "info": {
+    "name": "task-patch-collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "PATCH /api/v1/tasks/T163 更新任务",
+      "request": {
+        "method": "PATCH",
+        "url": "http://127.0.0.1:8080/api/v1/tasks/T163",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"status\": \"DELAYED\", \"reason\": \"与课程时间冲突\", \"note\": \"推迟到 11 月中旬\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "PATCH /api/v1/tasks/T163 更新标题",
+      "request": {
+        "method": "PATCH",
+        "url": "http://127.0.0.1:8080/api/v1/tasks/T163",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"status\": \"DOING\", \"title\": \"CLI 测试更新标题\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -3,6 +3,7 @@ package com.career.core.common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -38,6 +39,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<Map<String, Object>> handleNotFound(NoResourceFoundException e) {
         return ApiResponse.error(40400, "接口不存在");
+    }
+
+    /** 请求方法不支持（如 POST 命中仅 PATCH 的路由）→ 405，避免落入兜底 500 */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public ApiResponse<Map<String, Object>> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
+        return ApiResponse.error(40500, "请求方法不支持");
     }
 
     @ExceptionHandler(Exception.class)

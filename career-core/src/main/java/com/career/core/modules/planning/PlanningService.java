@@ -9,10 +9,13 @@ import com.career.core.modules.recommendation.RecommendationService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 计划模块服务（按线上 Apifox「目标计划」Schema 实现）。
@@ -28,6 +31,24 @@ public class PlanningService {
 
     private static final DateTimeFormatter MONTH_FMT = DateTimeFormatter.ofPattern("yyyy-MM");
     private static final String DEFAULT_SEMESTER = "2026-2027学年第1学期";
+
+    /** 线上方向编码英文关键词 → 本地方向名称关键词映射（Demo 兼容点，见 matchDirectionByKeywords） */
+    private static final List<String[]> DIRECTION_KEYWORD_MAP = List.of(
+            new String[]{"frontend", "前端"},
+            new String[]{"backend", "开发"},
+            new String[]{"software", "软件"},
+            new String[]{"employment", "开发"},
+            new String[]{"data", "数据"},
+            new String[]{"analysis", "数据"},
+            new String[]{"algorithm", "算法"},
+            new String[]{"machine", "算法"},
+            new String[]{"game", "游戏"},
+            new String[]{"security", "安全"},
+            new String[]{"network", "网络"},
+            new String[]{"test", "测试"},
+            new String[]{"quality", "测试"},
+            new String[]{"product", "产品"},
+            new String[]{"project", "项目"});
 
     private final RecommendationService recommendationService;
     private final RecommendationDao recommendationDao;
@@ -45,19 +66,10 @@ public class PlanningService {
 
     /** 生成学期计划草案（POST /plans/draft） */
     public PlanDraftDto generatePlanDraft(Long studentId, String directionId, boolean useAi) {
-        String dirCode = directionId;
-        if (dirCode == null || dirCode.isBlank()) {
-            RecommendationRunDto latest = recommendationService.getLatest(studentId);
-            if (latest != null && latest.results() != null && !latest.results().isEmpty()) {
-                dirCode = latest.results().get(0).directionId();
-            }
-        }
-        if (dirCode == null || dirCode.isBlank()) {
-            throw new BadRequestException("无法确定目标方向，请传入 directionId 或先生成推荐");
-        }
-        CareerDirection direction = recommendationDao.findDirectionByCode(dirCode);
+        // Demo 兼容点：directionId 支持本地 DIR 编码与线上语义编码（如 employment_backend），空则回退最新推荐
+        CareerDirection direction = resolveDirectionWithFallback(directionId, studentId, 0);
         if (direction == null) {
-            throw new BadRequestException("方向不存在：" + dirCode);
+            throw new BadRequestException("无法确定目标方向，请传入 directionId 或先生成推荐");
         }
 
         String goalSummary = "本学期围绕【" + direction.name() + "】方向打好基础："
@@ -132,19 +144,27 @@ public class PlanningService {
         return toGoalDto(goals);
     }
 
-    /** 设置 / 变更目标（POST /goals）：入参为方向编码，落库后返回 Goal */
+    /** 设置 / 变更目标（POST /goals）：入参为方向编码（兼容线上语义编码），落库后返回 Goal */
     public GoalDto setGoal(Long studentId, String primaryDirectionId, String backupDirectionId) {
-        CareerDirection primary = resolveDirection(primaryDirectionId);
+        CareerDirection primary = resolveDirectionWithFallback(primaryDirectionId, studentId, 0);
+        if (primary == null) {
+            throw new BadRequestException("方向不存在：" + primaryDirectionId);
+        }
         GoalDto.GoalItemDto primaryItem = toGoalItem(primary);
-        planningDao.insertGoal(studentId, primary == null ? null : primary.id(),
+        planningDao.insertGoal(studentId, primary.id(),
                 primaryItem.name() == null ? "我的发展目标" : primaryItem.name(), "MAIN", "ACTIVE");
+
         GoalDto.GoalItemDto backupItem = null;
         if (backupDirectionId != null && !backupDirectionId.isBlank()) {
-            CareerDirection backup = resolveDirection(backupDirectionId);
+            CareerDirection backup = resolveDirectionWithFallback(backupDirectionId, studentId, 1);
             if (backup != null) {
                 backupItem = toGoalItem(backup);
                 planningDao.insertGoal(studentId, backup.id(), backup.name(), "BACKUP", "ACTIVE");
             }
+        }
+        // Demo 精简点：未提供/未解析出备选目标时以主目标兜底，保证 backup 非 null（契约不允许 null）
+        if (backupItem == null) {
+            backupItem = primaryItem;
         }
         return new GoalDto(primaryItem, backupItem, "G-v1",
                 LocalDate.now().atStartOfDay().toString());
@@ -196,6 +216,60 @@ public class PlanningService {
                 LocalDate.now().atStartOfDay().toString());
     }
 
+    /** 解析方向：本地 DIR 编码 → 线上语义编码关键词匹配 → 最新推荐回退（Demo 兼容点，见各步注释） */
+    private CareerDirection resolveDirectionWithFallback(String directionId, Long studentId, int fallbackIndex) {
+        CareerDirection dir = resolveDirection(directionId);
+        if (dir == null) {
+            dir = matchDirectionByKeywords(directionId);
+        }
+        if (dir == null) {
+            dir = latestRecommendedDirection(studentId, fallbackIndex);
+        }
+        return dir;
+    }
+
+    /**
+     * 线上方向编码 → 本地方向（Demo 兼容点：线上编码如 employment_backend / data_analysis 不在本地
+     * direction_code 中，按英文关键词映射到中文名称/类型粗匹配；匹配不到返回 null）。
+     */
+    private CareerDirection matchDirectionByKeywords(String directionId) {
+        if (directionId == null || directionId.isBlank()) {
+            return null;
+        }
+        String lower = directionId.toLowerCase();
+        List<CareerDirection> all = recommendationDao.findAllDirections();
+        // 1) 名称/类型直接包含编码片段
+        for (CareerDirection d : all) {
+            String name = d.name() == null ? "" : d.name().toLowerCase();
+            String type = d.type() == null ? "" : d.type().toLowerCase();
+            if (name.contains(lower) || type.contains(lower)) {
+                return d;
+            }
+        }
+        // 2) 英文关键词 → 中文名称关键词
+        for (String[] kv : DIRECTION_KEYWORD_MAP) {
+            if (lower.contains(kv[0])) {
+                for (CareerDirection d : all) {
+                    String name = d.name() == null ? "" : d.name();
+                    if (name.contains(kv[1])) {
+                        return d;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /** 回退：取学生最新推荐批次第 index 个结果对应方向（保证契约非空；无推荐返回 null） */
+    private CareerDirection latestRecommendedDirection(Long studentId, int index) {
+        RecommendationRunDto latest = recommendationService.getLatest(studentId);
+        if (latest == null || latest.results() == null || latest.results().isEmpty()) {
+            return null;
+        }
+        int idx = Math.min(index, latest.results().size() - 1);
+        return resolveDirection(latest.results().get(idx).directionId());
+    }
+
     // ---------- 计划 ----------
 
     /** 最新计划（GET /plans/latest）：无则返回 null（Controller 转 404） */
@@ -216,12 +290,30 @@ public class PlanningService {
                 plan.status(), plan.createdAt()));
     }
 
+    /** 编辑最新计划（PATCH /plans 空 planId 兜底）：无计划则 404；仅支持 semester 更新，其余字段回读 */
+    public PlanDto editLatestPlan(Long studentId, String semester) {
+        List<PlanningDao.PlanRow> plans = planningDao.findPlans(studentId);
+        if (plans.isEmpty()) {
+            throw new NotFoundException("暂无计划，请先生成计划草案");
+        }
+        return editPlan(plans.get(0).id(), semester);
+    }
+
     /** 确认计划（POST /plans/{planId}/confirm） */
     public PlanDto confirmPlan(Long planId) {
         PlanningDao.PlanRow plan = requirePlan(planId);
         planningDao.updatePlan(planId, plan.semester(), "CONFIRMED");
         return toPlanDto(new PlanningDao.PlanRow(plan.id(), plan.goalId(), plan.semester(), plan.source(),
                 "CONFIRMED", plan.createdAt()));
+    }
+
+    /** 确认最新计划（POST /plans/confirm 空 planId 兜底）：无计划则 404 */
+    public PlanDto confirmLatestPlan(Long studentId) {
+        List<PlanningDao.PlanRow> plans = planningDao.findPlans(studentId);
+        if (plans.isEmpty()) {
+            throw new NotFoundException("暂无计划，请先生成计划草案");
+        }
+        return confirmPlan(plans.get(0).id());
     }
 
     /** 计划版本历史（GET /plan-versions）：线上 200 schema 为单个 Plan，返回最近一条 */
@@ -301,34 +393,106 @@ public class PlanningService {
                 task.month(), task.createdAt()));
     }
 
+    /** 更新最新任务（PATCH /tasks 空 taskId 兜底）：无任务则 404 */
+    public TaskDto updateLatestTask(Long studentId, String title, String status) {
+        List<PlanningDao.TaskRow> tasks = planningDao.findTasks(studentId);
+        if (tasks.isEmpty()) {
+            throw new NotFoundException("暂无任务");
+        }
+        return updateTask(tasks.get(0).id(), title, status);
+    }
+
     /** 删除任务（DELETE /tasks/{taskId}） */
     public void deleteTask(Long taskId) {
         requireTask(taskId);
         planningDao.deleteTask(taskId);
     }
 
-    /** 任务打卡（POST /tasks/{taskId}/checkin）：置为 DONE */
-    public TaskDto checkinTask(Long taskId) {
+    /** 删除最新任务（DELETE /tasks 空 taskId 兜底）：无任务则 404 */
+    public void deleteLatestTask(Long studentId) {
+        List<PlanningDao.TaskRow> tasks = planningDao.findTasks(studentId);
+        if (tasks.isEmpty()) {
+            throw new NotFoundException("暂无任务");
+        }
+        deleteTask(tasks.get(0).id());
+    }
+
+    /** 任务打卡（POST /tasks/{taskId}/checkin）：置为 DONE，返回契约 TaskCheckin 扁平结构 */
+    public TaskDto.TaskCheckinDto checkinTask(Long taskId, Map<String, Object> body) {
         PlanningDao.TaskRow task = requireTask(taskId);
         planningDao.updateTask(taskId, task.title(), "DONE");
-        return toTaskDto(new PlanningDao.TaskRow(taskId, task.studentId(), task.title(),
-                "DONE", task.month(), task.createdAt()));
+        return buildCheckin(taskId, task, body);
+    }
+
+    /** 对最新任务打卡（POST /tasks/checkin 空 taskId 兜底）：无任务则 404 */
+    public TaskDto.TaskCheckinDto checkinLatestTask(Long studentId, Map<String, Object> body) {
+        List<PlanningDao.TaskRow> tasks = planningDao.findTasks(studentId);
+        if (tasks.isEmpty()) {
+            throw new NotFoundException("暂无任务");
+        }
+        PlanningDao.TaskRow task = tasks.get(0);
+        return checkinTask(task.id(), body);
+    }
+
+    /** 组装契约 TaskCheckin：id/taskId/doneDesc 必填，其余字段非 null 兜底 */
+    private TaskDto.TaskCheckinDto buildCheckin(Long taskId, PlanningDao.TaskRow task, Map<String, Object> body) {
+        String id = "TC-" + taskId;
+        String taskIdStr = "T" + taskId;
+        String doneDesc = body == null ? null : (String) body.get("doneDesc");
+        String gains = body == null ? null : (String) body.get("gains");
+        String difficulties = body == null ? null : (String) body.get("difficulties");
+        String proofUrl = body == null ? null : (String) body.get("proofUrl");
+        // Demo 精简点：doneDesc 缺省取“任务已完成”，可选字段缺省空串，保证契约非空；后续迭代替换为真实打卡表
+        String checkedInAt = task.createdAt() == null ? LocalDateTime.now().toString() : task.createdAt().toString();
+        return new TaskDto.TaskCheckinDto(
+                id,
+                taskIdStr,
+                (doneDesc == null || doneDesc.isBlank()) ? "任务已完成" : doneDesc,
+                gains == null ? "" : gains,
+                difficulties == null ? "" : difficulties,
+                proofUrl == null ? "" : proofUrl,
+                checkedInAt);
     }
 
     private TaskDto toTaskDto(PlanningDao.TaskRow task) {
         String status = normalizeTaskStatus(task.status());
+        String id = task.id() == null ? null : "T" + task.id();
+        // Demo 精简点：无独立 month/deadline/note/打卡列，字段以默认值兜底，保证契约非空；后续迭代替换为真实列
+        String month = task.month() == null || task.month().isBlank() ? defaultMonth() : task.month();
+        String checkedInAt = task.createdAt() == null ? LocalDateTime.now().toString() : task.createdAt().toString();
         return new TaskDto(
-                task.id() == null ? null : "T" + task.id(),
-                task.month(),
+                id,
+                month,
                 task.title(),
                 taskTypeOf(task.title()),
                 0.0,
                 status,
-                null,
+                lastDayOfMonth(month),
                 List.of(),
-                null,
-                "DONE".equals(status) ? (task.createdAt() == null ? null : task.createdAt().toString()) : null,
-                null);
+                "",
+                checkedInAt,
+                new TaskDto.TaskCheckinDto(
+                        id == null ? null : "TC-" + task.id(),
+                        id,
+                        "DONE".equals(status) ? "任务已完成" : "",
+                        "",
+                        "",
+                        "",
+                        checkedInAt));
+    }
+
+    /** 默认月份（yyyy-MM）：任务无月份时的 Demo 兜底 */
+    private String defaultMonth() {
+        return LocalDate.now().format(MONTH_FMT);
+    }
+
+    /** 月份最后一天（deadline 兜底）：如 2026-09 → 2026-09-30 */
+    private String lastDayOfMonth(String month) {
+        try {
+            return YearMonth.parse(month).atEndOfMonth().toString();
+        } catch (Exception e) {
+            return LocalDate.now().withDayOfMonth(1).plusMonths(1).minusDays(1).toString();
+        }
     }
 
     /** 本地任务状态 → 线上枚举（TODO/DOING/DONE → PENDING/DOING/DONE） */
