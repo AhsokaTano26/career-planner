@@ -73,6 +73,8 @@
 
 - **PowerShell 编码**：PowerShell 管道会把 curl 输出的 UTF-8 按 GBK 解码，导致中文乱码/伪空格。对比接口结果请用 `curl.exe -o 文件` 存原始字节 + `Get-FileHash` 比对，或用 `Get-Content -Encoding utf8` 读取；查库用 `mysql ... -e "SELECT HEX(...)"`。
 - **JSON 请求体**：PowerShell 中 `curl -d "{\"...\"}"` 的 `\"` 不会转义，会原样发送反斜杠导致服务端 JSON 解析失败（500）。请用 `--data-binary @文件`。
+- **分支名带括号**：PowerShell 会把 `git ... origin/career-core(back-end)` 里的 `(back-end)` 解析成命令调用，报错 `back-end\` 不是命令。引用含括号的分支名/引用必须加引号，如 `$br = 'origin/career-core(back-end)'` 或 `git log 'origin/career-core(back-end)'`。
+- **终端工具会简化命令（丢掉 `cd`）**：后台长命令（如 `java -jar`、`python -m uvicorn`）可能被工具剥离开头的 `cd <目录>`，导致相对路径（如 `target\xxx.jar`）解析失败，报 `Unable to access jarfile`。启动服务请用绝对路径（`java -jar D:\...\target\xxx.jar`），或用 `--app-dir`（uvicorn）等不依赖当前目录的方式。
 - **保留字**：MySQL 8+ 中 `rank` 为保留字，SQL 需写成 `` `rank` ``。
 - **下载源**：archive.apache.org 很慢，Maven 用 dlcdn.apache.org；MySQL 版本须到 dev.mysql.com 下载页查当前版本（2026-08 为 26.7.0）。
 - **Apifox**：MCP 服务只读（无法直接写线上文档）；接口定义以 `docs/openapi/career-core-apis.yaml` 供导入。
