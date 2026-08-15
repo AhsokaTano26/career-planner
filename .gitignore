@@ -20,3 +20,7 @@
 **/__pycache__/
 *.pyc
 
+# Local backups & test artifacts (never commit)
+career-core-backup-*/
+run_resp.json
+
