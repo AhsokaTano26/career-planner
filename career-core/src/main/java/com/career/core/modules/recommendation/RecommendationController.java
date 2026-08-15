@@ -75,14 +75,16 @@ public class RecommendationController {
         return run;
     }
 
-    /** 推荐反馈：POST /recommendation-results/{resultId}/feedback */
+    /** 推荐反馈：POST /recommendation-results/{resultId}/feedback（resultId 为方向编码字符串，契约定义） */
     @PostMapping("/recommendation-results/{resultId}/feedback")
     public RecommendationFeedbackDto feedback(
-            @PathVariable Long resultId,
+            @PathVariable String resultId,
+            @RequestParam(value = "studentId", required = false) Long studentId,
             @RequestBody(required = false) Map<String, Object> body) {
+        long sid = studentId == null ? DEFAULT_STUDENT_ID : studentId;
         String feedbackType = body == null ? null : (String) body.get("feedbackType");
         String comment = body == null ? null : (String) body.get("comment");
-        service.feedback(resultId, feedbackType, comment);
+        service.feedback(resultId, feedbackType, comment, sid);
         return new RecommendationFeedbackDto(feedbackType, comment);
     }
 }

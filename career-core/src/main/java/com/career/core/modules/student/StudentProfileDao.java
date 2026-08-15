@@ -2,8 +2,12 @@ package com.career.core.modules.student;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -82,5 +86,38 @@ public class StudentProfileDao {
                 "SELECT id, student_id, type, title, start_date, description " +
                         "FROM student_experience WHERE student_id = ? ORDER BY id ASC",
                 EXPERIENCE_MAPPER, studentId);
+    }
+
+    /** 按快照ID查询画像快照（详情） */
+    public ProfileSnapshot findSnapshotById(Long snapshotId) {
+        List<ProfileSnapshot> list = jdbc.query(
+                "SELECT id, student_id, source_version, dimension_json, summary, created_at " +
+                        "FROM profile_snapshot WHERE id = ?",
+                SNAPSHOT_MAPPER, snapshotId);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    /** 新增画像反馈 */
+    public void insertFeedback(Long snapshotId, Long studentId, String feedbackType, String comment) {
+        jdbc.update(
+                "INSERT INTO profile_snapshot_feedback (snapshot_id, student_id, feedback_type, comment) VALUES (?, ?, ?, ?)",
+                snapshotId, studentId, feedbackType, comment);
+    }
+
+    /** 新增画像快照（返回自增主键），供「重新生成画像」复制最新快照 */
+    public long insertSnapshot(Long studentId, String sourceVersion, String dimensionJson, String summary) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbc.update(con -> {
+            PreparedStatement ps = con.prepareStatement(
+                    "INSERT INTO profile_snapshot (student_id, source_version, dimension_json, summary) VALUES (?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
+            ps.setLong(1, studentId);
+            ps.setString(2, sourceVersion);
+            ps.setString(3, dimensionJson);
+            ps.setString(4, summary);
+            return ps;
+        }, keyHolder);
+        Number key = keyHolder.getKey();
+        return key == null ? 0L : key.longValue();
     }
 }

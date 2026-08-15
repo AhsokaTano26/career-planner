@@ -1,6 +1,7 @@
 package com.career.core.modules.student;
 
 import com.career.core.common.Constants;
+import com.career.core.common.NotFoundException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -59,6 +60,38 @@ public class StudentProfileService {
                 .filter(s -> s.dimensionJson() != null && !s.dimensionJson().isBlank())
                 .map(this::toDto)
                 .toList();
+    }
+
+    /** 画像快照详情（按快照ID） */
+    public ProfileSnapshotDto getSnapshotById(Long snapshotId) {
+        ProfileSnapshot snapshot = dao.findSnapshotById(snapshotId);
+        if (snapshot == null || snapshot.dimensionJson() == null || snapshot.dimensionJson().isBlank()) {
+            return null;
+        }
+        return toDto(snapshot);
+    }
+
+    /** 画像反馈（Demo 精简点：直接落库，不做内容校验与反馈回流） */
+    public void addFeedback(Long snapshotId, Long studentId, String feedbackType, String comment) {
+        if (dao.findSnapshotById(snapshotId) == null) {
+            throw new NotFoundException("画像快照不存在：" + snapshotId);
+        }
+        dao.insertFeedback(snapshotId, studentId, feedbackType, comment);
+    }
+
+    /** 重新生成画像（Demo 精简点：无重算引擎，复制最新快照生成新版本；后续迭代替换为画像计算器） */
+    public ProfileSnapshotDto refreshProfile(Long studentId) {
+        StudentProfile student = dao.findStudentByUserId(studentId);
+        if (student == null) {
+            return null;
+        }
+        ProfileSnapshot latest = dao.findLatestSnapshot(studentId);
+        if (latest == null || latest.dimensionJson() == null || latest.dimensionJson().isBlank()) {
+            return null;
+        }
+        long id = dao.insertSnapshot(studentId, "refresh", latest.dimensionJson(), latest.summary());
+        ProfileSnapshot created = dao.findSnapshotById(id);
+        return created == null ? null : toDto(created);
     }
 
     private ProfileSnapshotDto toDto(ProfileSnapshot snapshot) {

@@ -128,21 +128,57 @@ public class RecommendationService {
     /**
      * 推荐反馈（POST /recommendation-results/{resultId}/feedback）。
      * 线上 feedbackType 枚举：HELPFUL / NEUTRAL / MISMATCH / NOT_INTERESTED。
+     * 契约中 resultId 为字符串方向编码（如 DIR002）；兼容旧调用方的数字型 resultId。
+     * Demo 无登录态，studentId 由 Controller 解析（缺省 1001）。
      */
-    public void feedback(Long resultId, String feedbackType, String comment) {
-        if (!recommendationDao.existsResult(resultId)) {
-            throw new BadRequestException("推荐结果不存在：" + resultId);
+    public void feedback(String resultRef, String feedbackType, String comment, Long studentId) {
+        Long resultId = resolveFeedbackResultId(resultRef, studentId);
+        if (resultId == null) {
+            throw new BadRequestException("推荐结果不存在：" + resultRef);
         }
         recommendationDao.insertFeedback(resultId, feedbackType, comment);
     }
 
-    /** 反馈（兼容空 resultId：自动使用最近一次推荐结果） */
+    /** 解析反馈目标结果ID：数字形式直接使用（兼容旧调用方）；否则按方向编码解析到该学生最新批次的结果。 */
+    private Long resolveFeedbackResultId(String resultRef, Long studentId) {
+        if (resultRef == null || resultRef.isBlank()) {
+            return null;
+        }
+        // 数字形式：直接作为 recommendation_result.id 使用
+        try {
+            long num = Long.parseLong(resultRef);
+            return recommendationDao.existsResult(num) ? num : null;
+        } catch (NumberFormatException ignored) {
+            // 非数字，走方向编码解析
+        }
+        // 方向编码 → 方向ID
+        Long dirId = recommendationDao.findAllDirections().stream()
+                .filter(d -> resultRef.equals(d.directionCode()))
+                .map(CareerDirection::id)
+                .findFirst()
+                .orElse(null);
+        if (dirId == null) {
+            return null;
+        }
+        // 学生最新批次的该方向结果
+        RecommendationDao.RunRow run = recommendationDao.findLatestRun(studentId);
+        if (run == null) {
+            return null;
+        }
+        return recommendationDao.findResultsByRunId(run.id()).stream()
+                .filter(r -> r.directionId() == dirId)
+                .map(RecommendationDao.ResultRow::id)
+                .findFirst()
+                .orElse(null);
+    }
+
+    /** 反馈（兼容空 resultId：自动使用最近一次推荐结果；无登录态，studentId 传 null） */
     public void feedbackLatest(String feedbackType, String comment) {
         Long latestId = recommendationDao.findLatestResultId();
         if (latestId == null) {
             throw new BadRequestException("暂无推荐结果，请先调用 /students/me/recommendations/runs 生成推荐");
         }
-        feedback(latestId, feedbackType, comment);
+        feedback(String.valueOf(latestId), feedbackType, comment, null);
     }
 
     // ---------- 内部工具 ----------

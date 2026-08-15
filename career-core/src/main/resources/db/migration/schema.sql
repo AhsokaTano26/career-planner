@@ -181,3 +181,29 @@ CREATE TABLE IF NOT EXISTS plan_task (
     PRIMARY KEY (id),
     KEY idx_task_plan (plan_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '计划任务';
+
+-- 画像反馈（profile_snapshot_feedback）
+-- 承接 POST /api/v1/profile-snapshots/{snapshotId}/feedback（snapshot_id 指向 profile_snapshot.id）
+CREATE TABLE IF NOT EXISTS profile_snapshot_feedback (
+    id            BIGINT       NOT NULL AUTO_INCREMENT,
+    snapshot_id   BIGINT       NOT NULL COMMENT '画像快照ID（profile_snapshot.id）',
+    student_id    BIGINT       DEFAULT NULL COMMENT '学生ID（冗余，便于按学生统计）',
+    feedback_type VARCHAR(32)  DEFAULT NULL COMMENT '反馈类型（MATCH/PARTIAL/MISMATCH）',
+    comment       VARCHAR(500) DEFAULT NULL COMMENT '反馈意见',
+    created_at    DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_psf_snapshot (snapshot_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '画像反馈';
+
+-- 学生任务（task）—— 学生个人任务（设计文档 8.2 计划域；与 plan_task 计划内任务分离）
+CREATE TABLE IF NOT EXISTS task (
+    id         BIGINT       NOT NULL AUTO_INCREMENT,
+    student_id BIGINT       NOT NULL COMMENT '学生ID（对应 student_profile.user_id）',
+    title      VARCHAR(128) NOT NULL COMMENT '任务标题',
+    status     VARCHAR(16)  DEFAULT 'TODO' COMMENT '状态：TODO/DOING/DONE',
+    month      VARCHAR(16)  DEFAULT NULL COMMENT '归属月份（如 2026-09）',
+    created_at DATETIME     DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_task_student (student_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '学生任务';

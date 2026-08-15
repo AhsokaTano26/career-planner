@@ -21,6 +21,11 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 app = FastAPI(title="career-ai", version="0.1.0")
 
+# AI 智能服务 + AI 生涯咨询路由（/api/v1/ai/*）
+from api.routes_ai import router as ai_router  # noqa: E402
+
+app.include_router(ai_router)
+
 
 # ---------------------------------------------------------------- 模型定义
 class Direction(BaseModel):

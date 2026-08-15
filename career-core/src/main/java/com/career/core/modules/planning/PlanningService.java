@@ -1,6 +1,7 @@
 package com.career.core.modules.planning;
 
 import com.career.core.common.BadRequestException;
+import com.career.core.common.NotFoundException;
 import com.career.core.modules.recommendation.CareerDirection;
 import com.career.core.modules.recommendation.RecommendationDao;
 import com.career.core.modules.recommendation.RecommendationRunDto;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 计划模块服务（按线上 Apifox「目标计划」PlanDraft 结构实现）。
@@ -126,5 +129,125 @@ public class PlanningService {
                     new String[]{"完成一项实践项目", "PRACTICE", "12"},
                     new String[]{"阶段复盘与调整", "REVIEW", "4"});
         };
+    }
+
+    // ---------- 目标 / 计划 / 任务（补齐线上「目标计划」模块） ----------
+
+    /** 我的目标列表 */
+    public List<GoalDto> getGoals(Long studentId) {
+        return planningDao.findGoals(studentId);
+    }
+
+    /** 设置 / 变更目标 */
+    public GoalDto setGoal(Long studentId, String directionId, String title, String goalType) {
+        Long dirId = null;
+        if (directionId != null && !directionId.isBlank()) {
+            CareerDirection direction = recommendationDao.findDirectionByCode(directionId);
+            if (direction != null) {
+                dirId = direction.id();
+            }
+        }
+        String goalTitle = (title != null && !title.isBlank()) ? title : "我的发展目标";
+        String type = (goalType != null && !goalType.isBlank()) ? goalType : "MAIN";
+        long id = planningDao.insertGoal(studentId, dirId, goalTitle, type, "ACTIVE");
+        return new GoalDto(id, dirId, goalTitle, type, "ACTIVE");
+    }
+
+    /** 最新计划 */
+    public PlanDto getLatestPlan(Long studentId) {
+        List<PlanDto> plans = planningDao.findPlans(studentId);
+        return plans.isEmpty() ? null : plans.get(0);
+    }
+
+    /** 编辑计划（Demo：仅学期可改） */
+    public PlanDto editPlan(Long planId, String semester) {
+        PlanDto plan = requirePlan(planId);
+        String sem = (semester != null && !semester.isBlank()) ? semester : plan.semester();
+        planningDao.updatePlan(planId, sem, plan.status());
+        return new PlanDto(plan.id(), plan.goalId(), sem, plan.source(), plan.status());
+    }
+
+    /** 确认计划 */
+    public PlanDto confirmPlan(Long planId) {
+        PlanDto plan = requirePlan(planId);
+        planningDao.updatePlan(planId, plan.semester(), "CONFIRMED");
+        return new PlanDto(plan.id(), plan.goalId(), plan.semester(), plan.source(), "CONFIRMED");
+    }
+
+    /** 计划版本历史（Demo 精简点：无独立版本表，历史列表即版本） */
+    public List<PlanDto> getPlanVersions(Long studentId) {
+        return planningDao.findPlans(studentId);
+    }
+
+    /** 目标版本历史（Demo 精简点：无独立版本表，历史列表即版本） */
+    public List<GoalDto> getGoalVersions(Long studentId) {
+        return planningDao.findGoals(studentId);
+    }
+
+    /** 任务列表 */
+    public List<TaskDto> getTasks(Long studentId) {
+        return planningDao.findTasks(studentId);
+    }
+
+    /** 新增任务 */
+    public TaskDto addTask(Long studentId, String title, String month) {
+        if (title == null || title.isBlank()) {
+            throw new BadRequestException("任务标题不能为空");
+        }
+        long id = planningDao.insertTask(studentId, title, month);
+        return planningDao.findTaskById(id);
+    }
+
+    /** 更新任务 */
+    public TaskDto updateTask(Long taskId, String title, String status) {
+        TaskDto task = requireTask(taskId);
+        String t = (title != null && !title.isBlank()) ? title : task.title();
+        String s = (status != null && !status.isBlank()) ? status : task.status();
+        planningDao.updateTask(taskId, t, s);
+        return new TaskDto(taskId, t, s, task.month());
+    }
+
+    /** 删除任务 */
+    public void deleteTask(Long taskId) {
+        requireTask(taskId);
+        planningDao.deleteTask(taskId);
+    }
+
+    /** 任务打卡：置为 DONE */
+    public TaskDto checkinTask(Long taskId) {
+        TaskDto task = requireTask(taskId);
+        planningDao.updateTask(taskId, task.title(), "DONE");
+        return new TaskDto(taskId, task.title(), "DONE", task.month());
+    }
+
+    /** 站内提醒（Demo 精简点：无提醒表，由 TODO 任务推导；后续迭代替换为提醒中心） */
+    public List<Map<String, Object>> getReminders(Long studentId) {
+        List<TaskDto> todos = planningDao.findTasks(studentId).stream()
+                .filter(t -> "TODO".equals(t.status()))
+                .toList();
+        List<Map<String, Object>> reminders = new ArrayList<>();
+        for (TaskDto t : todos) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("taskId", t.id());
+            m.put("message", "任务待完成：" + t.title());
+            reminders.add(m);
+        }
+        return reminders;
+    }
+
+    private PlanDto requirePlan(Long planId) {
+        PlanDto plan = planningDao.findPlanById(planId);
+        if (plan == null) {
+            throw new NotFoundException("计划不存在：" + planId);
+        }
+        return plan;
+    }
+
+    private TaskDto requireTask(Long taskId) {
+        TaskDto task = planningDao.findTaskById(taskId);
+        if (task == null) {
+            throw new NotFoundException("任务不存在：" + taskId);
+        }
+        return task;
     }
 }
