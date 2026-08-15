@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Tasks template for modernization plan. Generate this file alongside plan.md to track individual migration tasks.",
+  "tasks": [
+    {
+      "type": "upgrade",
+      "id": "001-upgrade-java-version",
+      "description": "Upgrade Java Version to the latest LTS. Addresses assessment issue 'Java Version is not the latest LTS'.",
+      "reason": "The application is not using the latest LTS Java version. Upgrading to the latest LTS ensures the application benefits from the most recent security enhancements, performance improvements, and a longer support lifecycle.",
+      "requirements": "Upgrade the career-core Spring Boot service to the latest LTS Java version (Java 25) and verify the entire project compiles and all unit tests pass on the target JDK. Complete any remaining documentation updates that reference the older Java version. Note: the assessment detected Java 21, while career-core/pom.xml already targets Java 25; verify and complete the upgrade end-to-end (build, tests, and validation).",
+      "environmentConfiguration": null,
+      "kbId": "java-version-upgrade",
+      "skills": [
+        {
+          "name": "java-version-upgrade",
+          "location": "builtin"
+        }
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      },
+      "dependencies": []
+    },
+    {
+      "type": "transform",
+      "id": "002-transform-migration-mysql-to-azure-database-for-mysql",
+      "description": "Migrate to Azure Database for MySQL. Addresses assessment issue 'MySQL database found'.",
+      "reason": "The application uses a local MySQL database (career_core) that is not managed or highly available. Migrating to a managed Azure Database for MySQL provides automated backups, scaling, monitoring, and built-in security features.",
+      "requirements": "Migrate the career-core MySQL database to Azure Database for MySQL. Update the Spring Boot datasource configuration to connect to the managed Azure MySQL instance and adopt secure passwordless (managed identity) authentication instead of username/password credentials. Ensure the existing schema and seed data migration is handled, apply monitoring/diagnostics and backup best practices, and update docker-compose/deployment references that assume a local MySQL instance.",
+      "environmentConfiguration": null,
+      "kbId": "mi-mysql",
+      "skills": [
+        {
+          "name": "migration-mi-mysql",
+          "location": "builtin"
+        }
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      },
+      "dependencies": [
+        "001-upgrade-java-version"
+      ]
+    },
+    {
+      "type": "transform",
+      "id": "003-transform-migration-plaintext-credential-to-azure-keyvault",
+      "description": "Migrate from Plaintext Credentials to Azure Key Vault. Addresses assessment issue 'Password found in configuration file'.",
+      "reason": "A database password with a default fallback value is present in the application configuration file, which is a security risk if the file is accessed by unauthorized parties. Moving secrets to Azure Key Vault centralizes and secures credential management.",
+      "requirements": "Move the database password and any other plaintext secrets out of the application configuration (application.yml) into Azure Key Vault, and update the Spring Boot configuration to retrieve these secrets securely at runtime. Remove the hardcoded default password fallback from the configuration file.",
+      "environmentConfiguration": null,
+      "kbId": "plaintext-credential-to-azure-keyvault",
+      "skills": [
+        {
+          "name": "migration-plaintext-credential-to-azure-keyvault",
+          "location": "builtin"
+        }
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      },
+      "dependencies": [
+        "001-upgrade-java-version"
+      ]
+    },
+    {
+      "type": "transform",
+      "id": "004-transform-use-secure-protocols",
+      "description": "Use Secure Protocols. Addresses assessment issue 'Use of unsecured network protocols or URI libraries'.",
+      "reason": "The application uses unsecured HTTP URIs for outbound calls (for example, the career-ai base URL) and the OpenAPI documentation contains HTTP example URLs. Secure protocols such as HTTPS should be used as applications are increasingly exposed and interconnected.",
+      "requirements": "Replace unsecured HTTP endpoints with HTTPS for all outbound service calls (for example, the career-ai base URL in application.yml and AiExplainClient) and update the OpenAPI specification example URLs to use secure protocols. Ensure the infrastructure serving the referenced resources supports HTTPS.",
+      "environmentConfiguration": null,
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      },
+      "dependencies": [
+        "001-upgrade-java-version"
+      ]
+    },
+    {
+      "type": "transform",
+      "id": "005-transform-check-hardcoded-urls",
+      "description": "Check hardcoded URLs. Addresses assessment issue 'Avoid using hardcoded URLs (HTTP protocol) in source code'.",
+      "reason": "Hardcoded HTTP URLs in source code and configuration (for example, the career-ai base URL and example URLs in the OpenAPI docs) must be replaced with the new resource URLs during the Azure migration.",
+      "requirements": "Review and externalize hardcoded HTTP URLs found in source code and configuration files (for example, the career-ai base URL in application.yml and AiExplainClient, and example URLs in the OpenAPI specification). Replace hardcoded URLs with configurable, environment-driven settings appropriate for the target Azure environment.",
+      "environmentConfiguration": null,
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      },
+      "dependencies": [
+        "001-upgrade-java-version"
+      ]
+    },
+    {
+      "type": "transform",
+      "id": "006-transform-migrate-local-resource-to-azure",
+      "description": "Migrate the Local Resource to Azure. Addresses assessment issue 'Local HTTP Calls'.",
+      "reason": "The application accesses a local resource (the career-ai FastAPI service at http://127.0.0.1:8000) over HTTP. This local resource must be migrated to the cloud so the application can call it through a public Azure-hosted endpoint.",
+      "requirements": "Migrate the locally hosted career-ai FastAPI service to an Azure-hosted endpoint and update the career-core integration (AiExplainClient and application.yml) to call the deployed service through its public HTTPS endpoint instead of localhost. The exact Azure compute target should follow the selected deployment approach; keep the code and configuration changes compatible with the migrated resource.",
+      "environmentConfiguration": null,
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      },
+      "dependencies": [
+        "001-upgrade-java-version"
+      ]
+    },
+    {
+      "type": "transform",
+      "id": "007-transform-check-hardcoded-ip-address",
+      "description": "Check hardcoded IP address. Addresses assessment issue 'Hardcoded IP Address'.",
+      "reason": "Hardcoded IP addresses (for example, 127.0.0.1 in the career-ai base URL configuration) may need to be modified or eliminated when the environment is migrated.",
+      "requirements": "Review and remove hardcoded IP addresses from source code and configuration files (for example, the 127.0.0.1 address in the career-ai base URL configuration). Replace them with configurable hostnames or environment settings appropriate for the target Azure environment.",
+      "environmentConfiguration": null,
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      },
+      "dependencies": [
+        "001-upgrade-java-version"
+      ]
+    }
+  ],
+  "metadata": {
+    "planName": "career-planner Azure Migration Plan",
+    "projectName": "career-planner",
+    "language": "java",
+    "createdAt": "2026-08-15T02:30:00Z",
+    "version": "1.0"
+  }
+}
