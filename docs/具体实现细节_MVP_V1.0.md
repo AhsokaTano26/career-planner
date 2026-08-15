@@ -19,7 +19,7 @@ Browser → Nginx → Spring Boot → MySQL
 
 ### 2.1 工程与横切实现
 
-采用 Java 21、Spring Boot 3、Spring Security、MyBatis-Plus、Flyway、MySQL 8。包名按 `modules/<domain>` 组织，每个领域固定包含 `controller`、`application`、`domain`、`infrastructure`、`dto` 五层。
+采用 Java 25、Spring Boot 3、Spring Security、MyBatis-Plus、Flyway、MySQL 8。包名按 `modules/<domain>` 组织，每个领域固定包含 `controller`、`application`、`domain`、`infrastructure`、`dto` 五层。
 
 ```text
 career-core/

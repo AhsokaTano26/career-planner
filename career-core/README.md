@@ -1,7 +1,7 @@
 # 生涯规划系统 · 核心业务服务（career-core）
 
 第一版 Demo 后端，实现 5 个接口（接口路径与主结构按线上 Apifox 为准），目标「最小可用、跑通流程」。
-技术栈：**Spring Boot 3.5 + Java 21 + MySQL + JdbcTemplate**（贴合正式架构 Spring Boot/MySQL 8）。
+技术栈：**Spring Boot 3.5 + Java 25 + MySQL + JdbcTemplate**（贴合正式架构 Spring Boot/MySQL 8）。
 
 > 说明：线上 Apifox 无“提交阶段复盘”接口，故复盘接口已按线上为准删除；本 Demo 保留「画像」「推荐」「计划」模块。
 
@@ -20,7 +20,7 @@
 
 ## 二、环境依赖
 
-- JDK 21（本机：`D:\devtools\jdk21\jdk-21.0.12+8`）
+- JDK 25（本机：`D:\devtools\jdk25\jdk-25.0.2`）
 - Maven 3.9+（本机：`D:\devtools\maven\apache-maven-3.9.16`）
 - MySQL（本机：`D:\devtools\mysql\mysql-26.7.0-winx64`，端口 3306）
 
@@ -42,7 +42,7 @@
 ## 四、构建与运行
 
 ```powershell
-$env:JAVA_HOME='D:\devtools\jdk21\jdk-21.0.12+8'
+$env:JAVA_HOME='D:\devtools\jdk25\jdk-25.0.2'
 cd career-core
 mvn -DskipTests package
 java -jar target\career-core-0.0.1-SNAPSHOT.jar

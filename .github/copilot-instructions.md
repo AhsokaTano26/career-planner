@@ -26,7 +26,7 @@
 
 | 工具 | 版本 | 安装路径 |
 |------|------|----------|
-| JDK | Temurin OpenJDK **21.0.12+8**（LTS，64 位） | `D:\devtools\jdk21\jdk-21.0.12+8` |
+| JDK | Microsoft OpenJDK **25.0.2+10**（LTS，64 位） | `D:\devtools\jdk25\jdk-25.0.2` |
 | Maven | **3.9.16** | `D:\devtools\maven\apache-maven-3.9.16` |
 | Node.js | **v24.18.0** | 系统 PATH |
 | npm | **11.16.0** | 系统 PATH |
@@ -35,12 +35,12 @@
 
 ## 4. 环境变量
 
-- `JAVA_HOME=D:\devtools\jdk21\jdk-21.0.12+8`（已写入 User 级环境变量）
+- `JAVA_HOME=D:\devtools\jdk25\jdk-25.0.2`（项目目标运行 JDK；若 User 级变量仍指向旧 JDK，请手动更新）
 - `MAVEN_HOME=D:\devtools\maven\apache-maven-3.9.16`（已写入 User 级环境变量）
 - ⚠️ **新开的终端会话可能读不到 User 级 JAVA_HOME**，运行 Maven/Java 前需手动设置：
   ```powershell
-  $env:JAVA_HOME='D:\devtools\jdk21\jdk-21.0.12+8'
-  $env:Path='D:\devtools\jdk21\jdk-21.0.12+8\bin;D:\devtools\maven\apache-maven-3.9.16\bin;'+$env:Path
+  $env:JAVA_HOME='D:\devtools\jdk25\jdk-25.0.2'
+  $env:Path='D:\devtools\jdk25\jdk-25.0.2\bin;D:\devtools\maven\apache-maven-3.9.16\bin;'+$env:Path
   ```
 
 ## 5. 数据库（MySQL 26.7.0）
@@ -59,7 +59,7 @@
 
 ## 6. 后端（career-core）运行
 
-- **技术栈**：Spring Boot **3.5.16**（pom 管理）+ Java 21 + MySQL + JdbcTemplate（无 MyBatis）
+- **技术栈**：Spring Boot **3.5.16**（pom 管理）+ Java 25 + MySQL + JdbcTemplate（无 MyBatis）
 - **服务端口**：8080
 - **构建与启动**：
   ```powershell
