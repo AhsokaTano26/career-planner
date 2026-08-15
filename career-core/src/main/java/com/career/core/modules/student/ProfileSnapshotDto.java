@@ -1,11 +1,16 @@
 package com.career.core.modules.student;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 /**
  * 画像快照响应（线上 Apifox ProfileSnapshot）。
  * dimensions 为六维得分数组；version 为整数版本号；completeness 为整数完整度。
+ * feedback 为非必填对象：无反馈时省略该字段（Apifox 契约测试不允许对象字段为 null），
+ * 故类级 @JsonInclude(NON_NULL) 只对 null 字段生效。
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ProfileSnapshotDto(
         String id,
         int version,

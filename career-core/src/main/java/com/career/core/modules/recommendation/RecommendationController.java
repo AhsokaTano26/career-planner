@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,14 +54,18 @@ public class RecommendationController {
         return run;
     }
 
-    /** 推荐批次历史：GET /students/me/recommendations */
+    /** 推荐批次历史：GET /students/me/recommendations（线上 200 schema 为单个 RecommendationRun） */
     @GetMapping("/students/me/recommendations")
-    public List<RecommendationRunDto> getHistory(
+    public RecommendationRunDto getHistory(
             @RequestParam(value = "studentId", required = false) Long studentId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "20") int size) {
         long sid = studentId == null ? DEFAULT_STUDENT_ID : studentId;
-        return service.getHistory(sid, page, size);
+        RecommendationRunDto run = service.getHistory(sid, page, size);
+        if (run == null) {
+            throw new NotFoundException("暂无推荐批次，请先生成推荐");
+        }
+        return run;
     }
 
     /** 推荐批次详情：GET /recommendation-runs/{runId} */

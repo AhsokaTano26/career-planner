@@ -170,6 +170,57 @@ def run_apifox(args: list) -> dict:
 
 ---
 
+## 7. JDK 版本冲突（默认 java 是 21，项目需 Java 25）
+
+**现象**：`java -jar target\career-core-0.0.1-SNAPSHOT.jar` 启动后端失败，报：
+
+```
+UnsupportedClassVersionError: com/career/core/CareerCoreApplication has been
+compiled by a more recent version of the Java Runtime (class file version 69.0),
+this version ... only recognizes class file versions up to 65.0
+```
+
+**根因**：项目 `pom.xml` 配置 `java.version=25`，jar 用 JDK 25 编译（class file version 69.0）；但新开的终端默认 `java` 仍是 JDK 21（只识别 65.0）。两者不匹配导致启动失败。
+
+**解决方式**（任选其一）：
+
+1. **直接用 JDK 25 绝对路径启动**（最稳，不依赖 PATH）：
+   ```powershell
+   & "D:\devtools\jdk25\jdk-25.0.2\bin\java.exe" -jar "D:\Zht20241287\career-planner\career-core\target\career-core-0.0.1-SNAPSHOT.jar"
+   ```
+
+2. **修正当前会话 JAVA_HOME / PATH 后再构建与启动**：
+   ```powershell
+   $env:JAVA_HOME='D:\devtools\jdk25\jdk-25.0.2'
+   $env:Path='D:\devtools\jdk25\jdk-25.0.2\bin;D:\devtools\maven\apache-maven-3.9.16\bin;'+$env:Path
+   mvn -DskipTests package
+   java -jar target\career-core-0.0.1-SNAPSHOT.jar
+   ```
+
+**避坑要点**：版本号对照——class file version 65.0 = Java 21，69.0 = Java 25；**构建和运行必须用同一 JDK（本项目统一 25）**。`JAVA_HOME` 已写入 User 级变量，但新终端会话可能读不到，务必显式设置或走绝对路径。
+
+---
+
+## 8. 本地服务启动命令速记（Apifox 调试前置）
+
+> Apifox 桌面端测试报 `connect ECONNREFUSED 127.0.0.1:8080` = 后端没启动；先启动 MySQL 再启动后端。
+
+```powershell
+# 1) 启动 MySQL（3306；mysqld 后台终端不要关）
+& D:\devtools\mysql\mysql-26.7.0-winx64\bin\mysqld.exe --defaults-file=D:\devtools\mysql\my.ini --console
+
+# 2) 启动后端（8080；JDK 25 绝对路径 + jar 绝对路径，避免丢 cd / 版本不匹配）
+& "D:\devtools\jdk25\jdk-25.0.2\bin\java.exe" -jar "D:\Zht20241287\career-planner\career-core\target\career-core-0.0.1-SNAPSHOT.jar"
+
+# 3) 验证端口与接口
+Test-NetConnection 127.0.0.1 -Port 8080 -WarningAction SilentlyContinue | Select TcpTestSucceeded
+Invoke-WebRequest -Uri "http://127.0.0.1:8080/api/v1/students/me/profile/latest?studentId=1001" -UseBasicParsing | Select StatusCode
+```
+
+**排障顺序**：① 3306 是否监听（MySQL 没起）→ ② 8080 是否监听（后端没起）→ ③ 后端启动日志（JDK 版本 / 端口占用 / 数据库连接）。
+
+---
+
 ## 汇总速查表
 
 | 问题 | 一句话解决 |
@@ -180,3 +231,6 @@ def run_apifox(args: list) -> dict:
 | PowerShell 拼 Markdown 转义混乱 | 改用 Python f-string 生成文档 |
 | Python 调不到 apifox | 用 `.cmd` 完整路径，不用 `.ps1` |
 | apifox 真实路径 | `C:\Users\uio8k\AppData\Roaming\npm\apifox.cmd` |
+| 后端启动报 UnsupportedClassVersionError | 用 JDK 25 绝对路径启动：`& "D:\devtools\jdk25\jdk-25.0.2\bin\java.exe" -jar ...` |
+| Apifox 报 ECONNREFUSED 8080 | 后端没启动：先起 MySQL（3306）再起后端（8080），见第 8 节 |
+

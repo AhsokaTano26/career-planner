@@ -106,11 +106,13 @@ public class RecommendationService {
         return toRunDto(runRow);
     }
 
-    /** 推荐批次历史（GET /recommendations）：分页返回批次列表（仅返回批次元数据，结果置空） */
-    public List<RecommendationRunDto> getHistory(Long studentId, int page, int size) {
-        return recommendationDao.findRunsByStudent(studentId, page, size).stream()
-                .map(this::toRunMetaDto)
-                .toList();
+    /**
+     * 推荐批次历史（GET /recommendations）：线上 200 schema 为单个 RecommendationRun。
+     * 本地实现取最近一次批次（含结果明细），保证响应结构与线上契约一致。
+     */
+    public RecommendationRunDto getHistory(Long studentId, int page, int size) {
+        List<RecommendationDao.RunRow> runs = recommendationDao.findRunsByStudent(studentId, page, size);
+        return runs.isEmpty() ? null : toRunDto(runs.get(0));
     }
 
     /** 推荐批次详情（GET /recommendation-runs/{runId}）：不存在则返回 null（由 Controller 转 404） */
@@ -219,13 +221,6 @@ public class RecommendationService {
         return new RecommendationRunDto(String.valueOf(runRow.id()), (int) runRow.profileSnapshotId(),
                 runRow.ruleVersion(), runRow.createdAt() == null ? null : runRow.createdAt().toString(),
                 runRow.status(), results);
-    }
-
-    /** RunRow → 批次元数据（历史列表：不展开 results） */
-    private RecommendationRunDto toRunMetaDto(RecommendationDao.RunRow runRow) {
-        return new RecommendationRunDto(String.valueOf(runRow.id()), (int) runRow.profileSnapshotId(),
-                runRow.ruleVersion(), runRow.createdAt() == null ? null : runRow.createdAt().toString(),
-                runRow.status(), List.of());
     }
 
     /** 从落库结果行重建 DTO（explanation_json 若为结构化对象则优先使用，否则回退模板重算） */

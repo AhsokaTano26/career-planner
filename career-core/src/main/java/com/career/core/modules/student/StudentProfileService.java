@@ -54,12 +54,14 @@ public class StudentProfileService {
         return toDto(snapshot);
     }
 
-    /** 画像版本列表（历史快照，分页） */
-    public List<ProfileSnapshotDto> getVersions(Long studentId, int page, int size) {
-        return dao.findSnapshots(studentId, page, size).stream()
-                .filter(s -> s.dimensionJson() != null && !s.dimensionJson().isBlank())
-                .map(this::toDto)
-                .toList();
+    /**
+     * 画像版本列表（GET /students/me/profile/versions）。
+     * <p>
+     * Demo 精简点：线上 200 schema 为单个 ProfileSnapshot（非数组），与 plan-versions / goal-versions /
+     * recommendations 历史接口一致，故返回最近一条快照；后续迭代替换为分页版本历史。
+     */
+    public ProfileSnapshotDto getVersions(Long studentId, int page, int size) {
+        return getLatestProfile(studentId);
     }
 
     /** 画像快照详情（按快照ID） */
@@ -69,6 +71,18 @@ public class StudentProfileService {
             return null;
         }
         return toDto(snapshot);
+    }
+
+    /**
+     * 最新画像快照的数值 ID（Demo 精简点：snapshotId 为空时反馈兜底用）。
+     * 无学生或无画像时抛 NotFoundException。
+     */
+    public Long latestSnapshotId(Long studentId) {
+        ProfileSnapshot latest = dao.findLatestSnapshot(studentId);
+        if (latest == null || latest.dimensionJson() == null || latest.dimensionJson().isBlank()) {
+            throw new NotFoundException("画像快照不存在");
+        }
+        return latest.id();
     }
 
     /** 画像反馈（Demo 精简点：直接落库，不做内容校验与反馈回流） */
