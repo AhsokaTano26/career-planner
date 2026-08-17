@@ -13,7 +13,7 @@ COPY career-core/.mvn .mvn
 RUN chmod +x mvnw && ./mvnw dependency:go-offline -q
 COPY career-core/ ./
 COPY --from=frontend-build /workspace/fronted/dist ./src/main/resources/static
-RUN ./mvnw package -DskipTests -q
+RUN chmod +x mvnw && ./mvnw package -DskipTests -q
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
