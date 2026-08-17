@@ -52,7 +52,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/register",
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/refresh").permitAll()
-                        .requestMatchers("/", "/index.html", "/test.html", "/static/**", "/favicon.ico").permitAll()
+                        // Vite production output is served from /assets; it must remain publicly readable
+                        // so the login page itself can load before a JWT exists.
+                        .requestMatchers("/", "/index.html", "/test.html", "/static/**", "/assets/**", "/favicon.ico").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) ->
