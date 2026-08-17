@@ -136,7 +136,7 @@ function toItem(item:unknown, index:number):Item {
   const title = String(valueOf(row, ['name','title','username','studentNo','directionName','abilityName','templateName','fileName','type']) ?? `记录 ${id}`)
   const status = valueOf(row, ['status','state','role','enabled','published'])
   const desc = Object.entries(row)
-    .filter(([key, value]) => !['id','jobId','userId','relationId','tagId','directionId','templateId','name','title','username','status','state','role'].includes(key) && formatValue(key, value))
+    .filter(([key, value]) => !['id','jobId','userId','relationId','tagId','directionId','templateId','name','title','username','status','state','role','verifyCode','password','passwordHash','accessToken','refreshToken'].includes(key) && formatValue(key, value))
     .slice(0, 3)
     .map(([key,value]) => `${fieldLabels[key] || key}: ${formatValue(key, value)}`)
     .join(' · ')

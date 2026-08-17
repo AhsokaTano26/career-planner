@@ -184,7 +184,6 @@ public class AdminWhitelistServiceImpl implements AdminWhitelistService {
         vo.setId(entry.getId());
         vo.setStudentNo(entry.getStudentNo());
         vo.setClassName(entry.getClassName());
-        vo.setVerifyCode(entry.getVerifyCode());
         vo.setUsed(entry.getUsed());
         vo.setCreatedAt(entry.getCreatedAt());
         return vo;

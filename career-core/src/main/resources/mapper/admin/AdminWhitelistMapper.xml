@@ -3,7 +3,7 @@
 <mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminWhitelistMapper">
 
     <select id="selectWhitelistPage" resultType="com.rickgao.careercore.modules.admin.vo.WhitelistEntryVO">
-        SELECT id, student_no, class_name, verify_code, used, created_at
+        SELECT id, student_no, class_name, used, created_at
         FROM student_whitelist
         WHERE 1 = 1
         <if test="used != null">
