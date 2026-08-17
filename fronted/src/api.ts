@@ -53,12 +53,19 @@ async function renewAccessToken():Promise<boolean> {
 
 export async function request<T>(path:string, init:RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers)
-  if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  if (init.body && !(init.body instanceof FormData) && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
   headers.set('X-Request-Id', crypto.randomUUID())
-  const response = await fetch(`${base}${path}`, { ...init, headers, credentials:'include' })
+  const method = (init.method || 'GET').toUpperCase()
+  // Every write is replay-safe on the backend. Preserve this key if a 401 refresh
+  // causes the request to be retried, so one user action remains one operation.
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && !headers.has('Idempotency-Key')) {
+    headers.set('Idempotency-Key', crypto.randomUUID())
+  }
+  const requestInit:RequestInit = { ...init, headers, credentials:'include' }
+  const response = await fetch(`${base}${path}`, requestInit)
   const body = await response.json().catch(() => null) as ApiEnvelope<T> | null
-  if (response.status === 401 && path !== '/auth/refresh' && await renewAccessToken()) return request<T>(path, init)
+  if (response.status === 401 && path !== '/auth/refresh' && await renewAccessToken()) return request<T>(path, requestInit)
   if (!response.ok || !body || body.code !== 'OK') {
     if (response.status === 401) clearAuthSession()
     throw new Error(body?.message || `请求失败（HTTP ${response.status}）`)

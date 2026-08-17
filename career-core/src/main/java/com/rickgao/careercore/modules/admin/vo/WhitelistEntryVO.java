@@ -13,7 +13,6 @@ public class WhitelistEntryVO {
     private String id;
     private String studentNo;
     private String className;
-    private String verifyCode;
     private Boolean used;
     private LocalDateTime createdAt;
 }
