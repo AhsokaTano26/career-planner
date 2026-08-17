@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from fastapi import HTTPException
@@ -52,7 +53,7 @@ def explain(request) -> "ExplainResponse":
                 {"role": "user", "content": user_prompt},
             ],
             temperature=0.7,
-            max_tokens=300,
+            max_tokens=1500,
         )
     except LlmError as exc:
         # Demo 边界：AI 失败由后端（career-core）回退规则模板，此处抛 502
@@ -98,5 +99,69 @@ def _validate(content: str) -> bool:
     return True
 
 
-__all__ = ["explain"]
+# ---------------------------------------------------------------- 批量推荐解释（Apifox /api/v1/ai/recommendation/explain）
+_BATCH_SYSTEM_PROMPT = (
+    "你是生涯规划系统中的「推荐解释生成器」。请基于给定的画像维度得分与候选方向列表，"
+    "为每个候选方向生成通俗解释。只输出 JSON，不要输出任何额外文字或 Markdown 代码块。"
+    "JSON 结构固定为：{\"explanations\": [{\"directionId\": 字符串, \"summary\": 通俗解释, "
+    "\"confidenceText\": 可信程度文字, \"disclaimer\": \"智能生成，供探索参考\"}]}。"
+    "必须为每个候选方向各生成一条解释，directionId 与输入保持一致，summary 简洁客观、"
+    "只依据输入数值，不得虚构。"
+)
+
+
+def explain_batch(profile: dict | None, results: list[dict]) -> list[dict]:
+    """为候选方向批量生成推荐解释，返回 explanations 列表。
+
+    输入按 Apifox ExplainRequest：profile（六维得分）、results（[{directionId, score, rank}]）。
+    输出每项含 directionId/summary/confidenceText/disclaimer。
+    大模型失败抛 LlmError；输出不合法抛 ValueError（由路由映射为 503）。
+    """
+    content = generate(
+        [
+            {"role": "system", "content": _BATCH_SYSTEM_PROMPT},
+            {"role": "user", "content": _build_batch_prompt(profile, results)},
+        ],
+        temperature=0.7,
+        # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
+        max_tokens=2000,
+    )
+    return _parse_batch_json(content)
+
+
+def _build_batch_prompt(profile: dict | None, results: list[dict]) -> str:
+    """把画像维度得分与候选方向拼成易读的 user 提示词。"""
+    lines = []
+    if profile:
+        dims = "；".join(f"{k}={round(v * 100)}%" for k, v in profile.items() if v is not None)
+        lines.append(f"画像维度得分：{dims or '无'}")
+    items = [f"- {r.get('directionId')}：得分 {r.get('score')}，排名 {r.get('rank')}" for r in results]
+    lines.append("候选方向：" + ("\n".join(items) if items else "无"))
+    lines.append("请为每个候选方向生成解释 JSON。")
+    return "\n".join(lines)
+
+
+def _parse_batch_json(content: str) -> list[dict]:
+    """解析模型输出；校验 explanations 非空且逐条含 directionId/summary。"""
+    text = content.strip()
+    if text.startswith("```"):
+        text = text.strip("`")
+        if text.startswith("json"):
+            text = text[4:]
+    start, end = text.find("{"), text.rfind("}")
+    if start < 0 or end <= start:
+        raise ValueError("推荐解释输出不含合法 JSON")
+    data = json.loads(text[start:end + 1])
+    explanations = data.get("explanations")
+    if not isinstance(explanations, list) or not explanations:
+        raise ValueError("推荐解释输出缺少 explanations")
+    for item in explanations:
+        if not item.get("directionId") or not item.get("summary"):
+            raise ValueError("推荐解释条目缺少 directionId/summary")
+        item.setdefault("confidenceText", "数据基本完整，供参考")
+        item.setdefault("disclaimer", "智能生成，供探索参考")
+    return explanations
+
+
+__all__ = ["explain", "explain_batch"]
 

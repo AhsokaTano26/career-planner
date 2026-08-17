@@ -16,7 +16,7 @@ import os
 
 import httpx
 
-DEFAULT_MODEL = "deepseek-v4-pro"
+DEFAULT_MODEL = "deepseek-v4-flash"
 DEFAULT_BASE_URL = "https://api.deepseek.com"
 DEFAULT_TIMEOUT = 20.0  # 秒
 

@@ -15,22 +15,45 @@ _SYSTEM_PROMPT = (
 )
 
 
-def summarize(raw_text: str) -> dict:
-    """生成阶段总结，返回 {summary, suggestions}。"""
+def summarize(review_content: dict, cycle: str, task_summary: str | None = None) -> dict:
+    """生成阶段总结，返回 {summary, suggestions}。
+
+    输入按 Apifox ReviewSummarizeRequest：reviewContent(ReviewContent)/cycle/taskSummary。
+    """
+    user_prompt = _build_prompt(review_content, cycle, task_summary)
     content = generate(
         [
             {"role": "system", "content": _SYSTEM_PROMPT},
-            {"role": "user", "content": raw_text or ""},
+            {"role": "user", "content": user_prompt},
         ],
         temperature=0.5,
-        max_tokens=500,
+        # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
+        max_tokens=1500,
     )
     import json
     text = content.strip()
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end <= start:
         return {"summary": content, "suggestions": []}
-    return json.loads(text[start:end + 1])
+    data = json.loads(text[start:end + 1])
+    if not data.get("summary"):
+        data["summary"] = content
+    data.setdefault("suggestions", [])
+    return data
+
+
+def _build_prompt(review_content: dict, cycle: str, task_summary: str | None) -> str:
+    """把复盘结构化内容拼成易读文本。"""
+    parts = [f"复盘周期：{cycle or '未指定'}"]
+    labels = [("done", "本阶段完成情况"), ("undone", "未完成情况及原因"),
+              ("interest", "方向兴趣变化"), ("ability", "能力提升"), ("next", "下一步安排")]
+    for key, label in labels:
+        value = (review_content or {}).get(key)
+        if value:
+            parts.append(f"{label}：{value}")
+    if task_summary:
+        parts.append(f"任务完成情况：{task_summary}")
+    return "\n".join(parts)
 
 
 __all__ = ["summarize"]

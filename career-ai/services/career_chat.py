@@ -16,21 +16,29 @@ _SYSTEM_PROMPT = (
 )
 
 
-def chat(message: str, history: list[dict] | None = None) -> str:
+def chat(question: str, context: dict | None = None) -> str:
     """生成一次生涯咨询回答。
 
-    :param message: 学生本次提问
-    :param history: 历史对话列表，每项含 role(user/assistant) 与 content
+    :param question: 学生本次提问
+    :param context: 可选上下文（directionId / goalSummary），来自 ChatRequest.context
     :return: 模型回答文本
     """
     messages = [{"role": "system", "content": _SYSTEM_PROMPT}]
-    for item in history or []:
-        role = "assistant" if item.get("role") == "assistant" else "user"
-        content = item.get("content", "")
-        if content:
-            messages.append({"role": role, "content": content})
-    messages.append({"role": "user", "content": desensitize(message)})
-    return generate(messages, temperature=0.7, max_tokens=600)
+    messages.append({"role": "user", "content": desensitize(_build_prompt(question, context))})
+    # max_tokens 需覆盖推理模型的 reasoning 预算，否则推理占满后 content 为空（deepseek-v4-flash 实测）
+    return generate(messages, temperature=0.7, max_tokens=2000)
+
+
+def _build_prompt(question: str, context: dict | None) -> str:
+    """把可选上下文拼入提问（Demo：仅追加方向与目标摘要）。"""
+    if not context:
+        return question
+    parts = [question]
+    if context.get("directionId"):
+        parts.append(f"当前关注方向：{context['directionId']}")
+    if context.get("goalSummary"):
+        parts.append(f"当前目标摘要：{context['goalSummary']}")
+    return "\n".join(parts)
 
 
 __all__ = ["chat"]

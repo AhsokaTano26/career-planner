@@ -20,12 +20,17 @@ _SYSTEM_PROMPT = (
 )
 
 
-def generate_plan(goal_summary: str, direction_name: str, dimensions: dict | None = None) -> dict:
-    """生成学期计划草案，返回结构化 dict（goalSummary/semesterGoals/monthlyTasks/notes）。"""
+def generate_plan(direction_id: str, semester: str, goal_summary: str | None = None,
+                  template: dict | None = None) -> dict:
+    """生成学期计划草案，返回结构化 dict（goalSummary/semesterGoals/monthlyTasks/notes）。
+
+    输入按 Apifox PlanGenerateRequest：directionId/semester/goalSummary/template(PlanDraft)。
+    """
     user_prompt = (
-        f"目标方向：{direction_name or '未指定'}\n"
-        f"目标摘要：{goal_summary or '围绕目标方向打好基础，完成一个小项目'}\n"
-        f"画像维度：{json.dumps(dimensions or {}, ensure_ascii=False)}\n"
+        f"方向编码：{direction_id or '未指定'}\n"
+        f"学期：{semester or '未指定'}\n"
+        f"目标摘要：{goal_summary or (template or {}).get('goalSummary') or '围绕目标方向打好基础，完成一个小项目'}\n"
+        f"参考模板：{json.dumps(template or {}, ensure_ascii=False)}\n"
         "请生成计划草案 JSON。"
     )
     content = generate(
@@ -34,9 +39,31 @@ def generate_plan(goal_summary: str, direction_name: str, dimensions: dict | Non
             {"role": "user", "content": user_prompt},
         ],
         temperature=0.7,
-        max_tokens=800,
+        # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
+        max_tokens=2000,
     )
-    return _parse_json(content)
+    return _normalize(_parse_json(content))
+
+
+def _normalize(data: dict) -> dict:
+    """补齐契约必填字段默认值，避免模型少返回字段导致契约校验失败（Demo 精简点）。"""
+    if not data.get("goalSummary"):
+        data["goalSummary"] = "围绕目标方向完成一学期学习与一个小项目"
+    semester_goals = data.get("semesterGoals") or []
+    data["semesterGoals"] = [
+        {"title": (g or {}).get("title") or "未命名目标", "abilityTag": (g or {}).get("abilityTag")}
+        for g in semester_goals if isinstance(g, dict)
+    ]
+    monthly_tasks = data.get("monthlyTasks") or []
+    data["monthlyTasks"] = [
+        {"month": (t or {}).get("month") or "2026-09",
+         "title": (t or {}).get("title") or "学习任务",
+         "taskType": (t or {}).get("taskType"),
+         "estimatedHours": (t or {}).get("estimatedHours")}
+        for t in monthly_tasks if isinstance(t, dict)
+    ]
+    data["notes"] = [str(n) for n in (data.get("notes") or [])]
+    return data
 
 
 def _parse_json(content: str) -> dict:
