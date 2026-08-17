@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminTemplateMapper">
+
+    <resultMap id="TaskTemplateVOMap" type="com.rickgao.careercore.modules.admin.vo.TaskTemplateVO">
+        <id property="id" column="id"/>
+        <result property="directionId" column="direction_id"/>
+        <result property="name" column="name"/>
+        <result property="goalSummary" column="goal_summary"/>
+        <result property="semesterGoals" column="semester_goals_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.JsonTypeHandler"/>
+        <result property="monthlyTasks" column="monthly_tasks_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.JsonTypeHandler"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <resultMap id="TaskTemplateMap" type="com.rickgao.careercore.modules.admin.entity.TaskTemplate">
+        <id property="id" column="id"/>
+        <result property="directionId" column="direction_id"/>
+        <result property="name" column="name"/>
+        <result property="goalSummary" column="goal_summary"/>
+        <result property="semesterGoalsJson" column="semester_goals_json"/>
+        <result property="monthlyTasksJson" column="monthly_tasks_json"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <select id="selectTemplatePage" resultMap="TaskTemplateVOMap">
+        SELECT id, direction_id, name, goal_summary, semester_goals_json, monthly_tasks_json, status
+        FROM task_template
+        WHERE deleted = 0
+        <if test="directionId != null">
+            AND direction_id = #{directionId}
+        </if>
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countTemplates" resultType="long">
+        SELECT COUNT(*)
+        FROM task_template
+        WHERE deleted = 0
+        <if test="directionId != null">
+            AND direction_id = #{directionId}
+        </if>
+    </select>
+
+    <select id="findById" resultMap="TaskTemplateMap">
+        SELECT id, direction_id, name, goal_summary, semester_goals_json, monthly_tasks_json,
+               status, created_at, updated_at, deleted
+        FROM task_template
+        WHERE id = #{id}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.admin.entity.TaskTemplate">
+        INSERT INTO task_template (id, direction_id, name, goal_summary, semester_goals_json, monthly_tasks_json, status)
+        VALUES (#{id}, #{directionId}, #{name}, #{goalSummary}, #{semesterGoalsJson}, #{monthlyTasksJson}, #{status})
+    </insert>
+
+    <update id="updateContent" parameterType="com.rickgao.careercore.modules.admin.entity.TaskTemplate">
+        UPDATE task_template
+        SET direction_id = #{directionId},
+            name = #{name},
+            goal_summary = #{goalSummary},
+            semester_goals_json = #{semesterGoalsJson},
+            monthly_tasks_json = #{monthlyTasksJson},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE task_template
+        SET status = #{status}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminCurriculumMapper">
+
+    <resultMap id="JobMap" type="com.rickgao.careercore.modules.admin.entity.CurriculumImportJob">
+        <id property="id" column="id"/>
+        <result property="filename" column="filename"/>
+        <result property="filePath" column="file_path"/>
+        <result property="fileType" column="file_type"/>
+        <result property="status" column="status"/>
+        <result property="totalItems" column="total_items"/>
+        <result property="parsedItems" column="parsed_items"/>
+        <result property="confidence" column="confidence"/>
+        <result property="errorMessage" column="error_message"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <resultMap id="ItemMap" type="com.rickgao.careercore.modules.admin.entity.CurriculumImportItem">
+        <id property="id" column="id"/>
+        <result property="jobId" column="job_id"/>
+        <result property="courseCode" column="course_code"/>
+        <result property="courseName" column="course_name"/>
+        <result property="semester" column="semester"/>
+        <result property="credits" column="credits"/>
+        <result property="hours" column="hours"/>
+        <result property="category" column="category"/>
+        <result property="module" column="module"/>
+        <result property="prerequisitesJson" column="prerequisites_json"/>
+        <result property="abilityTagsJson" column="ability_tags_json"/>
+        <result property="confidence" column="confidence"/>
+        <result property="pageRef" column="page_ref"/>
+        <result property="status" column="status"/>
+        <result property="mergedInto" column="merged_into"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <resultMap id="ItemVOMap" type="com.rickgao.careercore.modules.admin.vo.ImportItemVO">
+        <id property="id" column="id"/>
+        <result property="jobId" column="job_id"/>
+        <result property="courseCode" column="course_code"/>
+        <result property="courseName" column="course_name"/>
+        <result property="semester" column="semester"/>
+        <result property="credits" column="credits"/>
+        <result property="hours" column="hours"/>
+        <result property="category" column="category"/>
+        <result property="module" column="module"/>
+        <result property="prerequisites" column="prerequisites_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="abilityTags" column="ability_tags_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="confidence" column="confidence"/>
+        <result property="pageRef" column="page_ref"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <insert id="insertJob" parameterType="com.rickgao.careercore.modules.admin.entity.CurriculumImportJob">
+        INSERT INTO curriculum_import_job (id, filename, file_path, file_type, status, created_by)
+        VALUES (#{id}, #{filename}, #{filePath}, #{fileType}, #{status}, #{createdBy})
+    </insert>
+
+    <select id="findJobById" resultMap="JobMap">
+        SELECT id, filename, file_path, file_type, status, total_items, parsed_items, confidence,
+               error_message, created_by, created_at, updated_at, deleted
+        FROM curriculum_import_job
+        WHERE id = #{id}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectJobPage" resultType="com.rickgao.careercore.modules.admin.vo.CurriculumImportJobVO">
+        SELECT id, filename, status, total_items, parsed_items, confidence, created_at
+        FROM curriculum_import_job
+        WHERE deleted = 0
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countJobs" resultType="long">
+        SELECT COUNT(*) FROM curriculum_import_job WHERE deleted = 0
+    </select>
+
+    <update id="updateJobStatus">
+        UPDATE curriculum_import_job
+        SET status = #{status}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateJobParseResult">
+        UPDATE curriculum_import_job
+        SET status = #{status},
+            total_items = #{totalItems},
+            parsed_items = #{parsedItems},
+            confidence = #{confidence},
+            error_message = #{errorMessage},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertItem" parameterType="com.rickgao.careercore.modules.admin.entity.CurriculumImportItem">
+        INSERT INTO curriculum_import_item (id, job_id, course_code, course_name, semester, credits, hours,
+                                            category, module, prerequisites_json, ability_tags_json,
+                                            confidence, page_ref, status)
+        VALUES (#{id}, #{jobId}, #{courseCode}, #{courseName}, #{semester}, #{credits}, #{hours},
+                #{category}, #{module}, #{prerequisitesJson}, #{abilityTagsJson},
+                #{confidence}, #{pageRef}, #{status})
+    </insert>
+
+    <select id="findItemById" resultMap="ItemMap">
+        SELECT id, job_id, course_code, course_name, semester, credits, hours, category, module,
+               prerequisites_json, ability_tags_json, confidence, page_ref, status, merged_into,
+               created_at, updated_at
+        FROM curriculum_import_item
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="selectItemPage" resultMap="ItemVOMap">
+        SELECT id, job_id, course_code, course_name, semester, credits, hours, category, module,
+               prerequisites_json, ability_tags_json, confidence, page_ref, status
+        FROM curriculum_import_item
+        WHERE job_id = #{jobId}
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countItems" resultType="long">
+        SELECT COUNT(*)
+        FROM curriculum_import_item
+        WHERE job_id = #{jobId}
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+    </select>
+
+    <update id="updateItemContent" parameterType="com.rickgao.careercore.modules.admin.entity.CurriculumImportItem">
+        UPDATE curriculum_import_item
+        SET course_code = #{courseCode},
+            course_name = #{courseName},
+            semester = #{semester},
+            credits = #{credits},
+            hours = #{hours},
+            category = #{category},
+            module = #{module},
+            prerequisites_json = #{prerequisitesJson},
+            ability_tags_json = #{abilityTagsJson},
+            status = #{status},
+            merged_into = #{mergedInto},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateItemTags">
+        UPDATE curriculum_import_item
+        SET ability_tags_json = #{abilityTagsJson}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateItemStatus">
+        UPDATE curriculum_import_item
+        SET status = #{status}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectApprovedItems" resultMap="ItemMap">
+        SELECT id, job_id, course_code, course_name, semester, credits, hours, category, module,
+               prerequisites_json, ability_tags_json, confidence, page_ref, status, merged_into,
+               created_at, updated_at
+        FROM curriculum_import_item
+        WHERE job_id = #{jobId}
+          AND status = 'APPROVED'
+        ORDER BY id ASC
+    </select>
+
+    <insert id="insertVersion" parameterType="com.rickgao.careercore.modules.admin.entity.CurriculumVersion">
+        INSERT INTO curriculum_version (id, name, major, course_count, status, source_job_id, published_at, published_by)
+        VALUES (#{id}, #{name}, #{major}, #{courseCount}, #{status}, #{sourceJobId}, #{publishedAt}, #{publishedBy})
+    </insert>
+
+    <select id="selectVersionPage" resultType="com.rickgao.careercore.modules.admin.vo.CurriculumVersionVO">
+        SELECT id, name, major, course_count, status, published_at, published_by
+        FROM curriculum_version
+        WHERE deleted = 0
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countVersions" resultType="long">
+        SELECT COUNT(*) FROM curriculum_version WHERE deleted = 0
+    </select>
+
+    <insert id="insertCourse" parameterType="com.rickgao.careercore.modules.admin.entity.Course">
+        INSERT INTO course (id, version_id, course_code, course_name, semester, credits, hours,
+                            category, module, prerequisites_json, source_item_id)
+        VALUES (#{id}, #{versionId}, #{courseCode}, #{courseName}, #{semester}, #{credits}, #{hours},
+                #{category}, #{module}, #{prerequisitesJson}, #{sourceItemId})
+    </insert>
+
+    <insert id="insertCourseAbilityTag">
+        INSERT INTO course_ability_tag (id, course_id, ability_tag)
+        VALUES (#{id}, #{courseId}, #{abilityTag})
+    </insert>
+
+</mapper>

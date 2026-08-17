@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.student.mapper.StudentExperienceMapper">
+
+    <resultMap id="ExperienceMap" type="com.rickgao.careercore.modules.student.entity.StudentExperience">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="type" column="type"/>
+        <result property="title" column="title"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="description" column="description"/>
+        <result property="attachmentUrl" column="attachment_url"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <sql id="baseColumns">
+        id, student_id, type, title, start_date, end_date, description, attachment_url, created_at, updated_at, deleted
+    </sql>
+
+    <select id="findAllByStudentId" resultMap="ExperienceMap">
+        SELECT <include refid="baseColumns"/>
+        FROM student_experience
+        WHERE student_id = #{studentId} AND deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- sortColumn / sortDir 由 Service 白名单化后传入,仅支持 created_at -->
+    <select id="findByStudentIdPaged" resultMap="ExperienceMap">
+        SELECT <include refid="baseColumns"/>
+        FROM student_experience
+        WHERE student_id = #{studentId} AND deleted = 0
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="findByIdAndStudent" resultMap="ExperienceMap">
+        SELECT <include refid="baseColumns"/>
+        FROM student_experience
+        WHERE id = #{id} AND student_id = #{studentId} AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.student.entity.StudentExperience">
+        INSERT INTO student_experience (id, student_id, type, title, start_date, end_date, description,
+                                        attachment_url, created_at, updated_at, deleted)
+        VALUES (#{id}, #{studentId}, #{type}, #{title}, #{startDate}, #{endDate}, #{description},
+                #{attachmentUrl}, NOW(), NOW(), 0)
+    </insert>
+
+    <update id="update" parameterType="com.rickgao.careercore.modules.student.entity.StudentExperience">
+        UPDATE student_experience
+        SET type = #{type},
+            title = #{title},
+            start_date = #{startDate},
+            end_date = #{endDate},
+            description = #{description},
+            attachment_url = #{attachmentUrl},
+            updated_at = NOW()
+        WHERE id = #{id} AND student_id = #{studentId} AND deleted = 0
+    </update>
+
+    <update id="softDelete">
+        UPDATE student_experience
+        SET deleted = 1, updated_at = NOW()
+        WHERE id = #{id} AND student_id = #{studentId} AND deleted = 0
+    </update>
+
+</mapper>

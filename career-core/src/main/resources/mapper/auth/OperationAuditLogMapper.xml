@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.auth.mapper.OperationAuditLogMapper">
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.auth.entity.OperationAuditLog">
+        INSERT INTO operation_audit_log (id, user_id, action, target_type, target_id, detail, ip, created_at)
+        VALUES (#{id}, #{userId}, #{action}, #{targetType}, #{targetId}, #{detail}, #{ip}, NOW())
+    </insert>
+
+</mapper>
