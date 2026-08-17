@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vscode
+**/node_modules
+**/dist
+**/target
+data
+*.docx
+*.pdf
+API问题报告.md
+生涯规划系统原型
