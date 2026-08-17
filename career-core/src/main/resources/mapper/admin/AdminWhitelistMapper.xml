@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminWhitelistMapper">
+
+    <select id="selectWhitelistPage" resultType="com.rickgao.careercore.modules.admin.vo.WhitelistEntryVO">
+        SELECT id, student_no, class_name, verify_code, used, created_at
+        FROM student_whitelist
+        WHERE 1 = 1
+        <if test="used != null">
+            AND used = #{used}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (student_no LIKE CONCAT('%', #{keyword}, '%')
+                 OR class_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR name LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countWhitelist" resultType="long">
+        SELECT COUNT(*)
+        FROM student_whitelist
+        WHERE 1 = 1
+        <if test="used != null">
+            AND used = #{used}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (student_no LIKE CONCAT('%', #{keyword}, '%')
+                 OR class_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR name LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </select>
+
+    <select id="findById" resultType="com.rickgao.careercore.modules.auth.entity.StudentWhitelist">
+        SELECT id, student_no, name, class_name, verify_code, used, created_at, updated_at
+        FROM student_whitelist
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.auth.entity.StudentWhitelist">
+        INSERT INTO student_whitelist (id, student_no, name, class_name, verify_code)
+        VALUES (#{id}, #{studentNo}, #{name}, #{className}, #{verifyCode})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM student_whitelist
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

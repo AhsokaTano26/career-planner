@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.auth.mapper.RefreshTokenMapper">
+
+    <resultMap id="RefreshTokenMap" type="com.rickgao.careercore.modules.auth.entity.RefreshToken">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="token" column="token"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="revoked" column="revoked"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.auth.entity.RefreshToken">
+        INSERT INTO refresh_token (id, user_id, token, expires_at, revoked, created_at)
+        VALUES (#{id}, #{userId}, #{token}, #{expiresAt}, 0, NOW())
+    </insert>
+
+    <select id="findByToken" resultMap="RefreshTokenMap">
+        SELECT id, user_id, token, expires_at, revoked, created_at
+        FROM refresh_token
+        WHERE token = #{token}
+        LIMIT 1
+    </select>
+
+    <update id="revokeByUserId">
+        UPDATE refresh_token
+        SET revoked = 1
+        WHERE user_id = #{userId} AND revoked = 0
+    </update>
+
+    <update id="revoke">
+        UPDATE refresh_token
+        SET revoked = 1
+        WHERE id = #{id}
+    </update>
+
+</mapper>

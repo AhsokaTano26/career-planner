@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminDirectionMapper">
+
+    <resultMap id="AdminDirectionVOMap" type="com.rickgao.careercore.modules.admin.vo.AdminDirectionVO">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="path" column="path"/>
+        <result property="status" column="status"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="applicableMajors" column="applicable_majors_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <resultMap id="CareerDirectionMap" type="com.rickgao.careercore.modules.admin.entity.CareerDirection">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="path" column="path"/>
+        <result property="icon" column="icon"/>
+        <result property="intro" column="intro"/>
+        <result property="targetJson" column="target_json"/>
+        <result property="minAbility" column="min_ability"/>
+        <result property="minAcademic" column="min_academic"/>
+        <result property="learningJson" column="learning_json"/>
+        <result property="abilitiesJson" column="abilities_json"/>
+        <result property="coursesJson" column="courses_json"/>
+        <result property="activitiesJson" column="activities_json"/>
+        <result property="pathDescJson" column="path_desc_json"/>
+        <result property="misconceptionsJson" column="misconceptions_json"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="applicableMajorsJson" column="applicable_majors_json"/>
+        <result property="status" column="status"/>
+        <result property="updated" column="updated"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <select id="selectDirectionPage" resultMap="AdminDirectionVOMap">
+        SELECT id, name, path, status, sort_order, applicable_majors_json, updated_at
+        FROM career_direction
+        WHERE deleted = 0
+        <if test="path != null">
+            AND path = #{path}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (name LIKE CONCAT('%', #{keyword}, '%') OR id LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countDirections" resultType="long">
+        SELECT COUNT(*)
+        FROM career_direction
+        WHERE deleted = 0
+        <if test="path != null">
+            AND path = #{path}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (name LIKE CONCAT('%', #{keyword}, '%') OR id LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </select>
+
+    <select id="findById" resultMap="CareerDirectionMap">
+        SELECT id, name, path, icon, intro, target_json, min_ability, min_academic,
+               learning_json, abilities_json, courses_json, activities_json,
+               path_desc_json, misconceptions_json, sort_order, applicable_majors_json,
+               status, updated, created_at, updated_at, deleted
+        FROM career_direction
+        WHERE id = #{id}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.admin.entity.CareerDirection">
+        INSERT INTO career_direction (id, name, path, icon, intro, target_json, min_ability, min_academic,
+                                      learning_json, abilities_json, courses_json, activities_json,
+                                      path_desc_json, misconceptions_json, sort_order, applicable_majors_json,
+                                      status, updated)
+        VALUES (#{id}, #{name}, #{path}, #{icon}, #{intro}, #{targetJson}, #{minAbility}, #{minAcademic},
+                #{learningJson}, #{abilitiesJson}, #{coursesJson}, #{activitiesJson},
+                #{pathDescJson}, #{misconceptionsJson}, #{sortOrder}, #{applicableMajorsJson},
+                #{status}, #{updated})
+    </insert>
+
+    <update id="updateContent" parameterType="com.rickgao.careercore.modules.admin.entity.CareerDirection">
+        UPDATE career_direction
+        SET name = #{name},
+            path = #{path},
+            icon = #{icon},
+            intro = #{intro},
+            target_json = #{targetJson},
+            min_ability = #{minAbility},
+            min_academic = #{minAcademic},
+            learning_json = #{learningJson},
+            abilities_json = #{abilitiesJson},
+            courses_json = #{coursesJson},
+            activities_json = #{activitiesJson},
+            path_desc_json = #{pathDescJson},
+            misconceptions_json = #{misconceptionsJson},
+            sort_order = #{sortOrder},
+            applicable_majors_json = #{applicableMajorsJson},
+            updated = #{updated},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE career_direction
+        SET status = #{status}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

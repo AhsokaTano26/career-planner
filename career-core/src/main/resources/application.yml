@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: career-core
+  autoconfigure:
+    # 使用 JWT 无状态认证,不需要默认 UserDetailsService(避免生成无关的安全密码)
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  profiles:
+    # 未显式指定 profile 时默认使用 local(数据库凭据等在 application-local.yml 中,已 gitignore)
+    default: local
+  sql:
+    init:
+      # 应用启动时执行建表与种子脚本(幂等)
+      mode: always
+      schema-locations: classpath:db/schema.sql,classpath:db/advisor.sql,classpath:db/admin-config.sql,classpath:db/admin-curriculum.sql,classpath:db/admin-log.sql
+      data-locations: classpath:db/data.sql
+      continue-on-error: false
+  jackson:
+    time-zone: Asia/Shanghai
+
+server:
+  port: 8080
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.rickgao.careercore.modules
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+logging:
+  level:
+    com.rickgao.careercore: info
+    org.springframework.security: warn

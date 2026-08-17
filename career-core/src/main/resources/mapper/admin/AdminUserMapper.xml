@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminUserMapper">
+
+    <select id="selectUserPage" resultType="com.rickgao.careercore.modules.admin.vo.AdminUserVO">
+        SELECT id, username, name, role, class_name, status, last_login_at, created_at
+        FROM sys_user
+        WHERE deleted = 0
+        <if test="role != null">
+            AND role = #{role}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (username LIKE CONCAT('%', #{keyword}, '%')
+                 OR name LIKE CONCAT('%', #{keyword}, '%')
+                 OR class_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR student_no LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countUsers" resultType="long">
+        SELECT COUNT(*)
+        FROM sys_user
+        WHERE deleted = 0
+        <if test="role != null">
+            AND role = #{role}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (username LIKE CONCAT('%', #{keyword}, '%')
+                 OR name LIKE CONCAT('%', #{keyword}, '%')
+                 OR class_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR student_no LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </select>
+
+    <update id="updateStatusAndClass">
+        UPDATE sys_user
+        <set>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="className != null">
+                class_name = #{className},
+            </if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>
