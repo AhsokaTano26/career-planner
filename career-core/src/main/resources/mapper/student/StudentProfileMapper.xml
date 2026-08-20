@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.student.mapper.StudentProfileMapper">
+
+    <resultMap id="StudentProfileMap" type="com.rickgao.careercore.modules.student.entity.StudentProfile">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="name" column="name"/>
+        <result property="className" column="class_name"/>
+        <result property="grade" column="grade"/>
+        <result property="majorCategory" column="major_category"/>
+        <result property="basic" column="basic_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.JsonTypeHandler"/>
+        <result property="academic" column="academic_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.JsonTypeHandler"/>
+        <result property="interestPrefs" column="interest_prefs_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="abilitySelf" column="ability_self_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.JsonTypeHandler"/>
+        <result property="values" column="values_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="developmentIntention" column="development_intention"/>
+        <result property="constraints" column="constraints_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="completeness" column="completeness"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="findByUserId" resultMap="StudentProfileMap">
+        SELECT id, user_id, name, class_name, grade, major_category, basic_json, academic_json,
+               interest_prefs_json, ability_self_json, values_json, development_intention,
+               constraints_json, completeness, updated_at
+        FROM student_profile
+        WHERE user_id = #{userId}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.student.entity.StudentProfile">
+        INSERT INTO student_profile (id, user_id, name, class_name, grade, major_category,
+                                     basic_json, academic_json, interest_prefs_json, ability_self_json,
+                                     values_json, development_intention, constraints_json, completeness)
+        VALUES (#{id}, #{userId}, #{name}, #{className}, #{grade}, #{majorCategory},
+                #{basic, typeHandler=com.rickgao.careercore.common.typehandler.JsonTypeHandler, jdbcType=VARCHAR},
+                #{academic, typeHandler=com.rickgao.careercore.common.typehandler.JsonTypeHandler, jdbcType=VARCHAR},
+                #{interestPrefs, typeHandler=com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler, jdbcType=VARCHAR},
+                #{abilitySelf, typeHandler=com.rickgao.careercore.common.typehandler.JsonTypeHandler, jdbcType=VARCHAR},
+                #{values, typeHandler=com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler, jdbcType=VARCHAR},
+                #{developmentIntention},
+                #{constraints, typeHandler=com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler, jdbcType=VARCHAR},
+                #{completeness})
+    </insert>
+
+    <update id="update" parameterType="com.rickgao.careercore.modules.student.entity.StudentProfile">
+        UPDATE student_profile
+        SET name = #{name},
+            class_name = #{className},
+            grade = #{grade},
+            major_category = #{majorCategory},
+            basic_json = #{basic, typeHandler=com.rickgao.careercore.common.typehandler.JsonTypeHandler, jdbcType=VARCHAR},
+            academic_json = #{academic, typeHandler=com.rickgao.careercore.common.typehandler.JsonTypeHandler, jdbcType=VARCHAR},
+            interest_prefs_json = #{interestPrefs, typeHandler=com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler, jdbcType=VARCHAR},
+            ability_self_json = #{abilitySelf, typeHandler=com.rickgao.careercore.common.typehandler.JsonTypeHandler, jdbcType=VARCHAR},
+            values_json = #{values, typeHandler=com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler, jdbcType=VARCHAR},
+            development_intention = #{developmentIntention},
+            constraints_json = #{constraints, typeHandler=com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler, jdbcType=VARCHAR},
+            completeness = #{completeness},
+            updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+</mapper>

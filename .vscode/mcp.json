@@ -1,0 +1,18 @@
+{
+  "servers": {
+    "生涯规划 API 文档": {
+      "type": "stdio",
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "apifox-mcp-server@latest",
+        "--project-id=8662286"
+      ],
+      "env": {
+        "APIFOX_ACCESS_TOKEN": "<密钥>"
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.advisor.mapper.AdvisorCommentMapper">
+
+    <resultMap id="AdvisorCommentMap" type="com.rickgao.careercore.modules.advisor.entity.AdvisorComment">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="advisorId" column="advisor_id"/>
+        <result property="content" column="content"/>
+        <result property="adviceType" column="advice_type"/>
+        <result property="suggestedTask" column="suggested_task"/>
+        <result property="retestReason" column="retest_reason"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.advisor.entity.AdvisorComment">
+        INSERT INTO advisor_comment (id, student_id, advisor_id, content, advice_type, suggested_task, retest_reason)
+        VALUES (#{id}, #{studentId}, #{advisorId}, #{content}, #{adviceType}, #{suggestedTask}, #{retestReason})
+    </insert>
+
+    <select id="findByStudentId" resultMap="AdvisorCommentMap">
+        SELECT id, student_id, advisor_id, content, advice_type, suggested_task, retest_reason,
+               created_at, updated_at, deleted
+        FROM advisor_comment
+        WHERE student_id = #{studentId}
+          AND deleted = 0
+        ORDER BY created_at ASC
+    </select>
+
+</mapper>

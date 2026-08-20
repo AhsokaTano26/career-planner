@@ -1,0 +1,21 @@
+# 本机常用注意事项（避坑）
+
+- **PowerShell 编码**：PowerShell 管道会把 curl 输出的 UTF-8 按 GBK 解码，导致中文乱码/伪空格。对比接口结果请用 `curl.exe -o 文件` 存原始字节 + `Get-FileHash` 比对，或用 `Get-Content -Encoding utf8` 读取；查库用 `mysql ... -e "SELECT HEX(...)"`。
+- **JSON 请求体**：PowerShell 中 `curl -d "{\"...\"}"` 的 `\"` 不会转义，会原样发送反斜杠导致服务端 JSON 解析失败（500）。请用 `--data-binary @文件`。
+- **接口返回字段一般不允许为 null**：成功响应的业务对象字段尽量不返回 `null`，否则可能触发 Apifox 契约校验失败（已踩坑：画像模块 `ProfileSnapshotDto.feedback` 恒为 `null` 且未加过滤，被序列化为 `"feedback": null` 报契约错误）。实现约定：
+  - 给 DTO/record 加 `@JsonInclude(JsonInclude.Include.NON_NULL)` 过滤空值（与推荐模块同一套修复保持一致）；
+  - 空态统一为默认值/空串/空数组，而非 `null`；
+  - 涉及返回结构改动时对照 `docs/本地实现vs线上核对报告.md` 与 `docs/openapi/career-core-apis.yaml`。
+- **分支名带括号**：PowerShell 会把 `git ... origin/career-core(back-end)` 里的 `(back-end)` 解析成命令调用，报错 `back-end\` 不是命令。引用含括号的分支名/引用必须加引号，如 `$br = 'origin/career-core(back-end)'` 或 `git log 'origin/career-core(back-end)'`。
+- **终端工具会简化命令（丢掉 `cd`）**：后台长命令（如 `java -jar`、`python -m uvicorn`）可能被工具剥离开头的 `cd <目录>`，导致相对路径（如 `target\xxx.jar`）解析失败，报 `Unable to access jarfile`。启动服务请用绝对路径（`java -jar D:\...\target\xxx.jar`），或用 `--app-dir`（uvicorn）等不依赖当前目录的方式。
+- **保留字**：MySQL 8+ 中 `rank` 为保留字，SQL 需写成 `` `rank` ``。
+- **下载源**：archive.apache.org 很慢，Maven 用 dlcdn.apache.org；MySQL 版本须到 dev.mysql.com 下载页查当前版本（2026-08 为 26.7.0）。
+- **Apifox**：MCP 服务只读（无法直接写线上文档）；接口定义以 `docs/openapi/career-core-apis.yaml` 供导入。
+- **Apifox CLI 与开发环境排坑**：涉及 Apifox CLI 拉取/整理接口（中文乱码、uv 托管解释器、`.ps1`/`.cmd` 调用、PowerShell 转义等）时，先读 `docs/Apifox-CLI与开发环境排坑记录.md`。要点速记：
+  - CLI 真实路径用 `C:\Users\uio8k\AppData\Roaming\npm\apifox.cmd`（Python 跨进程调用必须用 `.cmd`，`.ps1` 无法被 subprocess 执行）。
+  - CLI 输出落盘用 `cmd /c "... > file"` 保留原始 UTF-8 字节，避免 PowerShell 按 GBK 解码致中文乱码；Python 侧 `subprocess.run(...).stdout.decode("utf-8-sig")`。
+  - Python 解释器由 uv 托管（PEP 668），**不要 `pip install`**；脚本优先纯标准库（json/subprocess），运行用 `& "C:/Users/uio8k/.local/bin/python.exe" script.py`。
+  - 生成含反引号的 Markdown 文档用 Python f-string，不要在 PowerShell 字符串插值里混用 `` `$ `` 转义。
+  - 全量接口清单：`docs/openapi/career-core-apis-live-summary.md`；可复跑脚本：`docs/scripts/organize_apifox_apis.py`（项目 ID 8662286，主分支 127 个接口）。
+  - **`test-case run` 不替换 path 变量（2026-08-15 坑）**：CLI 2.2.9 直接跑单接口测试用例（`apifox test-case run <id> -e <envId>`）时，URL 中 `{taskId}` 不会被替换成实际值（生成的 collection 里 `url.variable` 为空、URL 仍为字面 `{taskId}`），且 `--env-var` / `--global-var` / `--variables` 注入均不生效 → 请求打到字面路径返回 400。**可靠跑法**：先 `apifox test-case run <id> -e <envId> -r json` 生成报告 → 从报告 JSON 提取 `collection` 段另存 → 用 Python 把 URL path 中的 `{taskId}` 替换为实际值（`url.variable` 置空）→ 再 `apifox run <collection.json> -r cli,json` 执行（真实 URL 200 OK）。参考脚本 `docs/scripts/fix_collection_task.py`；示例用例「更新任务-正向 (PATCH /tasks/{taskId})」id=404389855，本地环境 47907998。
+- **无 winget / Docker**：安装软件一律手动下载 ZIP/安装包解压配置。
