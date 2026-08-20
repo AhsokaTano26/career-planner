@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.auth.mapper.ConsentMapper">
+
+    <resultMap id="DocumentMap" type="com.rickgao.careercore.modules.auth.entity.ConsentDocument">
+        <id property="id" column="id"/>
+        <result property="version" column="version"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="status" column="status"/>
+        <result property="publishedAt" column="published_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <resultMap id="RecordMap" type="com.rickgao.careercore.modules.auth.entity.ConsentRecord">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="version" column="version"/>
+        <result property="agreedAt" column="agreed_at"/>
+        <result property="ip" column="ip"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findPublished" resultMap="DocumentMap">
+        SELECT id, version, title, content, status, published_at, created_at, updated_at
+        FROM consent_document
+        WHERE status = 'PUBLISHED'
+        ORDER BY published_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="findByVersion" resultMap="DocumentMap">
+        SELECT id, version, title, content, status, published_at, created_at, updated_at
+        FROM consent_document
+        WHERE version = #{version}
+    </select>
+
+    <insert id="insertRecord" parameterType="com.rickgao.careercore.modules.auth.entity.ConsentRecord">
+        INSERT INTO consent_record (id, user_id, version, agreed_at, ip, created_at)
+        VALUES (#{id}, #{userId}, #{version}, #{agreedAt}, #{ip}, NOW())
+    </insert>
+
+    <select id="findLatestByUserId" resultMap="RecordMap">
+        SELECT id, user_id, version, agreed_at, ip, created_at
+        FROM consent_record
+        WHERE user_id = #{userId}
+        ORDER BY agreed_at DESC
+        LIMIT 1
+    </select>
+
+</mapper>

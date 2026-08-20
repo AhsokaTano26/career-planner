@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.common.mapper.SequenceMapper">
+
+    <update id="increment">
+        UPDATE id_sequence
+        SET next_val = LAST_INSERT_ID(next_val + 1)
+        WHERE seq_name = #{seqName}
+    </update>
+
+    <select id="lastInsertId" resultType="long">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+</mapper>

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminExportMapper">
+
+    <resultMap id="ExportJobMap" type="com.rickgao.careercore.modules.admin.entity.ExportJob">
+        <id property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="scope" column="scope"/>
+        <result property="filtersJson" column="filters_json"/>
+        <result property="status" column="status"/>
+        <result property="downloadUrl" column="download_url"/>
+        <result property="filePath" column="file_path"/>
+        <result property="errorMessage" column="error_message"/>
+        <result property="operatorId" column="operator_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <resultMap id="AiCallLogMap" type="com.rickgao.careercore.modules.admin.entity.AiCallLog">
+        <id property="id" column="id"/>
+        <result property="requestId" column="request_id"/>
+        <result property="userRef" column="user_ref"/>
+        <result property="scene" column="scene"/>
+        <result property="modelName" column="model_name"/>
+        <result property="promptVersion" column="prompt_version"/>
+        <result property="durationMs" column="duration_ms"/>
+        <result property="status" column="status"/>
+        <result property="tokenEstimate" column="token_estimate"/>
+        <result property="requestHash" column="request_hash"/>
+        <result property="inputHash" column="input_hash"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insertExportJob" parameterType="com.rickgao.careercore.modules.admin.entity.ExportJob">
+        INSERT INTO export_job (id, type, scope, filters_json, status, operator_id)
+        VALUES (#{id}, #{type}, #{scope}, #{filtersJson}, #{status}, #{operatorId})
+    </insert>
+
+    <select id="findExportJobById" resultMap="ExportJobMap">
+        SELECT id, type, scope, filters_json, status, download_url, file_path, error_message,
+               operator_id, created_at, updated_at, deleted
+        FROM export_job
+        WHERE id = #{id}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <select id="selectExportJobPage" resultType="com.rickgao.careercore.modules.admin.vo.ExportJobVO">
+        SELECT e.id, e.type, e.scope, e.status, e.download_url, e.created_at, u.name AS operator
+        FROM export_job e
+        LEFT JOIN sys_user u ON u.id = e.operator_id
+        WHERE e.deleted = 0
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countExportJobs" resultType="long">
+        SELECT COUNT(*) FROM export_job WHERE deleted = 0
+    </select>
+
+    <update id="updateExportJobDone">
+        UPDATE export_job
+        SET status = 'DONE', download_url = #{downloadUrl}, file_path = #{filePath},
+            error_message = NULL, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateExportJobFailed">
+        UPDATE export_job
+        SET status = 'FAILED', error_message = #{errorMessage}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectWhitelistExport" resultType="com.rickgao.careercore.modules.auth.entity.StudentWhitelist">
+        SELECT id, student_no, name, class_name, verify_code, used, created_at, updated_at
+        FROM student_whitelist
+        WHERE 1 = 1
+        <if test="used != null">
+            AND used = #{used}
+        </if>
+        ORDER BY created_at ASC
+    </select>
+
+    <select id="selectOperationLogExport" resultType="com.rickgao.careercore.modules.admin.vo.OperationLogVO">
+        SELECT l.id, l.created_at AS time, u.name AS operator, l.action,
+               CONCAT_WS('/', l.target_type, l.target_id) AS target,
+               l.detail, l.ip
+        FROM operation_audit_log l
+        LEFT JOIN sys_user u ON u.id = l.user_id
+        WHERE 1 = 1
+        <if test="action != null">
+            AND (l.action LIKE CONCAT('%', #{action}, '%') OR l.target_type LIKE CONCAT('%', #{action}, '%'))
+        </if>
+        <if test="operator != null">
+            AND u.name LIKE CONCAT('%', #{operator}, '%')
+        </if>
+        <if test="from != null">
+            AND l.created_at &gt;= #{from}
+        </if>
+        <if test="to != null">
+            AND l.created_at &lt;= #{to}
+        </if>
+        ORDER BY l.created_at ASC
+    </select>
+
+    <select id="selectAiLogExport" resultMap="AiCallLogMap">
+        SELECT id, request_id, user_ref, scene, model_name, prompt_version, duration_ms,
+               status, token_estimate, request_hash, input_hash, created_at
+        FROM ai_call_log
+        WHERE 1 = 1
+        <if test="scene != null">
+            AND scene = #{scene}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="from != null">
+            AND created_at &gt;= #{from}
+        </if>
+        <if test="to != null">
+            AND created_at &lt;= #{to}
+        </if>
+        ORDER BY created_at ASC
+    </select>
+
+    <select id="selectDirectionExport" resultType="com.rickgao.careercore.modules.admin.entity.CareerDirection">
+        SELECT id, name, path, status, sort_order, updated_at
+        FROM career_direction
+        WHERE deleted = 0
+        <if test="path != null">
+            AND path = #{path}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <select id="selectStudentExport" resultType="com.rickgao.careercore.modules.admin.query.StudentExportRow">
+        SELECT u.student_no,
+               p.name,
+               p.class_name,
+               p.grade,
+               p.major_category,
+               p.completeness,
+               p.development_intention AS path,
+               EXISTS(SELECT 1 FROM assessment_session s WHERE s.student_id = u.id AND s.status = 'SCORED') AS assessed,
+               (SELECT g.name FROM student_goal g
+                 WHERE g.student_id = u.id AND g.goal_type = 'PRIMARY' AND g.status = 'ACTIVE' LIMIT 1) AS primary_goal,
+               (SELECT MAX(r.submitted_at) FROM stage_review r
+                 WHERE r.student_id = u.id AND r.status = 'SUBMITTED') AS last_review
+        FROM sys_user u
+        JOIN student_profile p ON p.user_id = u.id
+        WHERE u.deleted = 0
+          AND u.role = 'STUDENT'
+        <if test="className != null">
+            AND p.class_name = #{className}
+        </if>
+        <if test="grade != null">
+            AND p.grade = #{grade}
+        </if>
+        ORDER BY u.id ASC
+    </select>
+
+    <select id="selectAiLogPage" resultType="com.rickgao.careercore.modules.admin.vo.AiCallLogVO">
+        SELECT id, created_at AS time, user_ref, scene, model_name, prompt_version, duration_ms,
+               status, token_estimate, request_hash
+        FROM ai_call_log
+        WHERE 1 = 1
+        <if test="scene != null">
+            AND scene = #{scene}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="from != null">
+            AND created_at &gt;= #{from}
+        </if>
+        <if test="to != null">
+            AND created_at &lt;= #{to}
+        </if>
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAiLogs" resultType="long">
+        SELECT COUNT(*) FROM ai_call_log
+        WHERE 1 = 1
+        <if test="scene != null">
+            AND scene = #{scene}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="from != null">
+            AND created_at &gt;= #{from}
+        </if>
+        <if test="to != null">
+            AND created_at &lt;= #{to}
+        </if>
+    </select>
+
+    <select id="selectOperationLogPage" resultType="com.rickgao.careercore.modules.admin.vo.OperationLogVO">
+        SELECT l.id, l.created_at AS time, u.name AS operator, l.action,
+               CONCAT_WS('/', l.target_type, l.target_id) AS target,
+               l.detail, l.ip
+        FROM operation_audit_log l
+        LEFT JOIN sys_user u ON u.id = l.user_id
+        WHERE 1 = 1
+        <if test="action != null">
+            AND (l.action LIKE CONCAT('%', #{action}, '%') OR l.target_type LIKE CONCAT('%', #{action}, '%'))
+        </if>
+        <if test="operator != null">
+            AND u.name LIKE CONCAT('%', #{operator}, '%')
+        </if>
+        <if test="from != null">
+            AND l.created_at &gt;= #{from}
+        </if>
+        <if test="to != null">
+            AND l.created_at &lt;= #{to}
+        </if>
+        ORDER BY ${sortColumn} ${sortDir}
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countOperationLogs" resultType="long">
+        SELECT COUNT(*)
+        FROM operation_audit_log l
+        LEFT JOIN sys_user u ON u.id = l.user_id
+        WHERE 1 = 1
+        <if test="action != null">
+            AND (l.action LIKE CONCAT('%', #{action}, '%') OR l.target_type LIKE CONCAT('%', #{action}, '%'))
+        </if>
+        <if test="operator != null">
+            AND u.name LIKE CONCAT('%', #{operator}, '%')
+        </if>
+        <if test="from != null">
+            AND l.created_at &gt;= #{from}
+        </if>
+        <if test="to != null">
+            AND l.created_at &lt;= #{to}
+        </if>
+    </select>
+
+</mapper>
