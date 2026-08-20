@@ -1,38 +1,33 @@
-# 生涯规划系统 · 第一版 Demo 后端配置
-server:
-  port: 8080
-
 spring:
   application:
     name: career-core
-  datasource:
-    url: jdbc:mysql://127.0.0.1:3306/career_core?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: ${DB_USERNAME:career}
-    # Demo 精简点：密码不硬编码入库，改由环境变量注入（缺省保留本地值，便于本地直启；后续迭代替换位置）
-    password: ${DB_PASSWORD:career123}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  # Demo：启动时自动执行 db/migration 下的建表与种子脚本（幂等，可重复启动）
+  autoconfigure:
+    # 使用 JWT 无状态认证,不需要默认 UserDetailsService(避免生成无关的安全密码)
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  profiles:
+    # 未显式指定 profile 时默认使用 local(数据库凭据等在 application-local.yml 中,已 gitignore)
+    default: local
   sql:
     init:
+      # 应用启动时执行建表与种子脚本(幂等)
       mode: always
-      encoding: UTF-8
-      schema-locations: classpath:db/migration/schema.sql
-      data-locations: classpath:db/migration/data.sql
+      schema-locations: classpath:db/schema.sql,classpath:db/advisor.sql,classpath:db/admin-config.sql,classpath:db/admin-curriculum.sql,classpath:db/admin-log.sql
+      data-locations: classpath:db/data.sql
       continue-on-error: false
   jackson:
     time-zone: Asia/Shanghai
-    date-format: yyyy-MM-dd HH:mm:ss
 
-# career-ai（FastAPI 智能服务）接入配置
-career:
-  ai:
-    enabled: true                 # 是否启用 AI 解释；关闭或调用失败时自动回退规则模板
-    base-url: http://127.0.0.1:8000
-    connect-timeout-ms: 2000      # 连接超时（毫秒）：AI 服务不可用时快速回退，不拖慢推荐接口
-    timeout-ms: 15000             # 读取超时（毫秒）：真实 LLM 生成解释需数秒，须放宽
-    model: deepseek-v4-pro        # 期望使用的模型名（实际由 career-ai 侧 LLM_MODEL 决定，此处仅作记录）
+server:
+  port: 8080
 
-# Demo 阶段不做日志审计、限流等中间件，保持最小可用
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.rickgao.careercore.modules
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
 logging:
   level:
-    com.career.demo: info
+    com.rickgao.careercore: info
+    org.springframework.security: warn

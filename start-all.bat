@@ -8,7 +8,7 @@ chcp 65001 >nul
 setlocal
 
 set "PROJECT=D:\Zht20241287\career-planner"
-set "JDK_HOME=D:\devtools\jdk25\jdk-25.0.2"
+set "JDK_HOME=D:\devtools\jdk17\jdk-17.0.20+8"
 set "MAVEN_HOME=D:\devtools\maven\apache-maven-3.9.16"
 set "MYSQL_BIN=D:\devtools\mysql\mysql-26.7.0-winx64\bin"
 set "MYSQL_INI=D:\devtools\mysql\my.ini"
