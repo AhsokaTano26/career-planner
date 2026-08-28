@@ -24,6 +24,12 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
     environment:
       LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_BASE_URL: ${LLM_BASE_URL:-}
@@ -38,6 +44,7 @@ services:
       DB_USER: ${MYSQL_USER:-career}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE:-career_core}
+      LITELLM_LOG: ${LITELLM_LOG:-WARNING}
 
   app:
     image: ${DOCKER_IMAGE:?set DOCKER_IMAGE in .env}
@@ -46,7 +53,7 @@ services:
       mysql:
         condition: service_healthy
       career-ai:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "${APP_PORT:-8080}:8080"
     environment:
