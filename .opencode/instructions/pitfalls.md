@@ -5,12 +5,12 @@
 - **接口返回字段一般不允许为 null**：成功响应的业务对象字段尽量不返回 `null`，否则可能触发 Apifox 契约校验失败（已踩坑：画像模块 `ProfileSnapshotDto.feedback` 恒为 `null` 且未加过滤，被序列化为 `"feedback": null` 报契约错误）。实现约定：
   - 给 DTO/record 加 `@JsonInclude(JsonInclude.Include.NON_NULL)` 过滤空值（与推荐模块同一套修复保持一致）；
   - 空态统一为默认值/空串/空数组，而非 `null`；
-  - 涉及返回结构改动时对照 `docs/本地实现vs线上核对报告.md` 与 `docs/openapi/career-core-apis.yaml`。
+  - 涉及返回结构改动时对照 `docs/reports/后端对齐Apifox记录.md` 与 `docs/openapi/career-core-apis-live.yaml`。
 - **分支名带括号**：PowerShell 会把 `git ... origin/career-core(back-end)` 里的 `(back-end)` 解析成命令调用，报错 `back-end\` 不是命令。引用含括号的分支名/引用必须加引号，如 `$br = 'origin/career-core(back-end)'` 或 `git log 'origin/career-core(back-end)'`。
 - **终端工具会简化命令（丢掉 `cd`）**：后台长命令（如 `java -jar`、`python -m uvicorn`）可能被工具剥离开头的 `cd <目录>`，导致相对路径（如 `target\xxx.jar`）解析失败，报 `Unable to access jarfile`。启动服务请用绝对路径（`java -jar D:\...\target\xxx.jar`），或用 `--app-dir`（uvicorn）等不依赖当前目录的方式。
 - **保留字**：MySQL 8+ 中 `rank` 为保留字，SQL 需写成 `` `rank` ``。
 - **下载源**：archive.apache.org 很慢，Maven 用 dlcdn.apache.org；MySQL 版本须到 dev.mysql.com 下载页查当前版本（2026-08 为 26.7.0）。
-- **Apifox**：MCP 服务只读（无法直接写线上文档）；接口定义以 `docs/openapi/career-core-apis.yaml` 供导入。
+- **Apifox**：MCP 服务只读（无法直接写线上文档）；接口定义以 `docs/openapi/career-core-apis-live.yaml` 供导入。
 - **Apifox CLI 与开发环境排坑**：涉及 Apifox CLI 拉取/整理接口（中文乱码、uv 托管解释器、`.ps1`/`.cmd` 调用、PowerShell 转义等）时，先读 `docs/Apifox-CLI与开发环境排坑记录.md`。要点速记：
   - CLI 真实路径用 `C:\Users\uio8k\AppData\Roaming\npm\apifox.cmd`（Python 跨进程调用必须用 `.cmd`，`.ps1` 无法被 subprocess 执行）。
   - CLI 输出落盘用 `cmd /c "... > file"` 保留原始 UTF-8 字节，避免 PowerShell 按 GBK 解码致中文乱码；Python 侧 `subprocess.run(...).stdout.decode("utf-8-sig")`。

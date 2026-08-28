@@ -7,12 +7,11 @@
 
 - **项目代码根目录**：`D:\Zht20241287\career-planner`（Git 仓库根目录）
   - `fronted/` —— Vue 3 + Vite + TypeScript 前端（已实现，实际代码所在）
-  - `frontend/` —— 旧空骨架目录（占位，非实际前端）
+  - （原 `frontend/` 空壳目录已删除，实际前端见 `fronted/`）
   - `career-core/` —— Spring Boot 后端（已实现：认证、画像、推荐、计划、辅导员、管理后台）
   - `career-ai/` —— FastAPI 智能服务（独立服务，未打包进线上镜像）
-  - `deploy/` —— 旧版 docker-compose 骨架、nginx/ 配置、scripts/
-  - `data-seed/` —— 空
-  - `docs/` —— 项目文档（`接口设计.md`、`openapi/career-core-apis.yaml`、`Apifox-CLI与开发环境排坑记录.md` 等）
+  - `deploy/` —— 旧版 docker-compose 骨架（`docker-compose.yml` + `env.example`）
+  - `docs/` —— 项目文档（`openapi/career-core-apis-live.yaml` + `career-core-apis-live-summary.md`、`reports/后端对齐Apifox记录.md`、`dev-notes/Apifox-CLI与开发环境排坑记录.md` 等）
   - `tests/` —— `smoke_api.py`（跨服务冒烟）、`feedback.json` 等
   - `.github/workflows/docker-publish.yml` —— GitHub Action：main 分支推送后自动构建 Docker 镜像并推送到 Docker Hub
   - `.opencode/` —— opencode 项目配置（本文件所在目录 + 指令 + 技能）
@@ -113,13 +112,13 @@
 - **接口返回字段一般不允许为 null**：成功响应的业务对象字段尽量不返回 `null`，否则可能触发 Apifox 契约校验失败。实现约定：
   - 给 DTO/record 加 `@JsonInclude(JsonInclude.Include.NON_NULL)` 过滤空值；
   - 空态统一为默认值/空串/空数组，而非 `null`；
-  - 涉及返回结构改动时对照 `docs/本地实现vs线上核对报告.md` 与 `docs/openapi/career-core-apis.yaml`。
+  - 涉及返回结构改动时对照 `docs/reports/后端对齐Apifox记录.md` 与 `docs/openapi/career-core-apis-live.yaml`。
 - **分支名带括号**：PowerShell 会把 `git ... origin/career-core(back-end)` 里的 `(back-end)` 解析成命令调用，报错 `back-end\` 不是命令。引用含括号的分支名/引用必须加引号，如 `$br = 'origin/career-core(back-end)'` 或 `git log 'origin/career-core(back-end)'`。
 - **终端工具会简化命令（丢掉 `cd`）**：后台长命令（如 `java -jar`、`python -m uvicorn`）可能被工具剥离开头的 `cd <目录>`，导致相对路径（如 `target\xxx.jar`）解析失败，报 `Unable to access jarfile`。启动服务请用绝对路径，或用 `--app-dir`（uvicorn）等不依赖当前目录的方式。
 - **Maven 构建**：本地与 Docker 统一用 `mvnw`（wrapper 3.9.16）；若本地用 `mvn` 也需确保 Maven 3.9.x。改 pom 后先 `clean` 再 `package`，避免 target 残留旧版本 class（如 major 69）导致 `Unsupported class file major version` 报错。
 - **保留字**：MySQL 8+ 中 `rank` 为保留字，SQL 需写成 `` `rank` ``。
 - **下载源**：archive.apache.org 很慢，Maven 用 dlcdn.apache.org；MySQL 版本须到 dev.mysql.com 下载页查当前版本（2026-08 为 26.7.0）。
-- **Apifox**：MCP 服务只读（无法直接写线上文档）；接口定义以 `docs/openapi/career-core-apis.yaml` 供导入。
+- **Apifox**：MCP 服务只读（无法直接写线上文档）；接口定义以 `docs/openapi/career-core-apis-live.yaml` 供导入。
 - **Apifox CLI 与开发环境排坑**：涉及 Apifox CLI 拉取/整理接口（中文乱码、uv 托管解释器、`.ps1`/`.cmd` 调用、PowerShell 转义等）时，先读 `docs/Apifox-CLI与开发环境排坑记录.md`。要点速记：
   - CLI 真实路径用 `C:\Users\uio8k\AppData\Roaming\npm\apifox.cmd`（Python 跨进程调用必须用 `.cmd`，`.ps1` 无法被 subprocess 执行）。
   - CLI 输出落盘用 `cmd /c "... > file"` 保留原始 UTF-8 字节，避免 PowerShell 按 GBK 解码致中文乱码；Python 侧 `subprocess.run(...).stdout.decode("utf-8-sig")`。
@@ -131,7 +130,7 @@
 
 ## 9. 开发约定（每次回答都要遵守）
 
-- **接口与鉴权**：统一前缀 `/api/v1`；JWT 认证（Spring Security + JJWT），登录接口 `POST /api/v1/auth/login`；涉及接口改动前先对照 `docs/接口设计.md` 与 `docs/openapi/career-core-apis.yaml`。
+- **接口与鉴权**：统一前缀 `/api/v1`；JWT 认证（Spring Security + JJWT），登录接口 `POST /api/v1/auth/login`；涉及接口改动前先对照 `docs/openapi/career-core-apis-live.yaml` 与 `docs/openapi/career-core-apis-live.yaml`。
 - **分层结构**：后端在 `career-core` 的 `com.rickgao.careercore.modules.<模块>` 下，每个模块 = controller + dto + entity + mapper + service(+impl) + vo；Mapper 接口 + XML 在 `resources/mapper/<模块>/`；公共类在 `com.rickgao.careercore.common`、`config`、`security`。
 - **数据库约定**：表/字段 snake_case、主键 varchar(32)（IdGenerator 生成，非自增 bigint）、通用列 `created_at/updated_at`；**优先沿用现有表结构，不轻易新增表/字段**；MySQL 保留字（如 `rank`）需反引号。
 - **注释约定**：所有 Demo 简化/增强/兼容逻辑处必须用注释标明「Demo 精简点 / 后续迭代替换位置」，便于后续识别替换。

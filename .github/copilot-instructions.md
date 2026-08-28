@@ -6,12 +6,11 @@
 
 - **工作区根目录**：`D:\Zht20241287\生涯规划系统开发`（当前 VS Code 打开的工作区）
 - **项目代码根目录**：`D:\Zht20241287\生涯规划系统开发\career-planning`
-  - `docs/` —— 项目文档（`接口设计.md`、设计/需求 docx、`openapi/career-core-apis.yaml`）
-  - `frontend/` —— Vue 3 前端（空骨架，未实现）
+  - `docs/` —— 项目文档（`openapi/career-core-apis-live.yaml` + `career-core-apis-live-summary.md`、`reports/后端对齐Apifox记录.md`、`dev-notes/Apifox-CLI与开发环境排坑记录.md` 等）
+  - `fronted/` —— Vue 3 + Vite + TS 前端（实际代码所在；原空壳 `frontend/` 已删除）
   - `career-core/` —— Spring Boot 后端（已实现：画像、推荐、计划生成）
   - `career-ai/` —— FastAPI 智能服务（占位骨架，未实现）
-  - `deploy/` —— docker-compose.yml、env.example、nginx/、scripts/
-  - `data-seed/` —— 空
+  - `deploy/` —— docker-compose.yml、env.example
   - `tests/` —— `smoke_api.py`（跨服务冒烟）、`feedback.json`
 - 无 Git 仓库（`.git` 不存在）；本机无 winget、无 Docker
 
@@ -90,12 +89,12 @@
 - **接口返回字段一般不允许为 null**：成功响应的业务对象字段尽量不返回 `null`，否则可能触发 Apifox 契约校验失败（已踩坑：画像模块 `ProfileSnapshotDto.feedback` 恒为 `null` 且未加过滤，被序列化为 `"feedback": null` 报契约错误）。实现约定：
   - 给 DTO/record 加 `@JsonInclude(JsonInclude.Include.NON_NULL)` 过滤空值（与推荐模块同一套修复保持一致）；
   - 空态统一为默认值/空串/空数组，而非 `null`；
-  - 涉及返回结构改动时对照 `docs/本地实现vs线上核对报告.md` 与 `docs/openapi/career-core-apis.yaml`。
+  - 涉及返回结构改动时对照 `docs/reports/后端对齐Apifox记录.md` 与 `docs/openapi/career-core-apis-live.yaml`。
 - **分支名带括号**：PowerShell 会把 `git ... origin/career-core(back-end)` 里的 `(back-end)` 解析成命令调用，报错 `back-end\` 不是命令。引用含括号的分支名/引用必须加引号，如 `$br = 'origin/career-core(back-end)'` 或 `git log 'origin/career-core(back-end)'`。
 - **终端工具会简化命令（丢掉 `cd`）**：后台长命令（如 `java -jar`、`python -m uvicorn`）可能被工具剥离开头的 `cd <目录>`，导致相对路径（如 `target\xxx.jar`）解析失败，报 `Unable to access jarfile`。启动服务请用绝对路径（`java -jar D:\...\target\xxx.jar`），或用 `--app-dir`（uvicorn）等不依赖当前目录的方式。
 - **保留字**：MySQL 8+ 中 `rank` 为保留字，SQL 需写成 `` `rank` ``。
 - **下载源**：archive.apache.org 很慢，Maven 用 dlcdn.apache.org；MySQL 版本须到 dev.mysql.com 下载页查当前版本（2026-08 为 26.7.0）。
-- **Apifox**：MCP 服务只读（无法直接写线上文档）；接口定义以 `docs/openapi/career-core-apis.yaml` 供导入。
+- **Apifox**：MCP 服务只读（无法直接写线上文档）；接口定义以 `docs/openapi/career-core-apis-live.yaml` 供导入。
 - **Apifox CLI 与开发环境排坑**：涉及 Apifox CLI 拉取/整理接口（中文乱码、uv 托管解释器、`.ps1`/`.cmd` 调用、PowerShell 转义等）时，先读 `docs/Apifox-CLI与开发环境排坑记录.md`。要点速记：
   - CLI 真实路径用 `C:\Users\uio8k\AppData\Roaming\npm\apifox.cmd`（Python 跨进程调用必须用 `.cmd`，`.ps1` 无法被 subprocess 执行）。
   - CLI 输出落盘用 `cmd /c "... > file"` 保留原始 UTF-8 字节，避免 PowerShell 按 GBK 解码致中文乱码；Python 侧 `subprocess.run(...).stdout.decode("utf-8-sig")`。
@@ -107,7 +106,7 @@
 
 ## 8. 开发约定（每次回答都要遵守）
 
-- **接口与鉴权**：统一前缀 `/api/v1`；Demo 无登录态，`studentId` 为可选参数、缺省取 1001；涉及接口改动前先对照 `docs/接口设计.md` 与 `docs/openapi/career-core-apis.yaml`。
+- **接口与鉴权**：统一前缀 `/api/v1`；Demo 无登录态，`studentId` 为可选参数、缺省取 1001；涉及接口改动前先对照 `docs/openapi/career-core-apis-live.yaml` 与 `docs/openapi/career-core-apis-live.yaml`。
 - **连续斜杠 `//` 处理**：Apifox 契约测试在路径变量为空时会请求带连续斜杠的 URL（如 `POST /api/v1/profile-snapshots//feedback`），Spring PathPattern 无法匹配空路径段（返回 404「接口不存在」）。全局已用 `career-core` 的 `com.career.core.common.PathNormalizeFilter`（OncePerRequestFilter + HttpServletRequestWrapper）把请求路径中的连续斜杠折叠为单斜杠；涉及「路径参数可为空」的接口改动时，需同时为该路径补充兜底路由（如 `{"/profile-snapshots/feedback", "/profile-snapshots/{snapshotId:.*}/feedback"}`），并让空 id 落到「最新一条」逻辑，保证 200 + 完整响应结构。
 - **分层结构**：后端在 `career-core` 的 `modules/<模块>` 下，每个模块 = Controller + Service + Dao(JdbcTemplate)，包名 `com.career.core.modules.*`；公共类在 `com.career.core.common`。
 - **数据库约定**：表/字段 snake_case、主键 bigint 自增、通用列 `created_at/updated_at`；**优先沿用现有表结构，不轻易新增表/字段**；MySQL 保留字（如 `rank`）需反引号。
