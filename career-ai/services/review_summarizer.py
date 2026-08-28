@@ -15,10 +15,12 @@ _SYSTEM_PROMPT = (
 )
 
 
-def summarize(review_content: dict, cycle: str, task_summary: str | None = None) -> dict:
+def summarize(review_content: dict, cycle: str, task_summary: str | None = None,
+              *, user_ref: str | None = None) -> dict:
     """生成阶段总结，返回 {summary, suggestions}。
 
     输入按 Apifox ReviewSummarizeRequest：reviewContent(ReviewContent)/cycle/taskSummary。
+    user_ref 为脱敏用户引用（写入 ai_call_log）。
     """
     user_prompt = _build_prompt(review_content, cycle, task_summary)
     content = generate(
@@ -29,6 +31,8 @@ def summarize(review_content: dict, cycle: str, task_summary: str | None = None)
         temperature=0.5,
         # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
         max_tokens=1500,
+        scene="review_summarize",
+        user_ref=user_ref,
     )
     import json
     text = content.strip()

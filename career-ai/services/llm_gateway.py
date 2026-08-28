@@ -1,21 +1,30 @@
-"""大模型网关：统一封装外部大模型调用。
+"""大模型网关（兼容层）：转发到 gateway.client（LiteLLM Router：多渠道/重试/降级/日志）。
 
-Demo 实现：直连 DeepSeek（OpenAI 兼容接口），模型名默认 deepseek-v4-pro。
-后续迭代（替换点）：在 providers/ 下扩展多 Provider 路由、重试/熔断、限流与 ai_call_log 调用记录。
+Demo 精简点 / 后续迭代替换位置：本模块仅保留兼容导出（LlmError / DEFAULT_MODEL / generate），
+新代码请直接 import gateway.client。
 """
 
 from __future__ import annotations
 
-from providers.deepseek import DEFAULT_MODEL, LlmError, chat_completion
+import os
+
+from gateway.client import GatewayError, get_gateway
+
+LlmError = GatewayError
+DEFAULT_MODEL = os.getenv("LLM_MODEL", "deepseek-v4-flash")
 
 
 def generate(messages: list[dict], **kwargs) -> str:
-    """统一入口：生成一次模型回复。
+    """统一入口：生成一次模型回复文本（透传 temperature/max_tokens 等参数）。
 
+    :param scene: ai_call_log 场景归因（career_chat/plan_generate/recommendation_explain/review_summarize/gateway_api）
+    :param user_ref: 脱敏用户引用，写入 ai_call_log.user_ref
     :raises LlmError: 调用失败时抛出，由上层决定回退策略。
     """
-    return chat_completion(messages, **kwargs)
+    scene = kwargs.pop("scene", "career_chat")
+    user_ref = kwargs.pop("user_ref", None)
+    result = get_gateway().generate(messages, scene=scene, user_ref=user_ref, **kwargs)
+    return result.text
 
 
-__all__ = ["generate", "LlmError", "DEFAULT_MODEL"]
-
+__all__ = ["generate", "LlmError", "GatewayError", "DEFAULT_MODEL"]

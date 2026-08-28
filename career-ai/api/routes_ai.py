@@ -13,7 +13,7 @@ from typing import Annotated, List, Literal, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, BeforeValidator
 
-from providers.deepseek import LlmError
+from gateway.client import GatewayError
 from services.career_chat import chat as chat_service
 from services.pdf_parser import parse_from_url
 from services.plan_generator import generate_plan
@@ -217,8 +217,9 @@ def ai_chat(req: ChatRequest) -> ChatResponse:
         answer = "该问题可能涉及心理健康、医疗或法律等专业领域，建议联系辅导员或专业机构获取帮助。"
     else:
         try:
-            answer = chat_service(req.question, req.context.model_dump() if req.context else None)
-        except LlmError as exc:
+            answer = chat_service(req.question, req.context.model_dump() if req.context else None,
+                                  user_ref=req.studentRef)
+        except GatewayError as exc:
             raise HTTPException(status_code=503, detail=f"生涯咨询生成失败：{exc}") from exc
 
     support_reason = "涉及心理健康/医疗/法律等话题，建议转人工或专业机构" if needs_human else ""
@@ -245,8 +246,10 @@ def ai_recommendation_explain(req: ExplainBatchRequest) -> ExplainBatchResult:
         explanations = explain_batch(
             req.profile.model_dump() if req.profile else None,
             [r.model_dump() for r in req.results],
+            run_id=run_id,
+            user_ref=req.studentRef,
         )
-    except LlmError as exc:
+    except GatewayError as exc:
         raise HTTPException(status_code=503, detail=f"推荐解释生成失败：{exc}") from exc
     except ValueError as exc:
         raise HTTPException(status_code=503, detail=f"推荐解释输出不合法：{exc}") from exc
@@ -262,8 +265,9 @@ def ai_plan_generate(req: PlanGenerateRequest) -> PlanGenerateResult:
             semester=req.semester,
             goal_summary=req.goalSummary,
             template=req.template.model_dump() if req.template else None,
+            user_ref=req.studentRef,
         )
-    except LlmError as exc:
+    except GatewayError as exc:
         raise HTTPException(status_code=503, detail=f"计划生成失败：{exc}") from exc
     except ValueError as exc:
         raise HTTPException(status_code=503, detail=f"计划生成输出不合法：{exc}") from exc
@@ -274,8 +278,9 @@ def ai_plan_generate(req: PlanGenerateRequest) -> PlanGenerateResult:
 def ai_review_summarize(req: ReviewSummarizeRequest) -> ReviewSummarizeResult:
     """生成阶段总结与调整建议。"""
     try:
-        result = review_summarize(req.reviewContent.model_dump(), req.cycle, req.taskSummary)
-    except LlmError as exc:
+        result = review_summarize(req.reviewContent.model_dump(), req.cycle, req.taskSummary,
+                                  user_ref=req.studentRef)
+    except GatewayError as exc:
         raise HTTPException(status_code=503, detail=f"阶段总结生成失败：{exc}") from exc
     return ReviewSummarizeResult(summary=result.get("summary", ""),
                                  suggestions=result.get("suggestions", []))

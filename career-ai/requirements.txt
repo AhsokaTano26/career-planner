@@ -1,4 +1,4 @@
-# career-ai 依赖（与 .venv 保持一致）
+# career-ai 依赖（与 .venv 保持一致；Python 3.12，对齐 Dockerfile python:3.12-slim）
 fastapi>=0.141
 uvicorn>=0.52
 httpx>=0.28
@@ -6,3 +6,9 @@ pydantic>=2.13
 python-dotenv>=1.2
 python-multipart>=0.0.20
 pytest>=8.0
+# AI 网关（复用 LiteLLM：多供应商路由/重试/降级/日志回调）
+litellm==1.98.0
+# ai_call_log 落库（MySQL，career-ai 仅写日志表）
+sqlalchemy>=2.0
+pymysql>=1.1
+cryptography>=44.0

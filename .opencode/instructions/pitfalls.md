@@ -16,6 +16,6 @@
   - CLI 输出落盘用 `cmd /c "... > file"` 保留原始 UTF-8 字节，避免 PowerShell 按 GBK 解码致中文乱码；Python 侧 `subprocess.run(...).stdout.decode("utf-8-sig")`。
   - Python 解释器由 uv 托管（PEP 668），**不要 `pip install`**；脚本优先纯标准库（json/subprocess），运行用 `& "C:/Users/uio8k/.local/bin/python.exe" script.py`。
   - 生成含反引号的 Markdown 文档用 Python f-string，不要在 PowerShell 字符串插值里混用 `` `$ `` 转义。
-  - 全量接口清单：`docs/openapi/career-core-apis-live-summary.md`；可复跑脚本：`docs/scripts/organize_apifox_apis.py`（项目 ID 8662286，主分支 127 个接口）。
+  - 全量接口清单：`docs/openapi/career-core-apis-live-summary.md`（124 个接口）；可复跑脚本：`docs/scripts/organize_apifox_apis.py`（项目 ID 8662286，主分支 124 个接口）。
   - **`test-case run` 不替换 path 变量（2026-08-15 坑）**：CLI 2.2.9 直接跑单接口测试用例（`apifox test-case run <id> -e <envId>`）时，URL 中 `{taskId}` 不会被替换成实际值（生成的 collection 里 `url.variable` 为空、URL 仍为字面 `{taskId}`），且 `--env-var` / `--global-var` / `--variables` 注入均不生效 → 请求打到字面路径返回 400。**可靠跑法**：先 `apifox test-case run <id> -e <envId> -r json` 生成报告 → 从报告 JSON 提取 `collection` 段另存 → 用 Python 把 URL path 中的 `{taskId}` 替换为实际值（`url.variable` 置空）→ 再 `apifox run <collection.json> -r cli,json` 执行（真实 URL 200 OK）。参考脚本 `docs/scripts/fix_collection_task.py`；示例用例「更新任务-正向 (PATCH /tasks/{taskId})」id=404389855，本地环境 47907998。
 - **无 winget / Docker**：安装软件一律手动下载 ZIP/安装包解压配置。

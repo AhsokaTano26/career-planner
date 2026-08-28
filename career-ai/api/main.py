@@ -9,8 +9,10 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import uuid as _uuid
+from contextlib import asynccontextmanager
 from datetime import datetime as _datetime
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -24,7 +26,22 @@ from pydantic import BaseModel
 # 加载 career-ai/.env（如存在）
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
-app = FastAPI(title="career-ai", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    """启动时预热网关（Demo 精简点：失败不阻塞启动，调用时报错）。"""
+    try:
+        from gateway.client import get_gateway
+
+        gw = get_gateway()
+        groups = [g.name for g in gw.config.groups]
+        logging.getLogger("gateway").info("AI 网关就绪：模型组=%s rpm=%s", groups, gw.config.rpm)
+    except Exception as exc:  # noqa: BLE001 - fail-open
+        logging.getLogger("gateway").warning("AI 网关初始化失败（调用时将报错）：%s", exc)
+    yield
+
+
+app = FastAPI(title="career-ai", version="0.2.0", lifespan=lifespan)
 
 
 @app.middleware("http")
@@ -48,6 +65,11 @@ from api.routes_ai import router as ai_router  # noqa: E402
 
 app.include_router(ai_router)
 
+# AI 网关路由（/v1/chat/completions、/api/v1/gateway/generate）
+from api.routes_gateway import router as gateway_router  # noqa: E402
+
+app.include_router(gateway_router)
+
 
 # ---------------------------------------------------------------- 统一错误响应（对齐 Apifox ErrorResponse）
 _ERROR_CODE_BY_STATUS = {
@@ -57,6 +79,7 @@ _ERROR_CODE_BY_STATUS = {
     404: "NOT_FOUND",
     409: "CONFLICT",
     422: "VALIDATION_ERROR",
+    429: "RATE_LIMITED",
     502: "BAD_GATEWAY",
     503: "SERVICE_UNAVAILABLE",
 }
@@ -112,16 +135,16 @@ class Direction(BaseModel):
     type: Optional[str] = None
     score: float = 0.0
     rank: Optional[int] = None
-    personality_tags: Optional[List[str]] = None  # 方向霍兰德标签（RIASEC）
-    matches: Optional[Dict[str, float]] = None    # 各维度匹配度（0-1）
-    gaps: Optional[Dict[str, float]] = None       # 各维度差距（0-1，供“建议加强”提示）
+    personality_tags: Optional[List[str]] = None
+    matches: Optional[Dict[str, float]] = None
+    gaps: Optional[Dict[str, float]] = None
 
 
 class ExplainRequest(BaseModel):
     """推荐解释请求：最小化结构化输入，不包含学生身份信息。"""
 
-    student_id: Optional[int] = None  # Demo 边界：可为空，避免持有身份信息
-    personality: Optional[List[str]] = None  # 学生霍兰德人格类型（RIASEC）
+    student_id: Optional[int] = None
+    personality: Optional[List[str]] = None
     direction: Direction
 
 
@@ -142,6 +165,21 @@ def recommendation_explain(req: ExplainRequest) -> ExplainResponse:
 
 
 @app.get("/health")
-def health() -> Dict[str, str]:
-    """健康检查。"""
-    return {"status": "ok", "service": "career-ai"}
+def health() -> Dict[str, object]:
+    """健康检查（含网关概要：模型组 / rpm / 日志落库配置）。"""
+    summary: Dict[str, object] = {"status": "ok", "service": "career-ai"}
+    try:
+        from gateway.client import get_gateway
+        from gateway.db import get_engine
+
+        gw = get_gateway()
+        summary["gateway"] = {
+            "groups": [g.name for g in gw.config.groups],
+            "rpm": gw.config.rpm,
+            "timeout": gw.config.timeout,
+            "maxRetries": gw.config.max_retries,
+            "callLogDb": get_engine() is not None,
+        }
+    except Exception as exc:  # noqa: BLE001 - 健康检查不因网关未就绪而失败
+        summary["gateway"] = {"status": "unavailable", "reason": str(exc)}
+    return summary

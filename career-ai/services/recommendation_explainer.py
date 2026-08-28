@@ -54,6 +54,8 @@ def explain(request) -> "ExplainResponse":
             ],
             temperature=0.7,
             max_tokens=1500,
+            scene="recommendation_explain",
+            user_ref=str(request.student_id) if request.student_id is not None else None,
         )
     except LlmError as exc:
         # Demo 边界：AI 失败由后端（career-core）回退规则模板，此处抛 502
@@ -110,12 +112,14 @@ _BATCH_SYSTEM_PROMPT = (
 )
 
 
-def explain_batch(profile: dict | None, results: list[dict]) -> list[dict]:
+def explain_batch(profile: dict | None, results: list[dict], *, run_id: str | None = None,
+                  user_ref: str | None = None) -> list[dict]:
     """为候选方向批量生成推荐解释，返回 explanations 列表。
 
     输入按 Apifox ExplainRequest：profile（六维得分）、results（[{directionId, score, rank}]）。
     输出每项含 directionId/summary/confidenceText/disclaimer。
     大模型失败抛 LlmError；输出不合法抛 ValueError（由路由映射为 503）。
+    run_id/user_ref 写入 ai_call_log 用于归因（Demo 精简点：仅记 user_ref，批次号暂不入库）。
     """
     content = generate(
         [
@@ -125,6 +129,8 @@ def explain_batch(profile: dict | None, results: list[dict]) -> list[dict]:
         temperature=0.7,
         # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
         max_tokens=2000,
+        scene="recommendation_explain",
+        user_ref=user_ref,
     )
     return _parse_batch_json(content)
 

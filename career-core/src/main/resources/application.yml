@@ -27,6 +27,21 @@ mybatis:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
+# AI 网关（career-ai）配置：career-core 全量大模型调用走网关（2026-08-29 起，原 llm.* 已废弃）
+# 环境变量注入，不硬编码；多渠道路由/重试/降级/调用日志由 career-ai 网关负责
+ai:
+  gateway-base-url: ${AI_GATEWAY_BASE_URL:http://127.0.0.1:8000}
+  gateway-api-key: ${AI_GATEWAY_API_KEY:}
+  gateway-model: ${AI_GATEWAY_MODEL:default}
+  gateway-timeout: ${AI_GATEWAY_TIMEOUT:30}
+
+# Deprecated（2026-08-29）：直连大模型配置，仅为兼容保留，代码不再读取
+llm:
+  api-key: ${LLM_API_KEY:}
+  base-url: ${LLM_BASE_URL:}
+  model: ${LLM_MODEL:}
+  timeout: ${LLM_TIMEOUT:20}
+
 logging:
   level:
     com.rickgao.careercore: info

@@ -16,17 +16,18 @@ _SYSTEM_PROMPT = (
 )
 
 
-def chat(question: str, context: dict | None = None) -> str:
+def chat(question: str, context: dict | None = None, *, user_ref: str | None = None) -> str:
     """生成一次生涯咨询回答。
 
     :param question: 学生本次提问
     :param context: 可选上下文（directionId / goalSummary），来自 ChatRequest.context
+    :param user_ref: 脱敏用户引用（写入 ai_call_log）
     :return: 模型回答文本
     """
     messages = [{"role": "system", "content": _SYSTEM_PROMPT}]
     messages.append({"role": "user", "content": desensitize(_build_prompt(question, context))})
     # max_tokens 需覆盖推理模型的 reasoning 预算，否则推理占满后 content 为空（deepseek-v4-flash 实测）
-    return generate(messages, temperature=0.7, max_tokens=2000)
+    return generate(messages, temperature=0.7, max_tokens=2000, scene="career_chat", user_ref=user_ref)
 
 
 def _build_prompt(question: str, context: dict | None) -> str:

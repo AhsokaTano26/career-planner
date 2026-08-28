@@ -15,12 +15,38 @@ services:
       timeout: 5s
       retries: 12
 
+  career-ai:
+    # AI 网关（2026-08-29 起）：career-core 全量大模型调用经此服务（gateway/*，基于 LiteLLM）；
+    # 仅 compose 内网可达（不映射宿主端口），并直连 MySQL 写 ai_call_log
+    build: ./career-ai
+    image: ${DOCKER_IMAGE_AI:-career-planner-ai:local}
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      GATEWAY_API_KEY: ${GATEWAY_API_KEY:?set GATEWAY_API_KEY in .env}
+      GATEWAY_MODEL_GROUPS: ${GATEWAY_MODEL_GROUPS:-}
+      GATEWAY_RPM: ${GATEWAY_RPM:-60}
+      GATEWAY_TIMEOUT: ${GATEWAY_TIMEOUT:-30}
+      GATEWAY_MAX_RETRIES: ${GATEWAY_MAX_RETRIES:-2}
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: ${MYSQL_USER:-career}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE:-career_core}
+
   app:
     image: ${DOCKER_IMAGE:?set DOCKER_IMAGE in .env}
     restart: unless-stopped
     depends_on:
       mysql:
         condition: service_healthy
+      career-ai:
+        condition: service_started
     ports:
       - "${APP_PORT:-8080}:8080"
     environment:
@@ -28,6 +54,11 @@ services:
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-career}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      # 大模型统一走 career-ai 网关（2026-08-29 起，LLM_* 直连配置已废弃）
+      AI_GATEWAY_BASE_URL: ${AI_GATEWAY_BASE_URL:-http://career-ai:8000}
+      AI_GATEWAY_API_KEY: ${GATEWAY_API_KEY:?set GATEWAY_API_KEY in .env}
+      AI_GATEWAY_MODEL: ${AI_GATEWAY_MODEL:-default}
+      AI_GATEWAY_TIMEOUT: ${AI_GATEWAY_TIMEOUT:-30}
 
 volumes:
   mysql-data:
