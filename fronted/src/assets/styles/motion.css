@@ -40,3 +40,26 @@
 /* ---- Toast:右侧滑入 + 淡出 ---- */
 .toast-enter-active, .toast-leave-active { transition: opacity .22s var(--ease-out), transform .22s var(--ease-out); }
 .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(24px); }
+
+/* ---- 按钮微交互 ---- */
+.outline-btn, .primary-btn, .outline-light, .white-btn, .compact-btn, .topbar .logout-btn, .tab-bar button {
+  transition: transform var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+}
+.outline-btn:hover, .outline-light:hover, .white-btn:hover, .compact-btn:hover, .topbar .logout-btn:hover, .tab-bar button:hover:not(:disabled) { transform: translateY(-1px); }
+.primary-btn:hover { transform: translateY(-1px); }
+.outline-btn:active, .primary-btn:active, .outline-light:active, .white-btn:active, .compact-btn:active, .topbar .logout-btn:active, .tab-bar button:active:not(:disabled) { transform: translateY(0) scale(.98); }
+
+/* ---- 导航项:悬停右移 + 左侧指示条生长(伪元素,避免布局偏移)---- */
+.side-nav nav button { position: relative; border-left-width: 0; transition: background-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out); }
+.side-nav nav button::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #fff; transform: scaleY(0); transition: transform var(--dur-base) var(--ease-out); }
+.side-nav nav button:hover { transform: translateX(2px); }
+.side-nav nav button.active::before { transform: scaleY(1); }
+
+/* ---- 卡片 / 列表行微抬升 ---- */
+.weight-card { transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); }
+.weight-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0, 75, 157, .12); }
+.enhanced-list article { transition: background-color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+.enhanced-list article:hover { transform: translateY(-1px); }
+
+/* ---- 键盘焦点环 ---- */
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--cqu-blue); outline-offset: 2px; }
