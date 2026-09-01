@@ -63,3 +63,16 @@
 
 /* ---- 键盘焦点环 ---- */
 button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--cqu-blue); outline-offset: 2px; }
+
+/* ---- 进度条生长:挂载时从 0 生长到实际宽度 ---- */
+.progress-line span, .weight-bars i b, .analysis-bars em, .path-bars em, .dimension-list em {
+  animation: grow var(--dur-grow) var(--ease-out) both;
+}
+@keyframes grow { from { width: 0; } }
+
+/* ---- 列表逐行错峰入场:第 n 行延迟 n*30ms ---- */
+.enhanced-list article, .record-list article, .advisor-student-table article, .attention-list article {
+  animation: item-in .3s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 30ms);
+}
+@keyframes item-in { from { opacity: 0; transform: translateY(6px); } }
