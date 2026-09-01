@@ -72,7 +72,7 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
 @keyframes grow { from { width: 0; } }
 
 /* ---- 列表逐行错峰入场:第 n 行延迟 n*30ms ---- */
-.enhanced-list article, .record-list article, .advisor-student-table article, .attention-list article {
+.enhanced-list article, .record-list article, .advisor-student-table article, .attention-list article, .weight-records > article, .detail-timeline article, .guidance-history article {
   animation: item-in .3s var(--ease-out) backwards;
   animation-delay: calc(var(--i, 0) * 30ms);
 }
@@ -82,3 +82,36 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
 .skeleton { position: relative; overflow: hidden; background: var(--cqu-blue-20); border-radius: 2px; }
 .skeleton::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent); animation: shimmer 1.1s var(--ease-out) infinite; }
 @keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+/* 无障碍降级必须覆盖上方动效规则：仅保留极短透明度，不保留移动、缩放或扫光。 */
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active, .page-leave-active,
+  .modal-enter-active, .modal-leave-active,
+  .dropdown-enter-active, .dropdown-leave-active,
+  .toast-enter-active, .toast-leave-active,
+  .native-select-menu { transition: opacity .08s linear !important; }
+  .page-enter-from, .page-leave-to,
+  .modal-enter-from .modal-card, .modal-leave-to .modal-card,
+  .dropdown-enter-from, .dropdown-leave-to,
+  .toast-enter-from, .toast-leave-to,
+  .native-select-menu, .native-select-renderer.open .native-select-menu,
+  .outline-btn:hover, .primary-btn:hover, .outline-light:hover, .white-btn:hover,
+  .compact-btn:hover, .topbar .logout-btn:hover, .tab-bar button:hover:not(:disabled),
+  .outline-btn:active, .primary-btn:active, .outline-light:active, .white-btn:active,
+  .compact-btn:active, .topbar .logout-btn:active, .tab-bar button:active:not(:disabled),
+  .side-nav nav button:hover, .side-nav nav button.active::before,
+  .weight-card:hover, .enhanced-list article:hover { transform: none !important; }
+  .side-nav nav button, .side-nav nav button::before, .weight-card,
+  .enhanced-list article, .outline-btn, .primary-btn, .outline-light, .white-btn,
+  .compact-btn, .topbar .logout-btn, .tab-bar button { transition: opacity .08s linear !important; }
+  .progress-line span, .weight-bars i b, .analysis-bars em, .path-bars em,
+  .dimension-list em, .enhanced-list article, .record-list article,
+  .advisor-student-table article, .attention-list article, .weight-records > article,
+  .detail-timeline article, .guidance-history article, .skeleton::after { animation: none !important; }
+}
+
+/* 所有可输入控件均提供一致的键盘焦点提示。 */
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--cqu-blue);
+  outline-offset: 2px;
+}
