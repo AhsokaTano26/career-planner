@@ -35,7 +35,9 @@ async function handleForcedPasswordChange(oldPassword: string, newPassword: stri
 
 <template>
   <MotionConfig :reducedMotion="'user'">
-    <RouterView />
+    <Transition name="page" mode="out-in">
+      <RouterView />
+    </Transition>
     <PasswordChangeDialog
       v-if="forcePasswordChange"
       mandatory

@@ -17,3 +17,8 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ---- 路由 / 页面切换 ---- */
+.page-enter-active, .page-leave-active { transition: opacity var(--dur-route) var(--ease-out), transform var(--dur-route) var(--ease-out); }
+.page-enter-from { opacity: 0; transform: translateY(8px); }
+.page-leave-to { opacity: 0; transform: translateY(-4px); }
