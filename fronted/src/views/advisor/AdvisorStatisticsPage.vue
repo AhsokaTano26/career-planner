@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { AdvisorStudent } from '../../types/domain'
 import PageHeader from '../../components/BasePageHeader.vue'
+import CountUp from '../../components/CountUp.vue'
 import { useAdvisorAnalysis } from '../../composables/useAdvisorAnalysis'
 
 const { students, loading, error, load } = useAdvisorAnalysis()
@@ -42,10 +43,10 @@ const maxCount=(data:Distribution[])=>Math.max(1,...data.map(item=>item.count))
   <p v-else-if="error" class="empty error-state">{{error}}</p>
   <template v-else>
     <div class="metric-grid advisor-metrics analysis-metrics">
-      <article><b>{{students.length}}</b><span>纳入统计学生</span></article>
-      <article><b>{{averageCompleteness}}<small>%</small></b><span>平均档案完整度</span></article>
-      <article><b>{{averagePlanRate}}<small>%</small></b><span>平均计划完成率</span></article>
-      <article><b>{{priorityCount}}</b><span>需优先跟进学生</span></article>
+      <article><b><CountUp :to="students.length"/></b><span>纳入统计学生</span></article>
+      <article><b><CountUp :to="averageCompleteness"/><small>%</small></b><span>平均档案完整度</span></article>
+      <article><b><CountUp :to="averagePlanRate"/><small>%</small></b><span>平均计划完成率</span></article>
+      <article><b><CountUp :to="priorityCount"/></b><span>需优先跟进学生</span></article>
     </div>
     <section v-if="students.length" class="analysis-grid">
       <article class="analysis-card"><div class="analysis-card-head"><div><p class="eyebrow">班级对比</p><h2>各班学生数量</h2></div><span>{{classDistribution.length}} 个班级</span></div><div class="analysis-bars"><div v-for="item in classDistribution" :key="item.label"><div><b>{{item.label}}</b><span>{{item.count}} 人</span></div><i><em :style="{width:`${item.count/maxCount(classDistribution)*100}%`}"/></i></div></div></article>
