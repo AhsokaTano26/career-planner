@@ -8,7 +8,7 @@ const selected=computed(()=>props.options.find(item=>item.value===props.modelVal
 function close(){open.value=false}
 function toggle(){if(!props.disabled)open.value=!open.value}
 function choose(value:string){emit('update:modelValue',value);close()}
-function keydown(event:KeyboardEvent){if(event.key==='Escape')return close();if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle();return}if(!open.value||!['ArrowDown','ArrowUp'].includes(event.key))return;event.preventDefault();const index=Math.max(0,props.options.findIndex(item=>item.value===props.modelValue));const next=event.key==='ArrowDown'?Math.min(props.options.length-1,index+1):Math.max(0,index-1);choose(props.options[next].value)}
+function keydown(event:KeyboardEvent){if(event.key==='Escape')return close();if(event.key==='Enter'||event.key===' '){event.preventDefault();toggle();return}if(!open.value||!['ArrowDown','ArrowUp'].includes(event.key)||!props.options.length)return;event.preventDefault();const index=Math.max(0,props.options.findIndex(item=>item.value===props.modelValue));const next=event.key==='ArrowDown'?Math.min(props.options.length-1,index+1):Math.max(0,index-1);choose(props.options[next].value)}
 function outside(event:MouseEvent){if(root.value&&!root.value.contains(event.target as Node))close()}
 document.addEventListener('click',outside)
 onBeforeUnmount(()=>document.removeEventListener('click',outside))

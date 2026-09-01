@@ -1,7 +1,7 @@
 import { onMounted, ref, watch } from 'vue'
 import { api, getErrorMessage } from '../api/request'
 import type { AdvisorFilters, AdvisorStudent } from '../types/domain'
-import { useAuth } from './useAuth'
+import { onSessionReset, useAuth } from './useAuth'
 
 // Module-level singleton state shared by the student list and guidance pages.
 const students = ref<AdvisorStudent[]>([])
@@ -13,6 +13,16 @@ const loading = ref(false)
 const error = ref('')
 
 const EMPTY_FILTERS: AdvisorFilters = { keyword: '', path: '', goalStatus: '', reviewStatus: '', guidanceRequested: '', sort: '-createdAt' }
+
+onSessionReset(() => {
+  students.value = []
+  filters.value = { ...EMPTY_FILTERS }
+  total.value = 0
+  page.value = 1
+  totalPages.value = 1
+  loading.value = false
+  error.value = ''
+})
 
 export function useAdvisorStudents() {
   const auth = useAuth()

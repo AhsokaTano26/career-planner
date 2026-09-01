@@ -1,12 +1,18 @@
 import { ref } from 'vue'
 import { api, getErrorMessage } from '../api/request'
 import type { AdvisorDetail, Guidance } from '../types/domain'
+import { onSessionReset } from './useAuth'
 import { useToast } from './useToast'
 
 export type GuidancePayload = { content: string; adviceType: Guidance['adviceType']; suggestedTask?: string; retestReason?: string }
 
 const student = ref<AdvisorDetail | null>(null)
 const guidanceSaving = ref(false)
+
+onSessionReset(() => {
+  student.value = null
+  guidanceSaving.value = false
+})
 
 export function useAdvisorDetail() {
   const { show: notice } = useToast()

@@ -1,7 +1,7 @@
 import { onMounted, ref, watch } from 'vue'
 import { api, getErrorMessage } from '../api/request'
 import type { Completeness, ConsentStatus, Experience, ExperienceDraft, Profile, ProfileForm } from '../types/domain'
-import { useAuth } from './useAuth'
+import { onSessionReset, useAuth } from './useAuth'
 import { useToast } from './useToast'
 
 // Module-level singleton state shared across the student views.
@@ -10,6 +10,14 @@ const completeness = ref<Completeness | null>(null)
 const experiences = ref<Experience[]>([])
 const consent = ref<ConsentStatus | null>(null)
 const consentAgreed = ref<boolean | null>(null)
+
+onSessionReset(() => {
+  profile.value = null
+  completeness.value = null
+  experiences.value = []
+  consent.value = null
+  consentAgreed.value = null
+})
 
 export function useStudent() {
   const auth = useAuth()
@@ -31,7 +39,7 @@ export function useStudent() {
     consentAgreed.value = consentStatus.agreed
   }
 
-  async function saveProfile(form: ProfileForm) {
+  async function saveProfile(form: ProfileForm): Promise<boolean> {
     saving.value = true
     try {
       const number = (v: string) => v.trim() ? Number(v) : undefined
@@ -47,14 +55,16 @@ export function useStudent() {
       })
       completeness.value = await api.student.completeness()
       notice('个人资料已保存')
+      return true
     } catch (e) {
       notice(getErrorMessage(e))
+      return false
     } finally {
       saving.value = false
     }
   }
 
-  async function saveExperience(draft: ExperienceDraft) {
+  async function saveExperience(draft: ExperienceDraft): Promise<boolean> {
     saving.value = true
     try {
       const data = {
@@ -69,21 +79,24 @@ export function useStudent() {
       const index = experiences.value.findIndex(current => current.id === item.id)
       index < 0 ? experiences.value.unshift(item) : experiences.value.splice(index, 1, item)
       notice('经历已保存')
+      return true
     } catch (e) {
       notice(getErrorMessage(e))
+      return false
     } finally {
       saving.value = false
     }
   }
 
-  async function removeExperience(id: string) {
-    if (!confirm('确定删除这条经历吗？')) return
+  async function removeExperience(id: string): Promise<boolean> {
     try {
       await api.student.deleteExperience(id)
       experiences.value = experiences.value.filter(item => item.id !== id)
       notice('经历已删除')
+      return true
     } catch (e) {
       notice(getErrorMessage(e))
+      return false
     }
   }
 
@@ -101,13 +114,15 @@ export function useStudent() {
     }
   }
 
-  async function requestDeletion(reason: string) {
+  async function requestDeletion(reason: string): Promise<boolean> {
     saving.value = true
     try {
       await api.student.requestDeletion(reason)
       notice('删除申请已提交')
+      return true
     } catch (e) {
       notice(getErrorMessage(e))
+      return false
     } finally {
       saving.value = false
     }

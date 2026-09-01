@@ -70,33 +70,38 @@ function normalizePage(data:unknown) {
   total.value = Number(value.total || rows.value.length)
   totalPages.value = Math.max(1, Number(value.totalPages || Math.ceil(total.value / 20) || 1))
 }
+let loadSeq = 0
 async function load() {
   if (props.module === 'admin-overview') { rows.value=[]; total.value=0; return }
+  const seq = ++loadSeq
   loading.value=true; error.value=''
   try {
-    if (props.module === 'weights') { normalizePage(await api.admin.weights()); return }
+    const apply = (data:unknown) => { if (seq === loadSeq) normalizePage(data) }
+    if (props.module === 'weights') { apply(await api.admin.weights()); return }
     if (props.module === 'curricula') {
       if (curriculumTab.value === 'items') {
         if (!selectedJob.value?.id) { rows.value=[]; total.value=0; return }
-        normalizePage(await request(`/admin/curricula/items?${query({...filters.value,jobId:String(selectedJob.value.id)})}`))
-      } else if (curriculumTab.value === 'versions') normalizePage(await request(`/admin/curricula/versions?${query()}`))
-      else normalizePage(await request(`/admin/curricula/jobs?${query()}`))
+        apply(await request(`/admin/curricula/items?${query({...filters.value,jobId:String(selectedJob.value.id)})}`))
+      } else if (curriculumTab.value === 'versions') apply(await request(`/admin/curricula/versions?${query()}`))
+      else apply(await request(`/admin/curricula/jobs?${query()}`))
       return
     }
     if (props.module === 'logs') {
       const values = {...filters.value}
       const endpoint = logTab.value === 'ai' ? '/admin/logs/ai' : '/admin/logs/operations'
       if (logTab.value === 'ai') { delete values.action; delete values.operator } else { delete values.scene; delete values.status }
-      normalizePage(await request(`${endpoint}?${query(values)}`)); return
+      apply(await request(`${endpoint}?${query(values)}`)); return
     }
-    normalizePage(await request(`${endpoints[props.module]}?${query(filters.value)}`))
-  } catch (e) { error.value=getErrorMessage(e) } finally { loading.value=false }
+    apply(await request(`${endpoints[props.module]}?${query(filters.value)}`))
+  } catch (e) { if (seq === loadSeq) error.value=getErrorMessage(e) } finally { if (seq === loadSeq) loading.value=false }
 }
 function resetAndLoad(){ page.value=1; load() }
 function nextPage(delta:number){ const target=page.value+delta; if(target>=1 && target<=totalPages.value){page.value=target;load()} }
 function label(key:string){ return ({id:'编号',userId:'用户编号',studentNo:'学号',name:'名称',username:'账号',className:'班级',role:'角色',status:'状态',createdAt:'创建时间',updatedAt:'更新时间',used:'已使用',advisorId:'辅导员编号',advisorName:'辅导员',studentId:'学生编号',studentName:'学生',directionId:'方向编号',version:'版本',type:'类型',filename:'文件名',fileName:'文件名',courseName:'课程名称',courseCode:'课程代码',semester:'学期',credits:'学分',hours:'学时',publishedAt:'发布时间',lastLoginAt:'最近登录',goalSummary:'目标摘要',sortOrder:'排序',applicableMajors:'适用专业',totalItems:'识别课程',parsedItems:'已解析',confidence:'置信度',operator:'操作人',action:'操作',scene:'场景',durationMs:'耗时'} as Record<string,string>)[key] || key }
 function optionText(input:unknown){ return ({'':'全部',STUDENT:'学生',ADVISOR:'辅导员',ADMIN:'系统管理员',ACTIVE:'已启用',DISABLED:'已停用',DRAFT:'草稿',PUBLISHED:'已发布',PENDING:'待处理',APPROVED:'已通过',REJECTED:'已驳回',MERGED:'已合并',APPROVE:'批量通过',REJECT:'批量驳回',graduate:'国内升学',employment:'就业发展',overseas:'出国留学',true:'已使用',false:'未使用',STUDENT_DATA:'学生数据',WHITELIST:'白名单',OPERATION_LOG:'操作日志',AI_LOG:'模型调用日志',DIRECTION_LIB:'方向库'} as Record<string,string>)[String(input)] || String(input) }
 function value(value:unknown){ if(value===null||value===undefined||value==='') return '—'; if(typeof value==='boolean') return value?'是':'否'; if(Array.isArray(value)) return value.map(item=>typeof item==='object'?'':optionText(item)).filter(Boolean).join('、')||'—'; if(typeof value==='object') return '—'; return optionText(value) }
+const weightBoundsKeys=['interest','values','ability','academic','tendency','practice','minConfidence']
+function numberBounds(field:Field){ if(field.type!=='number') return undefined; if(field.key.startsWith('target')) return {min:0,max:100}; if(weightBoundsKeys.includes(field.key)) return {min:0,max:1}; return undefined }
 function dateTime(input:unknown){ const text=String(input||''); if(!text) return '—'; const date=new Date(text); return Number.isNaN(date.getTime()) ? text.replace('T',' ').replace(/\+08:00$/,'') : date.toLocaleString('zh-CN',{hour12:false}).replace(/\//g,'-') }
 function shortText(input:unknown, length=42){ const text=String(input||'').trim(); return text.length>length ? `${text.slice(0,length)}…` : text }
 function list(input:unknown){ return Array.isArray(input) ? input.map(item=>String(item)).filter(Boolean) : [] }
@@ -237,7 +242,7 @@ onBeforeUnmount(clearCurriculumPolling)
     <p v-if="loading" class="empty">正在读取数据…</p><p v-else-if="error" class="empty error-state">{{ error }}</p>
     <template v-else-if="props.module!=='weights'"><div class="list-summary"><span>共 <b>{{ total }}</b> 条记录</span><span v-if="isPage">第 {{ page }} / {{ totalPages }} 页</span></div><div class="enhanced-list"><div class="list-columns"><span v-for="heading in columnLabels()" :key="heading">{{ heading }}</span></div><article v-for="row in rows" :key="rowId(row)"><small v-if="props.module==='curricula'&&curriculumTab==='items'"><input v-model="selectedItems" type="checkbox" :value="rowId(row)"/></small><small v-else>{{ rowId(row) || '—' }}</small><div><b>{{ rowTitle(row) }}</b><span>{{ detailLines(row).filter(Boolean).join(' · ') || '—' }}</span></div><div class="row-actions"><em v-if="rowStatus(row)!=='—'" :class="rowStatusClass(row)">{{ rowStatus(row) }}</em><button v-if="props.module==='users'||props.module==='abilities'||props.module==='templates'||(props.module==='admin-directions')" class="outline-btn" @click="openEdit(row)">编辑</button><button v-if="props.module==='whitelist'||props.module==='relations'" class="outline-btn" @click="askDelete(row)">删除</button><button v-if="props.module==='admin-directions'" class="outline-btn" @click="changeDirectionStatus(row)">{{ String(row.status)==='PUBLISHED'?'停用':'发布' }}</button><button v-if="props.module==='exports'" class="outline-btn" :disabled="String(row.status)!=='COMPLETED'" @click="download(row)">下载</button><button v-if="props.module==='curricula'&&curriculumTab==='jobs'" class="outline-btn" @click="openJob(row,true)">查看并校核</button><button v-if="props.module==='curricula'&&curriculumTab==='items'" class="outline-btn" @click="openEdit(row,'curriculumItem')">审核编辑</button></div></article><p v-if="!rows.length" class="empty">暂无记录。</p></div><div v-if="isPage&&totalPages>1" class="admin-pagination"><button class="outline-btn" :disabled="page<=1" @click="nextPage(-1)">上一页</button><span>{{ page }} / {{ totalPages }}</span><button class="outline-btn" :disabled="page>=totalPages" @click="nextPage(1)">下一页</button></div></template>
   </section>
-  <BaseModal v-if="modal" @close="modal=false"><form class="modal-card admin-editor" @submit.prevent="save"><p class="eyebrow">{{ editing ? '编辑' : '新建' }}</p><h2>{{ editKind==='curriculumItem'?'审核课程条目':editKind==='curriculumPublish'?'发布培养方案':title }}</h2><label v-for="field in currentFields" :key="field.key">{{ field.label }}<select v-if="field.type==='select'" v-model="form[field.key]" :required="field.required"><option value="" disabled>请选择</option><option v-for="option in field.options" :key="option" :value="option">{{optionText(option)}}</option></select><textarea v-else-if="field.type==='textarea'" v-model="form[field.key]" :required="field.required" :placeholder="field.placeholder"/><input v-else v-model.trim="form[field.key]" :type="field.type==='number'?'number':'text'" :min="field.type==='number'&&(['interest','values','ability','academic','tendency','practice','minConfidence'].includes(field.key)||field.key.startsWith('target'))?0:undefined" :max="field.type==='number'&&(['interest','values','ability','academic','tendency','practice','minConfidence'].includes(field.key)||field.key.startsWith('target'))?1:undefined" step="any" :required="field.required" :placeholder="field.placeholder"/></label><div><button type="button" class="outline-btn" @click="modal=false">取消</button><button class="primary-btn" :disabled="submitting">{{submitting?'正在保存…':'保存'}}</button></div></form></BaseModal>
+  <BaseModal v-if="modal" @close="modal=false"><form class="modal-card admin-editor" @submit.prevent="save"><p class="eyebrow">{{ editing ? '编辑' : '新建' }}</p><h2>{{ editKind==='curriculumItem'?'审核课程条目':editKind==='curriculumPublish'?'发布培养方案':title }}</h2><label v-for="field in currentFields" :key="field.key">{{ field.label }}<select v-if="field.type==='select'" v-model="form[field.key]" :required="field.required"><option value="" disabled>请选择</option><option v-for="option in field.options" :key="option" :value="option">{{optionText(option)}}</option></select><textarea v-else-if="field.type==='textarea'" v-model="form[field.key]" :required="field.required" :placeholder="field.placeholder"/><input v-else v-model.trim="form[field.key]" :type="field.type==='number'?'number':'text'" :min="numberBounds(field)?.min" :max="numberBounds(field)?.max" step="any" :required="field.required" :placeholder="field.placeholder"/></label><div><button type="button" class="outline-btn" @click="modal=false">取消</button><button class="primary-btn" :disabled="submitting">{{submitting?'正在保存…':'保存'}}</button></div></form></BaseModal>
   <BaseModal v-if="generatedInitialPasswords.length" :closeable="false"><section class="modal-card generated-password-dialog" role="dialog" aria-modal="true" aria-labelledby="generated-password-title"><p class="eyebrow">账户创建完成</p><h2 id="generated-password-title">请记录初始密码</h2><p>以下密码由系统自动生成，仅在本次提示中显示。学生首次登录后必须修改密码。</p><div class="generated-password-list"><div v-for="item in generatedInitialPasswords" :key="item.studentNo"><span>{{item.studentNo}}</span><code>{{item.initialPassword}}</code></div></div><div><button class="primary-btn" @click="generatedInitialPasswords=[]">我已记录</button></div></section></BaseModal>
   <BaseModal v-if="deleteTarget" @close="deleteTarget=null"><section class="modal-card confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-title"><p class="eyebrow">删除确认</p><h2 id="delete-confirm-title">确定删除这条记录吗？</h2><p>将删除「{{ rowTitle(deleteTarget) }}」，删除后不可恢复。</p><div><button type="button" class="outline-btn" @click="deleteTarget=null">取消</button><button class="primary-btn" @click="confirmDelete">确定删除</button></div></section></BaseModal>
 </template>

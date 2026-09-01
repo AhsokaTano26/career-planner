@@ -1,11 +1,17 @@
 import { onMounted, ref, watch } from 'vue'
 import { api, getErrorMessage } from '../api/request'
 import type { AdvisorAttention } from '../types/domain'
-import { useAuth } from './useAuth'
+import { onSessionReset, useAuth } from './useAuth'
 
 const items = ref<AdvisorAttention[]>([])
 const loading = ref(false)
 const error = ref('')
+
+onSessionReset(() => {
+  items.value = []
+  loading.value = false
+  error.value = ''
+})
 
 export function useAdvisorAttention() {
   const auth = useAuth()

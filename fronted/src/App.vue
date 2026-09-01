@@ -18,7 +18,7 @@ const router = useRouter()
 // default page behind the mandatory dialog instead of letting them roam.
 watch(forcePasswordChange, (forced) => {
   if (forced && loggedIn.value) {
-    router.replace({ name: defaultRouteName(role.value) })
+    router.replace({ name: defaultRouteName(role.value) }).catch(() => { /* 已在目标页时导航取消属正常情况 */ })
   }
 })
 

@@ -16966,6 +16966,192 @@
             "examples": [
               "2026-07-31T00:00:00+08:00"
             ]
+          },
+          "icon": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "图标",
+            "examples": [
+              "🖥️"
+            ]
+          },
+          "intro": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "方向简介",
+            "examples": [
+              "面向软件系统的服务端设计、开发与运维，是软件行业需求量大、成长路径清晰的就业方向之一。"
+            ]
+          },
+          "target": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "interest": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "兴趣目标值（0–100）",
+                "examples": [
+                  70
+                ]
+              },
+              "values": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "职业价值观目标值（0–100）",
+                "examples": [
+                  70
+                ]
+              },
+              "ability": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "能力基础目标值（0–100）",
+                "examples": [
+                  70
+                ]
+              },
+              "academic": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "学业基础目标值（0–100）",
+                "examples": [
+                  70
+                ]
+              },
+              "tendency": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "发展倾向目标值（0–100）",
+                "examples": [
+                  70
+                ]
+              },
+              "practice": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "description": "实践经历目标值（0–100）",
+                "examples": [
+                  70
+                ]
+              }
+            }
+          },
+          "minAbility": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "最低能力要求",
+            "examples": [
+              65
+            ]
+          },
+          "minAcademic": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "最低学业要求",
+            "examples": [
+              50
+            ]
+          },
+          "learning": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "examples": [
+                "Java / Go / Python 服务端语言"
+              ]
+            },
+            "description": "学习内容"
+          },
+          "abilities": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "examples": [
+                "编程实现"
+              ]
+            },
+            "description": "能力要求标签"
+          },
+          "courses": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "examples": [
+                "《Java 程序设计》《数据库原理》"
+              ]
+            },
+            "description": "推荐课程"
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "examples": [
+                "完成 1—2 个后端小项目并部署上线"
+              ]
+            },
+            "description": "实践活动建议"
+          },
+          "pathDesc": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "examples": [
+                "大一大二：打好编程与数据结构基础"
+              ]
+            },
+            "description": "发展路径描述"
+          },
+          "misconceptions": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "examples": [
+                "后端只会 CRUD 就够了"
+              ]
+            },
+            "description": "常见误区"
           }
         },
         "required": [

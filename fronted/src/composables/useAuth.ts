@@ -26,6 +26,18 @@ const saving = ref(false)
 
 let restoring: Promise<void> | null = null
 
+// Session-reset registry: composables register a handler to drop their module-level
+// singleton state when the session is torn down (logout / 401), so data never leaks
+// between accounts. Handlers run in registration order.
+type SessionResetHandler = () => void
+const sessionResetHandlers = new Set<SessionResetHandler>()
+export function onSessionReset(handler: SessionResetHandler) {
+  sessionResetHandlers.add(handler)
+}
+export function runSessionResets() {
+  sessionResetHandlers.forEach(handler => handler())
+}
+
 export function useAuth() {
   const { show: notice } = useToast()
 
@@ -46,6 +58,7 @@ export function useAuth() {
         forcePasswordChange.value = Boolean(user.passwordChangeRequired)
       } catch {
         clearAuthSession()
+        resetSession()
       } finally {
         loading.value = false
       }
@@ -87,6 +100,7 @@ export function useAuth() {
     role.value = 'STUDENT'
     loggedIn.value = false
     forcePasswordChange.value = false
+    runSessionResets()
     restoring = null
   }
 
@@ -102,31 +116,40 @@ export function useAuth() {
       await api.auth.changePassword({ oldPassword, newPassword })
       currentUser.value = await api.auth.me()
       forcePasswordChange.value = Boolean(currentUser.value?.passwordChangeRequired)
-      if (forcePasswordChange.value) throw new Error('密码修改状态未更新，请重试')
+      if (forcePasswordChange.value) {
+        // 后端仍未清除强制修改标记，避免死锁：登出会话，让用户重新登录。
+        clearAuthSession()
+        resetSession()
+        throw new Error('密码已修改，请重新登录')
+      }
     } finally {
       forcedPasswordSaving.value = false
     }
   }
 
-  async function saveAccount(name: string) {
+  async function saveAccount(name: string): Promise<boolean> {
     saving.value = true
     try {
       currentUser.value = await api.auth.updateMe({ name })
       notice('账户信息已保存')
+      return true
     } catch (e) {
       notice(getErrorMessage(e))
+      return false
     } finally {
       saving.value = false
     }
   }
 
-  async function changePassword(oldPassword: string, newPassword: string) {
+  async function changePassword(oldPassword: string, newPassword: string): Promise<boolean> {
     saving.value = true
     try {
       await api.auth.changePassword({ oldPassword, newPassword })
       notice('密码已修改')
+      return true
     } catch (e) {
       notice(getErrorMessage(e))
+      return false
     } finally {
       saving.value = false
     }

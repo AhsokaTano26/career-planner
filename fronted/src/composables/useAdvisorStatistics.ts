@@ -1,11 +1,17 @@
 import { onMounted, ref, watch } from 'vue'
 import { api, getErrorMessage } from '../api/request'
 import type { AdvisorStatistics } from '../types/domain'
-import { useAuth } from './useAuth'
+import { onSessionReset, useAuth } from './useAuth'
 
 const statistics = ref<AdvisorStatistics | null>(null)
 const loading = ref(false)
 const error = ref('')
+
+onSessionReset(() => {
+  statistics.value = null
+  loading.value = false
+  error.value = ''
+})
 
 export function useAdvisorStatistics() {
   const auth = useAuth()
