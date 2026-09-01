@@ -53,7 +53,7 @@
       </div>
       <div class="row">
         <label>班级</label><input id="r_className" value="计科2601">
-        <label>校验码</label><input id="r_verifyCode" value="202609">
+        <label>初始密码</label><input id="r_initialPassword" value="202609">
       </div>
       <div class="row">
         <button onclick="register()">POST /auth/register</button>
@@ -215,7 +215,7 @@ function onToken(json) {
 
 async function register() {
   const body = {
-    studentNo: v('r_studentNo'), name: v('r_name'), className: v('r_className'), verifyCode: v('r_verifyCode')
+    studentNo: v('r_studentNo'), name: v('r_name'), className: v('r_className'), initialPassword: v('r_initialPassword')
   };
   const r = await api('POST', '/auth/register', body, false);
   const json = log('注册', r.status, r.json); if (r.status<300) onToken(json);

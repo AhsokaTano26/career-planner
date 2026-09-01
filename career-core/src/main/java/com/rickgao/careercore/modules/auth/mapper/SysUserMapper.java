@@ -24,7 +24,8 @@ public interface SysUserMapper {
     /** 当前用户仅可更新自己的展示姓名，登录名、角色和状态由系统管理。 */
     int updateOwnName(@Param("id") String id, @Param("name") String name);
 
-    int updatePassword(@Param("id") String id, @Param("passwordHash") String passwordHash);
+    int updatePassword(@Param("id") String id, @Param("passwordHash") String passwordHash,
+                       @Param("passwordChangeRequired") boolean passwordChangeRequired);
 
     int updateConsentAgreed(@Param("id") String id, @Param("consentAgreed") boolean consentAgreed);
 

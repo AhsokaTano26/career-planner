@@ -4,7 +4,7 @@
  * internal token and must be reached through a server-side gateway.
  */
 export type ApiEnvelope<T> = { code: string; message: string; data: T; traceId?: string; timestamp?: string }
-export type User = { id:string; username:string; name:string; role:'STUDENT'|'ADVISOR'|'ADMIN'; studentNo?:string; grade?:string; majorCategory?:string; className?:string; consentAgreed?:boolean }
+export type User = { id:string; username:string; name:string; role:'STUDENT'|'ADVISOR'|'ADMIN'; studentNo?:string; grade?:string; majorCategory?:string; className?:string; consentAgreed?:boolean; passwordChangeRequired?:boolean }
 export type Token = { accessToken:string; refreshToken:string; expiresIn:number; tokenType:string; firstLogin:boolean; user:User }
 export type ConsentStatus = { agreed:boolean; version?:string; agreedAt?:string; currentVersion:string; currentVersionPublishedAt?:string; content?:string }
 export type Experience = { id:string; type:string; title:string; startDate:string; endDate?:string; description?:string; attachmentUrl?:string }
@@ -96,7 +96,7 @@ const formPost = <T>(path:string, data:FormData) => request<T>(path, { method:'P
 export const api = {
   auth: {
     login: (data:{account:string;password:string;role?:string}) => post<Token>('/auth/login', data),
-    register: (data:{studentNo:string;name:string;className?:string;verifyCode:string}) => post<Token>('/auth/register', data),
+    register: (data:{studentNo:string;name:string;className?:string;initialPassword:string}) => post<Token>('/auth/register', data),
     me: () => get<User>('/auth/me'), logout: () => post<void>('/auth/logout'),
     updateMe: (data:{name:string}) => patch<User>('/auth/me', data),
     refresh:(data:{refreshToken:string})=>post<Token>('/auth/refresh',data), resetPassword:(data:unknown)=>post<void>('/auth/password/reset',data),

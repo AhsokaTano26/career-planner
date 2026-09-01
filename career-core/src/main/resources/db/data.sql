@@ -24,7 +24,7 @@ SELECT 'CD001', 'v1.0', '隐私告知与 AI 使用说明',
 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM consent_document WHERE version = 'v1.0');
 
--- 白名单测试数据(verify_code 同时作为注册后的初始密码)
+-- 白名单测试数据(initial_password 作为注册后的初始密码)
 INSERT IGNORE INTO student_whitelist (id, student_no, name, class_name, verify_code) VALUES
 ('WL001', '2026011301', '李明',  '计科2601', '202601'),
 ('WL002', '2026011309', '张同学', '计科2601', '202609'),

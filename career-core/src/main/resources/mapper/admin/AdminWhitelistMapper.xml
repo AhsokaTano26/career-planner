@@ -41,7 +41,7 @@
 
     <insert id="insert" parameterType="com.rickgao.careercore.modules.auth.entity.StudentWhitelist">
         INSERT INTO student_whitelist (id, student_no, name, class_name, verify_code)
-        VALUES (#{id}, #{studentNo}, #{name}, #{className}, #{verifyCode})
+        VALUES (#{id}, #{studentNo}, #{name}, #{className}, #{initialPassword})
     </insert>
 
     <delete id="deleteById">

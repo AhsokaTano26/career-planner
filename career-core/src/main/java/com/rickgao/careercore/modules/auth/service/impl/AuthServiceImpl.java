@@ -83,8 +83,8 @@ public class AuthServiceImpl implements AuthService {
         if (whitelist == null) {
             throw new BizException(ResultCode.VALIDATION_ERROR, "学号不在白名单,无法注册");
         }
-        if (!whitelist.getVerifyCode().equals(request.getVerifyCode())) {
-            throw new BizException(ResultCode.VALIDATION_ERROR, "校验码不匹配");
+        if (!whitelist.getInitialPassword().equals(request.getInitialPassword())) {
+            throw new BizException(ResultCode.VALIDATION_ERROR, "初始密码不匹配");
         }
         if (Boolean.TRUE.equals(whitelist.getUsed()) || sysUserMapper.findByUsername(request.getStudentNo()) != null) {
             throw new BizException(ResultCode.STATE_CONFLICT, "该学号已注册,请直接登录");
@@ -95,14 +95,15 @@ public class AuthServiceImpl implements AuthService {
         user.setStudentNo(request.getStudentNo());
         user.setUsername(request.getStudentNo());
         user.setName(request.getName());
-        // Demo 精简点:注册接口未提供初始密码,初始密码取白名单校验码(学生入学时从辅导员获得)
-        user.setPasswordHash(passwordEncoder.encode(request.getVerifyCode()));
+        // 注册时使用管理员分配的初始密码；首次进入后必须修改。
+        user.setPasswordHash(passwordEncoder.encode(request.getInitialPassword()));
         user.setRole(CommonConstants.ROLE_STUDENT);
         user.setStatus(CommonConstants.USER_STATUS_ACTIVE);
         // Demo 精简点:白名单未包含专业大类;年级由学号前 4 位推导
         user.setGrade(deriveGrade(request.getStudentNo()));
         user.setClassName(StringUtils.hasText(request.getClassName()) ? request.getClassName() : whitelist.getClassName());
         user.setConsentAgreed(false);
+        user.setPasswordChangeRequired(true);
         sysUserMapper.insert(user);
         studentWhitelistMapper.markUsed(request.getStudentNo());
 
@@ -198,7 +199,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BizException(ResultCode.VALIDATION_ERROR, "原密码错误");
         }
         validatePasswordStrength(request.getNewPassword());
-        sysUserMapper.updatePassword(userId, passwordEncoder.encode(request.getNewPassword()));
+        sysUserMapper.updatePassword(userId, passwordEncoder.encode(request.getNewPassword()), false);
         // 使其他端会话失效
         refreshTokenMapper.revokeByUserId(userId);
         recordAudit(CommonConstants.AUDIT_PASSWORD_CHANGE, userId, "sys_user", userId, "修改密码", ip);
@@ -215,7 +216,7 @@ public class AuthServiceImpl implements AuthService {
         if (target == null) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "未找到该学号的用户");
         }
-        sysUserMapper.updatePassword(target.getId(), passwordEncoder.encode(request.getNewPassword()));
+        sysUserMapper.updatePassword(target.getId(), passwordEncoder.encode(request.getNewPassword()), true);
         refreshTokenMapper.revokeByUserId(target.getId());
         String reason = StringUtils.hasText(request.getReason()) ? request.getReason() : "";
         recordAudit(CommonConstants.AUDIT_PASSWORD_RESET, operatorId, "sys_user", target.getId(), "重置密码,原因:" + reason, ip);
@@ -300,6 +301,7 @@ public class AuthServiceImpl implements AuthService {
                 .majorCategory(user.getMajorCategory())
                 .className(user.getClassName())
                 .consentAgreed(user.getConsentAgreed())
+                .passwordChangeRequired(user.getPasswordChangeRequired())
                 .build();
     }
 

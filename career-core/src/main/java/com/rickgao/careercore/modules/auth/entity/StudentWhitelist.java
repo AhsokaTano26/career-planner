@@ -14,7 +14,8 @@ public class StudentWhitelist {
     private String studentNo;
     private String name;
     private String className;
-    private String verifyCode;
+    /** 初始密码(注册时校验,注册后作为用户初始密码) */
+    private String initialPassword;
     private Boolean used;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

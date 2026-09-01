@@ -12,8 +12,8 @@ import java.util.List;
 
 /**
  * 白名单 CSV 解析器。
- * 约定:UTF-8(兼容 BOM)、无表头、每行 3 列(学号,班级,校验码);
- * 校验码可空(由服务层生成);空行跳过;行号从 1 计(数据行)。
+ * 约定:UTF-8(兼容 BOM)、无表头、每行 3 列(学号,班级,初始密码);
+ * 初始密码可空(由服务层生成);空行跳过;行号从 1 计(数据行)。
  */
 public final class WhitelistCsvParser {
 
@@ -45,16 +45,16 @@ public final class WhitelistCsvParser {
                 if (parts.length >= 3) {
                     row.setStudentNo(parts[0]);
                     row.setClassName(parts[1]);
-                    row.setVerifyCode(parts[2]);
+                    row.setInitialPassword(parts[2]);
                 } else if (parts.length == 2) {
-                    // 两列视为 学号,校验码(班级留空)
+                    // 两列视为 学号,初始密码(班级留空)
                     row.setStudentNo(parts[0]);
                     row.setClassName("");
-                    row.setVerifyCode(parts[1]);
+                    row.setInitialPassword(parts[1]);
                 } else {
                     row.setStudentNo(parts[0]);
                     row.setClassName("");
-                    row.setVerifyCode("");
+                    row.setInitialPassword("");
                 }
                 rows.add(row);
             }
@@ -67,6 +67,6 @@ public final class WhitelistCsvParser {
         private int row;
         private String studentNo;
         private String className;
-        private String verifyCode;
+        private String initialPassword;
     }
 }

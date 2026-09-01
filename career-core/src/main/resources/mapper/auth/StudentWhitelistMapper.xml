@@ -7,7 +7,7 @@
         <result property="studentNo" column="student_no"/>
         <result property="name" column="name"/>
         <result property="className" column="class_name"/>
-        <result property="verifyCode" column="verify_code"/>
+        <result property="initialPassword" column="verify_code"/>
         <result property="used" column="used"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>

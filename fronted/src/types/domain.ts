@@ -13,6 +13,7 @@ export type AdvisorStatistics = {
   taskCompletionRate?:number; pathDistribution?:{path:string;count:number}[]
 }
 export type Guidance = { id:string; studentId:string; content:string; adviceType:'COMMENT'|'SUGGEST_TASK'|'SUGGEST_RETEST'; suggestedTask?:string; retestReason?:string; createdAt?:string }
+export type AdvisorFilters = { keyword:string; path:string; goalStatus:string; reviewStatus:string; guidanceRequested:string; sort:string }
 export type AdvisorDetail = { id:string; detail:unknown; guidance:Guidance[] }
 export type ProfileForm = { gender:string; hometown:string; birthday:string; phone:string; math:string; english:string; programming:string; academicNote:string; abilityProgramming:string; abilityMath:string; abilityEnglish:string; communication:string; organization:string; interests:string; values:string; developmentIntention:string; constraints:string }
 export type ExperienceDraft = { id?:string; type:string; title:string; startDate:string; endDate:string; description:string; attachment:string }

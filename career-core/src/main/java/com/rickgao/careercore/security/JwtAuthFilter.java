@@ -1,5 +1,10 @@
 package com.rickgao.careercore.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rickgao.careercore.common.response.ApiResponse;
+import com.rickgao.careercore.common.response.ResultCode;
+import com.rickgao.careercore.modules.auth.entity.SysUser;
+import com.rickgao.careercore.modules.auth.mapper.SysUserMapper;
 import com.rickgao.careercore.modules.auth.mapper.TokenBlacklistMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -15,6 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -26,10 +32,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final TokenBlacklistMapper tokenBlacklistMapper;
+    private final SysUserMapper sysUserMapper;
+    private final ObjectMapper objectMapper;
 
-    public JwtAuthFilter(JwtUtil jwtUtil, TokenBlacklistMapper tokenBlacklistMapper) {
+    public JwtAuthFilter(JwtUtil jwtUtil, TokenBlacklistMapper tokenBlacklistMapper,
+                         SysUserMapper sysUserMapper, ObjectMapper objectMapper) {
         this.jwtUtil = jwtUtil;
         this.tokenBlacklistMapper = tokenBlacklistMapper;
+        this.sysUserMapper = sysUserMapper;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -42,6 +53,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 Claims claims = jwtUtil.parse(token);
                 String jti = claims.getId();
                 if (tokenBlacklistMapper.exists(jti) == 0) {
+                    SysUser user = sysUserMapper.findById(claims.getSubject());
+                    if (user == null) {
+                        SecurityContextHolder.clearContext();
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
+                    if (Boolean.TRUE.equals(user.getPasswordChangeRequired()) && !isPasswordChangeAllowed(request)) {
+                        writePasswordChangeRequired(response);
+                        return;
+                    }
                     LoginUser loginUser = new LoginUser(
                             claims.getSubject(),
                             claims.get("username", String.class),
@@ -59,5 +80,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPasswordChangeAllowed(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return "/api/v1/auth/me".equals(uri)
+                || "/api/v1/auth/me/password".equals(uri)
+                || "/api/v1/auth/logout".equals(uri);
+    }
+
+    private void writePasswordChangeRequired(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("application/json");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.getWriter().write(objectMapper.writeValueAsString(
+                ApiResponse.fail(ResultCode.FORBIDDEN, "首次登录请先修改初始密码")));
     }
 }

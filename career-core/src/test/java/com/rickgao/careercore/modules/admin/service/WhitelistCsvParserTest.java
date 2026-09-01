@@ -18,20 +18,20 @@ class WhitelistCsvParserTest {
         assertEquals(2, rows.size());
         assertEquals(1, rows.get(0).getRow());
         assertEquals("2026110001", rows.get(0).getStudentNo());
-        assertEquals("abc123", rows.get(0).getVerifyCode());
+        assertEquals("abc123", rows.get(0).getInitialPassword());
         assertEquals(3, rows.get(1).getRow());
         assertEquals("2026110002", rows.get(1).getStudentNo());
-        assertEquals("", rows.get(1).getVerifyCode());
+        assertEquals("", rows.get(1).getInitialPassword());
     }
 
     @Test
-    void parse_twoColumnsTreatsSecondAsVerifyCode() throws Exception {
+    void parse_twoColumnsTreatsSecondAsInitialPassword() throws Exception {
         String csv = "2026110001,abc123\n";
         List<WhitelistCsvParser.Row> rows = WhitelistCsvParser.parse(
                 new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8)));
         assertEquals(1, rows.size());
         assertEquals("2026110001", rows.get(0).getStudentNo());
         assertEquals("", rows.get(0).getClassName());
-        assertEquals("abc123", rows.get(0).getVerifyCode());
+        assertEquals("abc123", rows.get(0).getInitialPassword());
     }
 }

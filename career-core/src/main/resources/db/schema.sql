@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS sys_user (
     major_category VARCHAR(50)  DEFAULT NULL COMMENT '专业大类(学生),如 计算机类',
     class_name     VARCHAR(50)  DEFAULT NULL COMMENT '班级(学生),如 计科2601',
     consent_agreed TINYINT(1)   NOT NULL DEFAULT 0 COMMENT '是否已同意隐私授权',
+    password_change_required TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否必须修改初始密码',
     last_login_at  DATETIME     DEFAULT NULL COMMENT '最近登录时间',
     created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -34,13 +35,14 @@ CREATE TABLE IF NOT EXISTS sys_user (
     UNIQUE KEY uk_student_no (student_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
 
+
 -- 学号白名单
 CREATE TABLE IF NOT EXISTS student_whitelist (
     id          VARCHAR(32) NOT NULL COMMENT '主键',
     student_no  VARCHAR(32) NOT NULL COMMENT '可注册学号',
     name        VARCHAR(50) DEFAULT NULL COMMENT '预填姓名',
     class_name  VARCHAR(50) DEFAULT NULL COMMENT '班级',
-    verify_code VARCHAR(32) NOT NULL COMMENT '初始校验码(注册时校验,作为初始密码)',
+    verify_code VARCHAR(32) NOT NULL COMMENT '初始密码(注册时校验,注册后作为用户初始密码)',
     used        TINYINT(1)  NOT NULL DEFAULT 0 COMMENT '是否已注册使用',
     created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
