@@ -1,6 +1,7 @@
 package com.rickgao.careercore.modules.auth.service;
 
 import com.rickgao.careercore.modules.auth.dto.ConsentRequest;
+import com.rickgao.careercore.modules.auth.dto.CurrentUserUpdateRequest;
 import com.rickgao.careercore.modules.auth.dto.LoginRequest;
 import com.rickgao.careercore.modules.auth.dto.PasswordChangeRequest;
 import com.rickgao.careercore.modules.auth.dto.PasswordResetRequest;
@@ -26,6 +27,8 @@ public interface AuthService {
     void logout(String userId, String jti, LocalDateTime tokenExpiresAt, String ip);
 
     CurrentUserVO me(String userId);
+
+    CurrentUserVO updateMe(String userId, CurrentUserUpdateRequest request, String ip);
 
     void changePassword(String userId, PasswordChangeRequest request, String ip);
 

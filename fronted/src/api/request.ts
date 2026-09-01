@@ -72,6 +72,21 @@ export async function request<T>(path:string, init:RequestInit = {}): Promise<T>
   }
   return body.data
 }
+
+export async function downloadFile(path:string):Promise<{blob:Blob; filename:string}> {
+  const headers = new Headers()
+  if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
+  headers.set('X-Request-Id', crypto.randomUUID())
+  let response = await fetch(`${base}${path}`, { headers, credentials:'include' })
+  if (response.status === 401 && await renewAccessToken()) {
+    headers.set('Authorization', `Bearer ${accessToken}`)
+    response = await fetch(`${base}${path}`, { headers, credentials:'include' })
+  }
+  if (!response.ok) throw new Error(`下载失败（HTTP ${response.status}）`)
+  const disposition = response.headers.get('Content-Disposition') || ''
+  const filename = /filename="?([^";]+)"?/i.exec(disposition)?.[1] || 'export.csv'
+  return { blob: await response.blob(), filename: decodeURIComponent(filename) }
+}
 const get = <T>(path:string) => request<T>(path)
 const post = <T>(path:string, data?:unknown) => request<T>(path, { method:'POST', body:data === undefined ? undefined : JSON.stringify(data) })
 const patch = <T>(path:string, data:unknown) => request<T>(path, { method:'PATCH', body:JSON.stringify(data) })
@@ -83,6 +98,7 @@ export const api = {
     login: (data:{account:string;password:string;role?:string}) => post<Token>('/auth/login', data),
     register: (data:{studentNo:string;name:string;className?:string;verifyCode:string}) => post<Token>('/auth/register', data),
     me: () => get<User>('/auth/me'), logout: () => post<void>('/auth/logout'),
+    updateMe: (data:{name:string}) => patch<User>('/auth/me', data),
     refresh:(data:{refreshToken:string})=>post<Token>('/auth/refresh',data), resetPassword:(data:unknown)=>post<void>('/auth/password/reset',data),
     changePassword: (data:{oldPassword:string;newPassword:string}) => patch<void>('/auth/me/password', data),
     consentStatus: () => get<ConsentStatus>('/auth/privacy-consent/status'),

@@ -3,6 +3,7 @@ package com.rickgao.careercore.modules.auth.controller;
 import com.rickgao.careercore.common.response.ApiResponse;
 import com.rickgao.careercore.common.util.IpUtil;
 import com.rickgao.careercore.modules.auth.dto.ConsentRequest;
+import com.rickgao.careercore.modules.auth.dto.CurrentUserUpdateRequest;
 import com.rickgao.careercore.modules.auth.dto.LoginRequest;
 import com.rickgao.careercore.modules.auth.dto.PasswordChangeRequest;
 import com.rickgao.careercore.modules.auth.dto.PasswordResetRequest;
@@ -67,6 +68,13 @@ public class AuthController {
     @GetMapping("/me")
     public ApiResponse<CurrentUserVO> me() {
         return ApiResponse.ok(authService.me(SecurityUtils.currentUserId()));
+    }
+
+    /** 当前登录用户维护自己的展示姓名。 */
+    @PatchMapping("/me")
+    public ApiResponse<CurrentUserVO> updateMe(@Valid @RequestBody CurrentUserUpdateRequest request,
+                                                HttpServletRequest httpRequest) {
+        return ApiResponse.ok(authService.updateMe(SecurityUtils.currentUserId(), request, IpUtil.getClientIp(httpRequest)));
     }
 
     /** 修改密码 */

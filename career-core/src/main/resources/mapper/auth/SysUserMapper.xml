@@ -61,6 +61,12 @@
         WHERE id = #{id}
     </update>
 
+    <update id="updateOwnName">
+        UPDATE sys_user
+        SET name = #{name}, updated_at = NOW()
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
     <update id="updatePassword">
         UPDATE sys_user
         SET password_hash = #{passwordHash}, updated_at = NOW()

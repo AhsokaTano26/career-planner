@@ -7,6 +7,7 @@ import com.rickgao.careercore.common.response.ResultCode;
 import com.rickgao.careercore.common.util.IdGenerator;
 import com.rickgao.careercore.common.util.TraceIdUtil;
 import com.rickgao.careercore.modules.auth.dto.ConsentRequest;
+import com.rickgao.careercore.modules.auth.dto.CurrentUserUpdateRequest;
 import com.rickgao.careercore.modules.auth.dto.LoginRequest;
 import com.rickgao.careercore.modules.auth.dto.PasswordChangeRequest;
 import com.rickgao.careercore.modules.auth.dto.PasswordResetRequest;
@@ -169,6 +170,20 @@ public class AuthServiceImpl implements AuthService {
         if (user == null) {
             throw new BizException(ResultCode.AUTH_REQUIRED, "用户不存在");
         }
+        return toCurrentUserVO(user);
+    }
+
+    @Override
+    @Transactional
+    public CurrentUserVO updateMe(String userId, CurrentUserUpdateRequest request, String ip) {
+        SysUser user = sysUserMapper.findById(userId);
+        if (user == null) {
+            throw new BizException(ResultCode.AUTH_REQUIRED, "用户不存在");
+        }
+        String name = request.getName().trim();
+        sysUserMapper.updateOwnName(userId, name);
+        user.setName(name);
+        recordAudit("UPDATE_ACCOUNT", userId, "sys_user", userId, "更新账户姓名", ip);
         return toCurrentUserVO(user);
     }
 
