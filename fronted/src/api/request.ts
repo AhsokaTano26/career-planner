@@ -130,7 +130,7 @@ export const api = {
     updateUser:(id:string,data:unknown)=>patch<void>(`/admin/users/${id}`,data), deleteWhitelist:(id:string)=>del<void>(`/admin/whitelist/${id}`), deleteRelation:(id:string)=>del<void>(`/admin/relations/${id}`),
     updateDirection:(id:string,data:unknown)=>patch<unknown>(`/admin/directions/${id}`,data), updateAbility:(id:string,data:unknown)=>patch<unknown>(`/admin/abilities/${id}`,data), updateTemplate:(id:string,data:unknown)=>patch<unknown>(`/admin/templates/${id}`,data),
     setDirectionStatus:(id:string,data:unknown)=>patch<unknown>(`/admin/directions/${id}/status`,data),
-    curriculumJob:(id:string)=>get<unknown>(`/admin/curricula/jobs/${id}`), curriculumItems:(jobId:string)=>get<unknown>(`/admin/curricula/items?jobId=${encodeURIComponent(jobId)}`), curriculumVersions:()=>get<unknown>('/admin/curricula/versions'),
+    curriculumJob:(id:string)=>get<unknown>(`/admin/curricula/jobs/${id}`),
     importWhitelist:(file:File)=>{const data=new FormData();data.append('file',file);return formPost<unknown>('/admin/whitelist/import',data)}, importCurriculum:(file:File)=>{const data=new FormData();data.append('file',file);return formPost<unknown>('/admin/curricula/import',data)},
     reviewCurriculumItem:(id:string,data:unknown)=>patch<unknown>(`/admin/curricula/items/${id}`,data), batchReviewCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/items/batch',data), publishCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/publish',data),
   },

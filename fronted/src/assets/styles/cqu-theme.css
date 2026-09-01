@@ -177,3 +177,17 @@ nav button:hover { background: var(--cqu-blue); border-left-color: #fff; }
   .enhanced-list span,.record-list span,.advisor-student-table span { font-size: 12px; }
   .outline-btn,.primary-btn,.outline-light,.white-btn,.topbar .logout-btn { min-height: 40px; font-size: 13px; }
 }
+
+/* 404 / 错误页共享布局 */
+.status-page { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 48px 16px 64px; text-align: center; }
+.status-code { font: 800 clamp(96px, 20vw, 216px)/.85 var(--mono); letter-spacing: -.08em; color: var(--cqu-blue-20); }
+.status-card { width: min(600px, 100%); }
+.status-card h1 { font: 800 28px/1.15 var(--sans); letter-spacing: -.04em; margin: 0 0 10px; color: var(--ink); }
+.status-card > p { margin: 0 0 18px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.status-empty { margin: 0; }
+.status-path { display: inline-block; max-width: 100%; padding: 9px 12px; border: 1px solid var(--line); background: #edf4fa; color: var(--cqu-blue-deep); font: 12px var(--mono); word-break: break-all; }
+.status-actions { display: flex; gap: 10px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
+.status-actions .primary-btn { min-width: 132px; }
+.error-trace { text-align: left; margin-top: 6px; }
+.error-trace pre { margin: 0; padding: 14px 16px; border: 1px solid var(--cqu-blue-deep); background: #0f2137; color: #cfe3f7; font: 12px/1.65 var(--mono); white-space: pre-wrap; word-break: break-all; overflow: auto; max-height: 300px; }
+.error-trace pre + small { display: block; margin: 14px 0 6px; color: var(--muted); font: 700 10px var(--mono); letter-spacing: .08em; }

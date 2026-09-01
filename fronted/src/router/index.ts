@@ -6,6 +6,7 @@ import AuthView from '../views/AuthView.vue'
 import DefaultLayout from '../layouts/DefaultLayout.vue'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import AdminModuleView from '../views/admin/AdminModuleView.vue'
+import ErrorView from '../views/ErrorView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import StudentOverviewPage from '../views/student/StudentOverviewPage.vue'
 import StudentProfilePage from '../views/student/StudentProfilePage.vue'
@@ -85,6 +86,12 @@ const routes: RouteRecordRaw[] = [
       { path: 'exports', name: 'admin-exports', component: AdminModuleView, props: { module: 'exports' } },
       { path: 'logs', name: 'admin-logs', component: AdminModuleView, props: { module: 'logs' } },
     ],
+  },
+  {
+    path: '/error',
+    name: 'error',
+    component: ErrorView,
+    // 无需登录:全局错误兜底会在任何会话状态下跳转到此页。
   },
   { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFoundView },
 ]
