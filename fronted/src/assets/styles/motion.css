@@ -77,3 +77,8 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
   animation-delay: calc(var(--i, 0) * 30ms);
 }
 @keyframes item-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* ---- 骨架屏 ---- */
+.skeleton { position: relative; overflow: hidden; background: var(--cqu-blue-20); border-radius: 2px; }
+.skeleton::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent); animation: shimmer 1.1s var(--ease-out) infinite; }
+@keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
