@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watch } from 'vue'
+import { MotionConfig } from 'motion-v'
 import { useRouter } from 'vue-router'
 import PasswordChangeDialog from './components/PasswordChangeDialog.vue'
 import AdvisorStudentDialog from './components/AdvisorStudentDialog.vue'
@@ -33,19 +34,21 @@ async function handleForcedPasswordChange(oldPassword: string, newPassword: stri
 </script>
 
 <template>
-  <RouterView />
-  <PasswordChangeDialog
-    v-if="forcePasswordChange"
-    mandatory
-    :saving="forcedPasswordSaving"
-    @submit="handleForcedPasswordChange"
-  />
-  <AdvisorStudentDialog
-    v-if="advisorDetail"
-    :student="advisorDetail"
-    :saving="guidanceSaving"
-    @close="closeAdvisorDetail"
-    @submit="sendGuidance"
-  />
-  <div v-if="toast" class="toast">✓ {{ toast }}</div>
+  <MotionConfig :reducedMotion="'user'">
+    <RouterView />
+    <PasswordChangeDialog
+      v-if="forcePasswordChange"
+      mandatory
+      :saving="forcedPasswordSaving"
+      @submit="handleForcedPasswordChange"
+    />
+    <AdvisorStudentDialog
+      v-if="advisorDetail"
+      :student="advisorDetail"
+      :saving="guidanceSaving"
+      @close="closeAdvisorDetail"
+      @submit="sendGuidance"
+    />
+    <div v-if="toast" class="toast">✓ {{ toast }}</div>
+  </MotionConfig>
 </template>

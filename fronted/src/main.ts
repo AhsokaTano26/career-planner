@@ -6,6 +6,7 @@ import './assets/styles/functional.css'
 import './assets/styles/lists.css'
 import './assets/styles/logout.css'
 import './assets/styles/cqu-theme.css'
+import './assets/styles/motion.css'
 import { installCustomSelects } from './plugins/customSelect'
 import { encodeBase64 } from './utils/base64'
 
