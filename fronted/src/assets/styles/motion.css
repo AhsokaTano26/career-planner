@@ -22,3 +22,21 @@
 .page-enter-active, .page-leave-active { transition: opacity var(--dur-route) var(--ease-out), transform var(--dur-route) var(--ease-out); }
 .page-enter-from { opacity: 0; transform: translateY(8px); }
 .page-leave-to { opacity: 0; transform: translateY(-4px); }
+
+/* ---- 弹窗:遮罩淡入淡出 + 卡片 0.97→1 缩放 ---- */
+.modal-enter-active, .modal-leave-active { transition: opacity var(--dur-base) var(--ease-out); }
+.modal-enter-active .modal-card, .modal-leave-active .modal-card { transition: transform var(--dur-base) var(--ease-out); }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-from .modal-card, .modal-leave-to .modal-card { transform: scale(.97); }
+
+/* ---- 下拉(BaseSelect 菜单)---- */
+.dropdown-enter-active, .dropdown-leave-active { transition: opacity var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out); transform-origin: top; }
+.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-2px) scaleY(.98); }
+
+/* ---- 下拉(customSelect 原生增强:类切换过渡)---- */
+.native-select-menu { display: block; opacity: 0; transform: translateY(-2px) scaleY(.98); transform-origin: top; visibility: hidden; pointer-events: none; transition: opacity var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out), visibility var(--dur-micro); }
+.native-select-renderer.open .native-select-menu { opacity: 1; transform: none; visibility: visible; pointer-events: auto; }
+
+/* ---- Toast:右侧滑入 + 淡出 ---- */
+.toast-enter-active, .toast-leave-active { transition: opacity .22s var(--ease-out), transform .22s var(--ease-out); }
+.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateX(24px); }

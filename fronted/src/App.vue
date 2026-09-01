@@ -38,19 +38,25 @@ async function handleForcedPasswordChange(oldPassword: string, newPassword: stri
     <Transition name="page" mode="out-in">
       <RouterView />
     </Transition>
-    <PasswordChangeDialog
-      v-if="forcePasswordChange"
-      mandatory
-      :saving="forcedPasswordSaving"
-      @submit="handleForcedPasswordChange"
-    />
-    <AdvisorStudentDialog
-      v-if="advisorDetail"
-      :student="advisorDetail"
-      :saving="guidanceSaving"
-      @close="closeAdvisorDetail"
-      @submit="sendGuidance"
-    />
-    <div v-if="toast" class="toast">✓ {{ toast }}</div>
+    <Transition name="modal">
+      <PasswordChangeDialog
+        v-if="forcePasswordChange"
+        mandatory
+        :saving="forcedPasswordSaving"
+        @submit="handleForcedPasswordChange"
+      />
+    </Transition>
+    <Transition name="modal">
+      <AdvisorStudentDialog
+        v-if="advisorDetail"
+        :student="advisorDetail"
+        :saving="guidanceSaving"
+        @close="closeAdvisorDetail"
+        @submit="sendGuidance"
+      />
+    </Transition>
+    <Transition name="toast">
+      <div v-if="toast" class="toast">✓ {{ toast }}</div>
+    </Transition>
   </MotionConfig>
 </template>
