@@ -12,6 +12,7 @@
   *, *::before, *::after {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
     transition-duration: .08s !important;
     transition-delay: 0s !important;
     scroll-behavior: auto !important;
@@ -72,7 +73,7 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible { outline: 
 
 /* ---- 列表逐行错峰入场:第 n 行延迟 n*30ms ---- */
 .enhanced-list article, .record-list article, .advisor-student-table article, .attention-list article {
-  animation: item-in .3s var(--ease-out) both;
+  animation: item-in .3s var(--ease-out) backwards;
   animation-delay: calc(var(--i, 0) * 30ms);
 }
 @keyframes item-in { from { opacity: 0; transform: translateY(6px); } }
