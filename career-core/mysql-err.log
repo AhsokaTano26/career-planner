@@ -1,0 +1,10 @@
+2026-08-22T02:21:08.303895Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-08-22T02:21:08.479125Z 0 [System] [MY-010116] [Server] D:\devtools\mysql\mysql-26.7.0-winx64\bin\mysqld.exe (mysqld 26.7.0) starting as process 9936
+2026-08-22T02:21:08.479137Z 0 [System] [MY-015603] [Server] MySQL Server has access to 16 logical CPUs.
+2026-08-22T02:21:08.479144Z 0 [System] [MY-015603] [Server] MySQL Server has access to 17082138624 bytes of physical memory.
+2026-08-22T02:21:08.499797Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-08-22T02:21:08.753680Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-08-22T02:21:09.057271Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-08-22T02:21:09.057498Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-08-22T02:21:09.057594Z 0 [Warning] [MY-015696] [Server] TLS channel 'mysql_main' is not configured to require post-quantum key exchange algorithms; future TLS sessions may use a non-post-quantum key exchange algorithm because force_pqc is disabled
+2026-08-22T02:21:09.083933Z 0 [System] [MY-010931] [Server] D:\devtools\mysql\mysql-26.7.0-winx64\bin\mysqld.exe: ready for connections. Version: '26.7.0'  socket: ''  port: 3306  MySQL Community Server - GPL.

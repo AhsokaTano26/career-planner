@@ -1,0 +1,647 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 35,
+      "responseAverage": 35,
+      "responseMin": 35,
+      "responseMax": 35,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970406615,
+      "completed": 1787970406780
+    },
+    "transfers": {
+      "responseTotal": 136
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "38d116a3-6b94-4b5c-9363-ddf6f768dfab",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 35,
+      "responseAverage": 35,
+      "responseMin": 35,
+      "responseMax": 35,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970406615,
+      "completed": 1787970406780
+    },
+    "transfers": {
+      "responseTotal": 136
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "38d116a3-6b94-4b5c-9363-ddf6f768dfab",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408811075
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\方向推荐",
+    "outFile": "apifox-report-2026-08-29-10-26-45-969-0",
+    "originalOutFile": "apifox-report-2026-08-29-10-26-45-969-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "93f428e8-90af-4841-b917-54274905d778",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "6e8e360b-e9a9-4a4a-911d-605832e1fade",
+            "name": "我的收藏(GET /api/v1/students/me/favorites)",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "students",
+                  "me",
+                  "favorites"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                }
+              ],
+              "method": "GET",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {},
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "38273131-8caf-447d-8b4f-c55e28f406ff",
+              "id": "38273131-8caf-447d-8b4f-c55e28f406ff",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109124,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109124,
+              "httpApiCaseId": 408811075,
+              "httpApiName": "我的收藏",
+              "httpApiPath": "/api/v1/students/me/favorites",
+              "httpApiMethod": "get",
+              "httpApiCaseName": "GET /api/v1/students/me/favorites",
+              "moduleId": 8309868,
+              "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {},
+              "examples": []
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "我的收藏"
+      }
+    ],
+    "info": {
+      "name": "我的收藏"
+    },
+    "dataSchemas": {},
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8000",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8000",
+      "variable": {
+        "id": "62d31ee6-3727-40dd-a98e-9af1db5f1351",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8000",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "054eed20-96ec-46e9-a422-61da7aeadd2b",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "e8789888-2ecd-486b-ad5c-8275199b050d",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "6e8e360b-e9a9-4a4a-911d-605832e1fade",
+              "name": "我的收藏(GET /api/v1/students/me/favorites)",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "students",
+                    "me",
+                    "favorites"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  }
+                ],
+                "method": "GET",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {},
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "38273131-8caf-447d-8b4f-c55e28f406ff",
+                "id": "38273131-8caf-447d-8b4f-c55e28f406ff",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109124,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109124,
+                "httpApiCaseId": 408811075,
+                "httpApiName": "我的收藏",
+                "httpApiPath": "/api/v1/students/me/favorites",
+                "httpApiMethod": "get",
+                "httpApiCaseName": "GET /api/v1/students/me/favorites",
+                "moduleId": 8309868,
+                "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {},
+                "examples": []
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "我的收藏"
+        }
+      ],
+      "info": {
+        "name": "我的收藏"
+      },
+      "dataSchemas": {},
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8000",
+        "variable": {
+          "id": "62d31ee6-3727-40dd-a98e-9af1db5f1351",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8000",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8000",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "054eed20-96ec-46e9-a422-61da7aeadd2b",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "e8789888-2ecd-486b-ad5c-8275199b050d",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109124,
+        "name": "我的收藏",
+        "path": "/api/v1/students/me/favorites",
+        "method": "get"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408811075,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "70a21e6f-28f6-4819-8433-9ff5447fa856",
+    "name": "我的收藏"
+  }
+}

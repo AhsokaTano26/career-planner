@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.recommendation.mapper.RecommendationMapper">
+
+    <resultMap id="RunMap" type="com.rickgao.careercore.modules.recommendation.entity.RecommendationRun">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="profileSnapshotId" column="profile_snapshot_id"/>
+        <result property="ruleVersion" column="rule_version"/>
+        <result property="status" column="status"/>
+        <result property="generatedAt" column="generated_at"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <resultMap id="ResultMap" type="com.rickgao.careercore.modules.recommendation.entity.RecommendationResult">
+        <id property="id" column="id"/>
+        <result property="runId" column="run_id"/>
+        <result property="directionId" column="direction_id"/>
+        <result property="score" column="score"/>
+        <result property="rank" column="rank"/>
+        <result property="confidence" column="confidence"/>
+        <result property="reasonsJson" column="reasons_json"/>
+        <result property="strengthsJson" column="strengths_json"/>
+        <result property="gapsJson" column="gaps_json"/>
+        <result property="semesterActionsJson" column="semester_actions_json"/>
+        <result property="feedbackJson" column="feedback_json"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insertRun" parameterType="com.rickgao.careercore.modules.recommendation.entity.RecommendationRun">
+        INSERT INTO recommendation_run (id, student_id, profile_snapshot_id, rule_version, status, generated_at)
+        VALUES (#{id}, #{studentId}, #{profileSnapshotId}, #{ruleVersion}, #{status}, #{generatedAt})
+    </insert>
+
+    <select id="findRunById" resultMap="RunMap">
+        SELECT id, student_id, profile_snapshot_id, rule_version, status, generated_at, created_at
+        FROM recommendation_run
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="findLatestRunByStudent" resultMap="RunMap">
+        SELECT id, student_id, profile_snapshot_id, rule_version, status, generated_at, created_at
+        FROM recommendation_run
+        WHERE student_id = #{studentId}
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="listRunsByStudent" resultMap="RunMap">
+        SELECT id, student_id, profile_snapshot_id, rule_version, status, generated_at, created_at
+        FROM recommendation_run
+        WHERE student_id = #{studentId}
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countRunsByStudent" resultType="long">
+        SELECT COUNT(*) FROM recommendation_run WHERE student_id = #{studentId}
+    </select>
+
+    <insert id="insertResult" parameterType="com.rickgao.careercore.modules.recommendation.entity.RecommendationResult">
+        INSERT INTO recommendation_result (id, run_id, direction_id, score, `rank`, confidence,
+                                           reasons_json, strengths_json, gaps_json, semester_actions_json, feedback_json)
+        VALUES (#{id}, #{runId}, #{directionId}, #{score}, #{rank}, #{confidence},
+                #{reasonsJson}, #{strengthsJson}, #{gapsJson}, #{semesterActionsJson}, #{feedbackJson})
+    </insert>
+
+    <select id="listResultsByRun" resultMap="ResultMap">
+        SELECT id, run_id, direction_id, score, `rank`, confidence, reasons_json, strengths_json,
+               gaps_json, semester_actions_json, feedback_json, created_at
+        FROM recommendation_result
+        WHERE run_id = #{runId}
+        ORDER BY `rank` ASC
+    </select>
+
+    <select id="findResultById" resultMap="ResultMap">
+        SELECT id, run_id, direction_id, score, `rank`, confidence, reasons_json, strengths_json,
+               gaps_json, semester_actions_json, feedback_json, created_at
+        FROM recommendation_result
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <update id="updateResultFeedback">
+        UPDATE recommendation_result
+        SET feedback_json = #{feedbackJson}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

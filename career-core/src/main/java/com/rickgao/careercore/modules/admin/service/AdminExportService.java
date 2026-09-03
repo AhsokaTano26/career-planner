@@ -11,6 +11,8 @@ public interface AdminExportService {
 
     PageResult<ExportJobVO> listExports(Integer page, Integer size, String sort);
 
+    ExportJobVO getJob(String jobId);
+
     DownloadFile download(String jobId);
 
     record DownloadFile(String path, String filename) {

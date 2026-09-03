@@ -1,0 +1,647 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 56,
+      "responseAverage": 56,
+      "responseMin": 56,
+      "responseMax": 56,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787975665547,
+      "completed": 1787975665719
+    },
+    "transfers": {
+      "responseTotal": 269
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "3329fcd2-cec7-4cc6-beec-2b37672eb551",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 56,
+      "responseAverage": 56,
+      "responseMin": 56,
+      "responseMax": 56,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787975665547,
+      "completed": 1787975665719
+    },
+    "transfers": {
+      "responseTotal": 269
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "3329fcd2-cec7-4cc6-beec-2b37672eb551",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408828920
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\AI生涯咨询",
+    "outFile": "apifox-report-2026-08-29-11-54-24-779-0",
+    "originalOutFile": "apifox-report-2026-08-29-11-54-24-779-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "1e8d1ade-3175-4081-833b-ddd0d758198a",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "bf408dab-1eda-4063-b0d4-a4226df9a7a5",
+            "name": "会话历史(GET /api/v1/ai/chat/history)",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "ai",
+                  "chat",
+                  "history"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                }
+              ],
+              "method": "GET",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {},
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "b68d9cdb-81e7-4bf5-be66-71b8ec4570f2",
+              "id": "b68d9cdb-81e7-4bf5-be66-71b8ec4570f2",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109159,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109159,
+              "httpApiCaseId": 408828920,
+              "httpApiName": "会话历史",
+              "httpApiPath": "/api/v1/ai/chat/history",
+              "httpApiMethod": "get",
+              "httpApiCaseName": "GET /api/v1/ai/chat/history",
+              "moduleId": 8309868,
+              "serverId": "default"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {},
+              "examples": []
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "会话历史"
+      }
+    ],
+    "info": {
+      "name": "会话历史"
+    },
+    "dataSchemas": {},
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8080",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8080",
+      "variable": {
+        "id": "7a45ddd0-b253-4c68-91af-b25a82e638c0",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8080",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8080",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "31d6a581-b17d-40c1-ae7d-e04a51000027",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "68e5f8ed-6411-4424-b1ab-43db6f89295b",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "bf408dab-1eda-4063-b0d4-a4226df9a7a5",
+              "name": "会话历史(GET /api/v1/ai/chat/history)",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "ai",
+                    "chat",
+                    "history"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  }
+                ],
+                "method": "GET",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {},
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "b68d9cdb-81e7-4bf5-be66-71b8ec4570f2",
+                "id": "b68d9cdb-81e7-4bf5-be66-71b8ec4570f2",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109159,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109159,
+                "httpApiCaseId": 408828920,
+                "httpApiName": "会话历史",
+                "httpApiPath": "/api/v1/ai/chat/history",
+                "httpApiMethod": "get",
+                "httpApiCaseName": "GET /api/v1/ai/chat/history",
+                "moduleId": 8309868,
+                "serverId": "default"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {},
+                "examples": []
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "会话历史"
+        }
+      ],
+      "info": {
+        "name": "会话历史"
+      },
+      "dataSchemas": {},
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8080",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8080",
+        "variable": {
+          "id": "7a45ddd0-b253-4c68-91af-b25a82e638c0",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8080",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8080",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "31d6a581-b17d-40c1-ae7d-e04a51000027",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "68e5f8ed-6411-4424-b1ab-43db6f89295b",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109159,
+        "name": "会话历史",
+        "path": "/api/v1/ai/chat/history",
+        "method": "get"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408828920,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "0857b8c6-15e9-478f-bfc2-fa9c491259e6",
+    "name": "会话历史"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/assessment-sessions/AS-106/answers",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":null,\"traceId\":\"9363c96d0f226be290639b4e068b5af5\",\"timestamp\":\"2026-08-29T11:48:00.4625477+08:00\"}"
+}

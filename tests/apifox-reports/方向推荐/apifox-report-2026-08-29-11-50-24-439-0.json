@@ -1,0 +1,659 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 38,
+      "responseAverage": 38,
+      "responseMin": 38,
+      "responseMax": 38,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787975425267,
+      "completed": 1787975425401
+    },
+    "transfers": {
+      "responseTotal": 168
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "59c11eee-ea49-4884-8519-07df2fb6fd7a",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 38,
+      "responseAverage": 38,
+      "responseMin": 38,
+      "responseMax": 38,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787975425267,
+      "completed": 1787975425401
+    },
+    "transfers": {
+      "responseTotal": 168
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "59c11eee-ea49-4884-8519-07df2fb6fd7a",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408828478
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\方向推荐",
+    "outFile": "apifox-report-2026-08-29-11-50-24-439-0",
+    "originalOutFile": "apifox-report-2026-08-29-11-50-24-439-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "40d6e46a-3813-4702-9e25-09f1589cc447",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "a35dca8b-898c-4db1-a59f-49da528e1ba9",
+            "name": "推荐批次详情(GET /api/v1/recommendation-runs/{runId})",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "recommendation-runs",
+                  "PS-102"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": [
+                  {
+                    "disabled": false,
+                    "type": "string",
+                    "value": "PS-102",
+                    "key": "runId"
+                  }
+                ]
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                }
+              ],
+              "method": "GET",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {},
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "83b9cfbc-74ff-40f6-bed4-0438591f9ab2",
+              "id": "83b9cfbc-74ff-40f6-bed4-0438591f9ab2",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109130,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109130,
+              "httpApiCaseId": 408828478,
+              "httpApiName": "推荐批次详情",
+              "httpApiPath": "/api/v1/recommendation-runs/{runId}",
+              "httpApiMethod": "get",
+              "httpApiCaseName": "GET /api/v1/recommendation-runs/{runId}",
+              "moduleId": 8309868,
+              "serverId": "default"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {},
+              "examples": []
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "推荐批次详情"
+      }
+    ],
+    "info": {
+      "name": "推荐批次详情"
+    },
+    "dataSchemas": {},
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8080",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8080",
+      "variable": {
+        "id": "641ea4ef-d499-4eeb-9031-bbac9804ead6",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8080",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8080",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "c730f38a-1adb-4580-91ae-b0dd3a56070f",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "d50c583b-9975-4273-8a6a-65c64a59067f",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "a35dca8b-898c-4db1-a59f-49da528e1ba9",
+              "name": "推荐批次详情(GET /api/v1/recommendation-runs/{runId})",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "recommendation-runs",
+                    "PS-102"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "string",
+                      "value": "PS-102",
+                      "key": "runId"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  }
+                ],
+                "method": "GET",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {},
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "83b9cfbc-74ff-40f6-bed4-0438591f9ab2",
+                "id": "83b9cfbc-74ff-40f6-bed4-0438591f9ab2",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109130,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109130,
+                "httpApiCaseId": 408828478,
+                "httpApiName": "推荐批次详情",
+                "httpApiPath": "/api/v1/recommendation-runs/{runId}",
+                "httpApiMethod": "get",
+                "httpApiCaseName": "GET /api/v1/recommendation-runs/{runId}",
+                "moduleId": 8309868,
+                "serverId": "default"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {},
+                "examples": []
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "推荐批次详情"
+        }
+      ],
+      "info": {
+        "name": "推荐批次详情"
+      },
+      "dataSchemas": {},
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8080",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8080",
+        "variable": {
+          "id": "641ea4ef-d499-4eeb-9031-bbac9804ead6",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8080",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8080",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "c730f38a-1adb-4580-91ae-b0dd3a56070f",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "d50c583b-9975-4273-8a6a-65c64a59067f",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109130,
+        "name": "推荐批次详情",
+        "path": "/api/v1/recommendation-runs/{runId}",
+        "method": "get"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408828478,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "d861d2dc-8c54-462f-be8e-adc30a7322f4",
+    "name": "推荐批次详情"
+  }
+}

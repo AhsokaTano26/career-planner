@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/plans/SP-106/confirm",
+  "status": 404,
+  "body": "{\"code\":\"RESOURCE_NOT_FOUND\",\"message\":\"资源不存在\",\"data\":null,\"traceId\":\"c0185016c1058c012266af07b23fdca9\",\"timestamp\":\"2026-08-29T11:51:33.235036+08:00\"}"
+}

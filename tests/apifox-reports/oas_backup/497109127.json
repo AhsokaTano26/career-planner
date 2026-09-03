@@ -1,0 +1,172 @@
+{
+ "id": 497109127,
+ "name": "创建推荐批次",
+ "type": "http",
+ "serverId": "",
+ "preProcessors": [],
+ "postProcessors": [],
+ "inheritPreProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "inheritPostProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "description": "触发三段式推荐（规则过滤 → 结构化评分 → AI 解释）。`requestId` 幂等。\nAI 不可用时自动降级：仍返回排序结果，仅解释使用规则模板。",
+ "operationId": "recommendationCreateRun",
+ "sourceUrl": "",
+ "method": "post",
+ "path": "/api/v1/students/me/recommendations/runs",
+ "tags": [
+  "方向推荐"
+ ],
+ "status": "released",
+ "requestBody": {
+  "type": "application/json",
+  "parameters": [],
+  "jsonSchema": {
+   "$ref": "#/definitions/301352855"
+  },
+  "mediaType": "application/json",
+  "oasExtensions": "",
+  "required": true,
+  "additionalContentTypes": [],
+  "examples": [
+   {
+    "value": "{\n    \"pathFilter\": \"employment\",\n    \"requestId\": \"req-rec-001\"\n}",
+    "mediaType": "application/json",
+    "description": ""
+   }
+  ]
+ },
+ "parameters": {
+  "path": [],
+  "query": [],
+  "cookie": [],
+  "header": []
+ },
+ "commonParameters": {},
+ "auth": {
+  "type": "securityscheme"
+ },
+ "responses": [
+  {
+   "id": "171939841",
+   "name": "",
+   "code": "200",
+   "contentType": "json",
+   "jsonSchema": {
+    "$ref": "#/definitions/301352854"
+   },
+   "itemSchema": {},
+   "description": "推荐批次（可能为 RUNNING，需轮询详情）",
+   "mediaType": "application/json",
+   "headers": [],
+   "oasExtensions": ""
+  },
+  {
+   "id": "342336242",
+   "code": 400,
+   "referencedResponseId": 342336242
+  },
+  {
+   "id": "342336243",
+   "code": 401,
+   "referencedResponseId": 342336243
+  },
+  {
+   "id": "342336246",
+   "code": 409,
+   "referencedResponseId": 342336246
+  },
+  {
+   "id": "342336247",
+   "code": 503,
+   "referencedResponseId": 342336247
+  },
+  {
+   "id": "159783059",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  },
+  {
+   "id": "109914826",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  }
+ ],
+ "responseExamples": [],
+ "codeSamples": [],
+ "projectId": 8662286,
+ "moduleId": 8309868,
+ "folderId": 92650090,
+ "ordering": 6,
+ "responsibleId": 0,
+ "commonResponseStatus": {
+  "342336242": true,
+  "342336243": true,
+  "342336246": true,
+  "342336247": true
+ },
+ "advancedSettings": {
+  "disabledSystemHeaders": {}
+ },
+ "customApiFields": {},
+ "oasExtensions": "",
+ "mockScript": {},
+ "createdAt": "2026-08-04T14:42:57.000Z",
+ "updatedAt": "2026-08-29T04:49:55.000Z",
+ "creatorId": 3510276,
+ "editorId": 1000960460,
+ "creatorUserId": 3510276,
+ "editorUserId": 3779705,
+ "visibility": "INHERITED",
+ "securityScheme": {
+  "schemeGroups": [
+   {
+    "id": "v2bzkcC_RJvtpdFAuBj3g",
+    "schemeIds": [
+     1687020
+    ]
+   }
+  ],
+  "required": true,
+  "use": {
+   "id": "v2bzkcC_RJvtpdFAuBj3g",
+   "configs": {
+    "1687020": {
+     "authConfigs": {
+      "x-apifox": {
+       "token": "{{bearerToken}}"
+      }
+     }
+    }
+   }
+  },
+  "scopes": {
+   "v2bzkcC_RJvtpdFAuBj3g": {
+    "1687020": []
+   }
+  }
+ },
+ "callbacks": ""
+}

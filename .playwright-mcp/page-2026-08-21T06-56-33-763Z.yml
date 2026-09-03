@@ -1,0 +1,128 @@
+- generic [ref=f1e3]:
+  - complementary [ref=f1e4]:
+    - generic [ref=f1e5]:
+      - generic [ref=f1e6]: C
+      - generic [ref=f1e7]: CAREER / ARCHIVE
+    - generic [ref=f1e8]:
+      - generic [ref=f1e9]: 李
+      - generic [ref=f1e10]:
+        - generic [ref=f1e11]: 李明
+        - generic [ref=f1e12]: 学生工作台 · 在线
+    - navigation [ref=f1e13]:
+      - paragraph [ref=f1e14]: 我的生涯
+      - button "◼ 生涯总览" [ref=f1e15] [cursor=pointer]:
+        - generic [ref=f1e16]: ◼
+        - text: 生涯总览
+      - button "◼ 个人资料" [ref=f1e17] [cursor=pointer]:
+        - generic [ref=f1e18]: ◼
+        - text: 个人资料
+      - button "◼ 经历管理" [ref=f1e19] [cursor=pointer]:
+        - generic [ref=f1e20]: ◼
+        - text: 经历管理
+      - button "◼ 生涯测评" [ref=f1e21] [cursor=pointer]:
+        - generic [ref=f1e22]: ◼
+        - text: 生涯测评
+      - button "◼ 能力画像" [ref=f1e23] [cursor=pointer]:
+        - generic [ref=f1e24]: ◼
+        - text: 能力画像
+    - navigation [ref=f1e25]:
+      - paragraph [ref=f1e26]: 探索与行动
+      - button "◼ 路径探索" [active] [ref=f1e27] [cursor=pointer]:
+        - generic [ref=f1e28]: ◼
+        - text: 路径探索
+      - button "◼ 方向推荐" [ref=f1e29] [cursor=pointer]:
+        - generic [ref=f1e30]: ◼
+        - text: 方向推荐
+      - button "◼ 方向对比" [ref=f1e31] [cursor=pointer]:
+        - generic [ref=f1e32]: ◼
+        - text: 方向对比
+      - button "◼ 我的收藏" [ref=f1e33] [cursor=pointer]:
+        - generic [ref=f1e34]: ◼
+        - text: 我的收藏
+      - button "◼ 目标管理" [ref=f1e35] [cursor=pointer]:
+        - generic [ref=f1e36]: ◼
+        - text: 目标管理
+      - button "◼ 学期计划" [ref=f1e37] [cursor=pointer]:
+        - generic [ref=f1e38]: ◼
+        - text: 学期计划
+      - button "◼ 任务看板" [ref=f1e39] [cursor=pointer]:
+        - generic [ref=f1e40]: ◼
+        - text: 任务看板
+      - button "◼ 阶段复盘" [ref=f1e41] [cursor=pointer]:
+        - generic [ref=f1e42]: ◼
+        - text: 阶段复盘
+    - navigation [ref=f1e43]:
+      - paragraph [ref=f1e44]: 支持与设置
+      - button "◼ 任务提醒" [ref=f1e45] [cursor=pointer]:
+        - generic [ref=f1e46]: ◼
+        - text: 任务提醒
+      - button "◼ AI 咨询" [ref=f1e47] [cursor=pointer]:
+        - generic [ref=f1e48]: ◼
+        - text: AI 咨询
+      - button "◼ 隐私与账户" [ref=f1e49] [cursor=pointer]:
+        - generic [ref=f1e50]: ◼
+        - text: 隐私与账户
+    - generic [ref=f1e51]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=f1e52]:
+    - generic [ref=f1e53]:
+      - generic [ref=f1e54]: 学生工作台 / 2026-2027 · FIRST TERM
+      - generic [ref=f1e55]:
+        - button "↙ 退出登录" [ref=f1e56] [cursor=pointer]
+        - button "+ 新建" [ref=f1e57] [cursor=pointer]
+        - button "●" [ref=f1e58] [cursor=pointer]
+    - generic [ref=f1e59]:
+      - generic [ref=f1e61]:
+        - paragraph [ref=f1e62]: MODULE / DIRECTIONS
+        - heading "路径探索" [level=1] [ref=f1e154]
+        - paragraph
+      - generic [ref=f1e155]:
+        - generic [ref=f1e156]:
+          - generic [ref=f1e157]:
+            - paragraph [ref=f1e158]: DIRECTION / EXPLORE
+            - heading "路径探索" [level=2] [ref=f1e159]
+          - generic [ref=f1e160]:
+            - generic [ref=f1e161]:
+              - text: 路径
+              - combobox "路径" [ref=f1e162]:
+                - option "全部路径" [selected]
+                - option "国内升学"
+                - option "就业发展"
+                - option "出国留学"
+            - button "刷新" [ref=f1e163] [cursor=pointer]
+        - generic [ref=f1e164]:
+          - generic [ref=f1e165]:
+            - generic [ref=f1e166]: 方向
+            - generic [ref=f1e167]: 简介
+            - generic [ref=f1e168]: 操作
+          - article [ref=f1e169]:
+            - generic [ref=f1e170]: data_analysis
+            - generic [ref=f1e171]:
+              - generic [ref=f1e172]: 数据分析师
+              - generic [ref=f1e173]: 面向数据采集、清洗、分析与可视化表达的就业方向。
+            - generic [ref=f1e174]:
+              - button "详情" [ref=f1e175] [cursor=pointer]
+              - button "收藏" [ref=f1e176] [cursor=pointer]
+          - article [ref=f1e177]:
+            - generic [ref=f1e178]: backend_dev
+            - generic [ref=f1e179]:
+              - generic [ref=f1e180]: 后端开发工程师
+              - generic [ref=f1e181]: 面向 Web 服务端、接口与系统架构的就业方向。
+            - generic [ref=f1e182]:
+              - button "详情" [ref=f1e183] [cursor=pointer]
+              - button "收藏" [ref=f1e184] [cursor=pointer]
+          - article [ref=f1e185]:
+            - generic [ref=f1e186]: ai_research
+            - generic [ref=f1e187]:
+              - generic [ref=f1e188]: 算法工程师
+              - generic [ref=f1e189]: 面向机器学习、深度学习与算法研究的深造方向。
+            - generic [ref=f1e190]:
+              - button "详情" [ref=f1e191] [cursor=pointer]
+              - button "取消收藏" [ref=f1e192] [cursor=pointer]
+          - article [ref=f1e193]:
+            - generic [ref=f1e194]: software_eng
+            - generic [ref=f1e195]:
+              - generic [ref=f1e196]: 软件工程师
+              - generic [ref=f1e197]: 面向软件开发、测试与工程化实践的就业方向。
+            - generic [ref=f1e198]:
+              - button "详情" [ref=f1e199] [cursor=pointer]
+              - button "取消收藏" [ref=f1e200] [cursor=pointer]

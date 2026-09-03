@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from services.desensitizer import mask_free_text
 from services.llm_gateway import generate
 
 _SYSTEM_PROMPT = (
@@ -23,6 +24,8 @@ def summarize(review_content: dict, cycle: str, task_summary: str | None = None,
     user_ref 为脱敏用户引用（写入 ai_call_log）。
     """
     user_prompt = _build_prompt(review_content, cycle, task_summary)
+    # 复盘为自由文本：截断到 2000 字 + 脱敏（spec 4.2「已脱敏复盘」）
+    user_prompt = mask_free_text(user_prompt, limit=2000)
     content = generate(
         [
             {"role": "system", "content": _SYSTEM_PROMPT},

@@ -67,6 +67,7 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<ApiResponse<Void>> build(ResultCode resultCode, String message) {
-        return ResponseEntity.status(resultCode.getHttpStatus()).body(ApiResponse.fail(resultCode, message));
+        // 统一返回 HTTP 200，通过业务码区分错误类型（对齐 Apifox 响应校验要求）
+        return ResponseEntity.ok(ApiResponse.fail(resultCode, message));
     }
 }

@@ -73,6 +73,31 @@ export async function request<T>(path:string, init:RequestInit = {}): Promise<T>
   return body.data
 }
 
+/**
+ * 透传请求：不解析 ApiEnvelope，直接返回响应 JSON。
+ * 仅用于后端明确返回非 ApiResponse 包装的接口（当前：/api/v1/gateway/chat/completions，
+ * 保持 OpenAI 兼容原生格式）。
+ *
+ * <p>Demo 精简点 / 后续迭代替换位置:不接入 ApiEnvelope 校验与自动 401 token 刷新，
+ * 若 gateway 接口后续接入鉴权，应单独补刷新逻辑或评估改为 ApiResponse 包装。
+ */
+export async function requestRaw(path:string, init:RequestInit = {}): Promise<unknown> {
+  const headers = new Headers(init.headers)
+  if (init.body && !(init.body instanceof FormData) && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
+  if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
+  headers.set('X-Request-Id', crypto.randomUUID())
+  const method = (init.method || 'GET').toUpperCase()
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && !headers.has('Idempotency-Key')) {
+    headers.set('Idempotency-Key', crypto.randomUUID())
+  }
+  const requestInit:RequestInit = { ...init, headers, credentials:'include' }
+  const response = await fetch(`${base}${path}`, requestInit)
+  if (!response.ok) {
+    throw new Error(`请求失败（HTTP ${response.status}）`)
+  }
+  return response.json().catch(() => null)
+}
+
 export async function downloadFile(path:string):Promise<{blob:Blob; filename:string}> {
   const headers = new Headers()
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
@@ -92,6 +117,7 @@ export async function downloadFile(path:string):Promise<{blob:Blob; filename:str
 }
 const get = <T>(path:string) => request<T>(path)
 const post = <T>(path:string, data?:unknown) => request<T>(path, { method:'POST', body:data === undefined ? undefined : JSON.stringify(data) })
+const postRaw = <T = unknown>(path:string, data?:unknown) => requestRaw(path, { method:'POST', body:data === undefined ? undefined : JSON.stringify(data) }) as Promise<T>
 const patch = <T>(path:string, data:unknown) => request<T>(path, { method:'PATCH', body:JSON.stringify(data) })
 const del = <T>(path:string) => request<T>(path, { method:'DELETE' })
 const formPost = <T>(path:string, data:FormData) => request<T>(path, { method:'POST', body:data })
@@ -133,5 +159,22 @@ export const api = {
     curriculumJob:(id:string)=>get<unknown>(`/admin/curricula/jobs/${id}`),
     importWhitelist:(file:File)=>{const data=new FormData();data.append('file',file);return formPost<unknown>('/admin/whitelist/import',data)}, importCurriculum:(file:File)=>{const data=new FormData();data.append('file',file);return formPost<unknown>('/admin/curricula/import',data)},
     reviewCurriculumItem:(id:string,data:unknown)=>patch<unknown>(`/admin/curricula/items/${id}`,data), batchReviewCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/items/batch',data), publishCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/publish',data),
+  },
+  gateway: {
+    generate: (data:any) => post<any>('/gateway/generate', data),
+    // chat/completions 后端透传 OpenAI 原生 JSON（无 ApiResponse 包装），需走 postRaw 避免误判
+    chatCompletions: (data:any) => postRaw<any>('/gateway/chat/completions', data),
+  },
+  ai: {
+    chat: (data:any) => post<any>('/ai/chat', data),
+    chatFeedback: (messageId:string, data:any) => post<any>(`/ai/chat/${messageId}/feedback`, data),
+    chatFeedbackFallback: (data:any) => post<any>('/ai/chat/feedback', data),
+    chatHistory: (params:{page?:number; size?:number} = {}) => get<any>(`/ai/chat/history?page=${params.page ?? 1}&size=${params.size ?? 20}`),
+    reviewSummarize: (data:any) => post<any>('/ai/review/summarize', data),
+    recommendationExplain: (data:any) => post<any>('/ai/recommendation/explain', data),
+    planGenerate: (data:any) => post<any>('/ai/plan/generate', data),
+    // /ai/pdf/parse 后端契约是 application/json（接收 jobId + fileUrl + filename，后端 fetch(fileUrl) 拿数据），
+    // 不要走 multipart（前端之前的 formPost 会导致 Spring HttpMessageNotReadableException → "未预期系统错误"）。
+    pdfParse: (data:{jobId:string; fileUrl:string; filename:string}) => post<any>('/ai/pdf/parse', data),
   },
 }

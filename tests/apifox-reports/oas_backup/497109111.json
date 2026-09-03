@@ -1,0 +1,166 @@
+{
+ "id": 497109111,
+ "name": "会话详情",
+ "type": "http",
+ "serverId": "",
+ "preProcessors": [],
+ "postProcessors": [],
+ "inheritPreProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "inheritPostProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "description": "返回会话进度与已保存答案，用于断点续填。",
+ "operationId": "assessmentGetSession",
+ "sourceUrl": "",
+ "method": "get",
+ "path": "/api/v1/assessment-sessions/{sessionId}",
+ "tags": [
+  "测评"
+ ],
+ "status": "released",
+ "requestBody": {
+  "type": "none",
+  "parameters": [],
+  "required": false,
+  "additionalContentTypes": [],
+  "oasExtensions": ""
+ },
+ "parameters": {
+  "path": [
+   {
+    "id": "sessionId#0",
+    "name": "sessionId",
+    "required": true,
+    "enable": true,
+    "description": "",
+    "example": "",
+    "type": "string",
+    "schema": {
+     "type": "string",
+     "examples": [
+      "AS-20260901-001"
+     ]
+    },
+    "omitGeneratedExample": false
+   }
+  ],
+  "query": [],
+  "cookie": [],
+  "header": []
+ },
+ "commonParameters": {},
+ "auth": {
+  "type": "securityscheme"
+ },
+ "responses": [
+  {
+   "id": "158816226",
+   "name": "",
+   "code": "200",
+   "contentType": "json",
+   "jsonSchema": {
+    "$ref": "#/definitions/301352840"
+   },
+   "itemSchema": {},
+   "description": "操作成功",
+   "mediaType": "application/json",
+   "headers": [],
+   "oasExtensions": ""
+  },
+  {
+   "id": "342336243",
+   "code": 401,
+   "referencedResponseId": 342336243
+  },
+  {
+   "id": "342336245",
+   "code": 404,
+   "referencedResponseId": 342336245
+  },
+  {
+   "id": "171610362",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  },
+  {
+   "id": "197364179",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  }
+ ],
+ "responseExamples": [],
+ "codeSamples": [],
+ "projectId": 8662286,
+ "moduleId": 8309868,
+ "folderId": 92650087,
+ "ordering": 36,
+ "responsibleId": 0,
+ "commonResponseStatus": {
+  "342336243": true,
+  "342336245": true
+ },
+ "advancedSettings": {
+  "disabledSystemHeaders": {}
+ },
+ "customApiFields": {},
+ "oasExtensions": "",
+ "mockScript": {},
+ "createdAt": "2026-08-04T14:42:57.000Z",
+ "updatedAt": "2026-08-29T04:48:49.000Z",
+ "creatorId": 3510276,
+ "editorId": 1000960460,
+ "creatorUserId": 3510276,
+ "editorUserId": 3779705,
+ "visibility": "INHERITED",
+ "securityScheme": {
+  "schemeGroups": [
+   {
+    "id": "EVf46KYNoMmMvb05_32tL",
+    "schemeIds": [
+     1687020
+    ]
+   }
+  ],
+  "required": true,
+  "use": {
+   "id": "EVf46KYNoMmMvb05_32tL",
+   "configs": {
+    "1687020": {
+     "authConfigs": {
+      "x-apifox": {
+       "token": "{{bearerToken}}"
+      }
+     }
+    }
+   }
+  },
+  "scopes": {
+   "EVf46KYNoMmMvb05_32tL": {
+    "1687020": []
+   }
+  }
+ },
+ "callbacks": ""
+}

@@ -1,0 +1,645 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 34,
+      "responseAverage": 34,
+      "responseMin": 34,
+      "responseMax": 34,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970397769,
+      "completed": 1787970397949
+    },
+    "transfers": {
+      "responseTotal": 162
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "17fd8caf-6494-4eb9-a6af-702fa1158291",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 34,
+      "responseAverage": 34,
+      "responseMin": 34,
+      "responseMax": 34,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970397769,
+      "completed": 1787970397949
+    },
+    "transfers": {
+      "responseTotal": 162
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "17fd8caf-6494-4eb9-a6af-702fa1158291",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408811074
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\方向推荐",
+    "outFile": "apifox-report-2026-08-29-10-26-37-111-0",
+    "originalOutFile": "apifox-report-2026-08-29-10-26-37-111-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "7750ee6a-3775-4a66-938e-3900bb99bc5d",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "98c4c860-1339-4931-8cce-11b7fcd04f5f",
+            "name": "方向对比(GET /api/v1/directions/compare)",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "directions",
+                  "compare"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                }
+              ],
+              "method": "GET",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {},
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "f5ef9781-0499-4ff7-885b-ee09eb186a0c",
+              "id": "f5ef9781-0499-4ff7-885b-ee09eb186a0c",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109123,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109123,
+              "httpApiCaseId": 408811074,
+              "httpApiName": "方向对比",
+              "httpApiPath": "/api/v1/directions/compare",
+              "httpApiMethod": "get",
+              "httpApiCaseName": "GET /api/v1/directions/compare",
+              "moduleId": 8309868,
+              "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {},
+              "examples": []
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "方向对比"
+      }
+    ],
+    "info": {
+      "name": "方向对比"
+    },
+    "dataSchemas": {},
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8000",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8000",
+      "variable": {
+        "id": "74e9b5df-9551-4591-98be-7ebe602b13ca",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8000",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "d1f2934a-1333-47ed-b183-7ff2aea84cf8",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "7c87c13f-2933-438f-ac94-3ae806aa2717",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "98c4c860-1339-4931-8cce-11b7fcd04f5f",
+              "name": "方向对比(GET /api/v1/directions/compare)",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "directions",
+                    "compare"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  }
+                ],
+                "method": "GET",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {},
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "f5ef9781-0499-4ff7-885b-ee09eb186a0c",
+                "id": "f5ef9781-0499-4ff7-885b-ee09eb186a0c",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109123,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109123,
+                "httpApiCaseId": 408811074,
+                "httpApiName": "方向对比",
+                "httpApiPath": "/api/v1/directions/compare",
+                "httpApiMethod": "get",
+                "httpApiCaseName": "GET /api/v1/directions/compare",
+                "moduleId": 8309868,
+                "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {},
+                "examples": []
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "方向对比"
+        }
+      ],
+      "info": {
+        "name": "方向对比"
+      },
+      "dataSchemas": {},
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8000",
+        "variable": {
+          "id": "74e9b5df-9551-4591-98be-7ebe602b13ca",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8000",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8000",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "d1f2934a-1333-47ed-b183-7ff2aea84cf8",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "7c87c13f-2933-438f-ac94-3ae806aa2717",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109123,
+        "name": "方向对比",
+        "path": "/api/v1/directions/compare",
+        "method": "get"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408811074,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "78ba1ad1-9040-4e7f-86c8-50060ee1dac7",
+    "name": "方向对比"
+  }
+}

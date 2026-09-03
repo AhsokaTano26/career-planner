@@ -1,0 +1,189 @@
+{
+ "id": 497109142,
+ "name": "更新任务",
+ "type": "http",
+ "serverId": "",
+ "preProcessors": [],
+ "postProcessors": [],
+ "inheritPreProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "inheritPostProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "description": "更新任务标题 / 月份 / 预计时长 / 状态。延期或放弃时 reason 必填。",
+ "operationId": "planningUpdateTask",
+ "sourceUrl": "",
+ "method": "patch",
+ "path": "/api/v1/tasks/{taskId}",
+ "tags": [
+  "目标计划"
+ ],
+ "status": "released",
+ "requestBody": {
+  "type": "application/json",
+  "parameters": [],
+  "jsonSchema": {
+   "$ref": "#/definitions/301352870"
+  },
+  "mediaType": "application/json",
+  "oasExtensions": "",
+  "required": true,
+  "additionalContentTypes": [],
+  "examples": [
+   {
+    "value": "{\n    \"status\": \"DELAYED\",\n    \"reason\": \"与课程时间冲突\",\n    \"note\": \"推迟到 11 月中旬\"\n}",
+    "mediaType": "application/json",
+    "description": ""
+   }
+  ]
+ },
+ "parameters": {
+  "path": [
+   {
+    "id": "taskId#0",
+    "name": "taskId",
+    "required": true,
+    "enable": true,
+    "description": "",
+    "example": "",
+    "type": "string",
+    "schema": {
+     "type": "string",
+     "examples": [
+      "T6"
+     ]
+    },
+    "omitGeneratedExample": false
+   }
+  ],
+  "query": [],
+  "cookie": [],
+  "header": []
+ },
+ "commonParameters": {},
+ "auth": {
+  "type": "securityscheme"
+ },
+ "responses": [
+  {
+   "id": "167172808",
+   "name": "",
+   "code": "200",
+   "contentType": "json",
+   "jsonSchema": {
+    "$ref": "#/definitions/301352868"
+   },
+   "itemSchema": {},
+   "description": "操作成功",
+   "mediaType": "application/json",
+   "headers": [],
+   "oasExtensions": ""
+  },
+  {
+   "id": "342336242",
+   "code": 400,
+   "referencedResponseId": 342336242
+  },
+  {
+   "id": "342336243",
+   "code": 401,
+   "referencedResponseId": 342336243
+  },
+  {
+   "id": "342336245",
+   "code": 404,
+   "referencedResponseId": 342336245
+  },
+  {
+   "id": "342336246",
+   "code": 409,
+   "referencedResponseId": 342336246
+  },
+  {
+   "id": "155263664",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  },
+  {
+   "id": "124074347",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  }
+ ],
+ "responseExamples": [],
+ "codeSamples": [],
+ "projectId": 8662286,
+ "moduleId": 8309868,
+ "folderId": 92650091,
+ "ordering": 66,
+ "responsibleId": 0,
+ "commonResponseStatus": {
+  "342336242": true,
+  "342336243": true,
+  "342336245": true,
+  "342336246": true
+ },
+ "advancedSettings": {
+  "disabledSystemHeaders": {}
+ },
+ "customApiFields": {},
+ "oasExtensions": "",
+ "mockScript": {},
+ "createdAt": "2026-08-04T14:42:57.000Z",
+ "updatedAt": "2026-08-29T04:50:59.000Z",
+ "creatorId": 3510276,
+ "editorId": 1000960460,
+ "creatorUserId": 3510276,
+ "editorUserId": 3779705,
+ "visibility": "INHERITED",
+ "securityScheme": {
+  "schemeGroups": [
+   {
+    "id": "KZqzvcjrDmSey956kmBP2",
+    "schemeIds": [
+     1687020
+    ]
+   }
+  ],
+  "required": true,
+  "use": {
+   "id": "KZqzvcjrDmSey956kmBP2",
+   "configs": {
+    "1687020": {
+     "authConfigs": {
+      "x-apifox": {
+       "token": "{{bearerToken}}"
+      }
+     }
+    }
+   }
+  },
+  "scopes": {
+   "KZqzvcjrDmSey956kmBP2": {
+    "1687020": []
+   }
+  }
+ },
+ "callbacks": ""
+}

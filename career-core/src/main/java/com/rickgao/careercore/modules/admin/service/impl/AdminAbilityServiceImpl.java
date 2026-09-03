@@ -43,9 +43,12 @@ public class AdminAbilityServiceImpl implements AdminAbilityService {
         int currentPage = page == null || page < 1 ? DEFAULT_PAGE : page;
         int currentSize = size == null || size < 1 ? DEFAULT_SIZE : Math.min(size, MAX_SIZE);
         String[] sortPair = resolveSort(sort);
-        long total = abilityMapper.countAbilities(category, keyword);
+        // Demo 增强点:空字符串查询参数统一归一化为 null,避免 Mapper 的 category='' 等值过滤导致列表查空
+        String filterCategory = StringUtils.hasText(category) ? category.trim() : null;
+        String filterKeyword = StringUtils.hasText(keyword) ? keyword.trim() : null;
+        long total = abilityMapper.countAbilities(filterCategory, filterKeyword);
         List<AbilityTagVO> list = abilityMapper.selectAbilityPage(
-                category, keyword, sortPair[0], sortPair[1],
+                filterCategory, filterKeyword, sortPair[0], sortPair[1],
                 (currentPage - 1) * currentSize, currentSize);
         return PageResult.of(list, total, currentPage, currentSize);
     }

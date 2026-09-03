@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8000/api/v1/gateway/generate",
+  "status": 400,
+  "body": "{\"code\":\"VALIDATION_ERROR\",\"message\":\"请求参数校验失败\",\"data\":[{\"field\":\"messages\",\"message\":\"Field required\"}],\"traceId\":\"de357a0119054c3c9cd54c51b4124b21\",\"timestamp\":\"2026-08-29T11:54:56+08:00\"}"
+}

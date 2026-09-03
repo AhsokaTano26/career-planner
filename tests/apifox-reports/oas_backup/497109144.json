@@ -1,0 +1,189 @@
+{
+ "id": 497109144,
+ "name": "任务打卡",
+ "type": "http",
+ "serverId": "",
+ "preProcessors": [],
+ "postProcessors": [],
+ "inheritPreProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "inheritPostProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "description": "任务完成后打卡：填写完成说明、收获、困难和可选证明材料。打卡后任务状态自动置为 DONE。",
+ "operationId": "planningCheckin",
+ "sourceUrl": "",
+ "method": "post",
+ "path": "/api/v1/tasks/{taskId}/checkin",
+ "tags": [
+  "目标计划"
+ ],
+ "status": "released",
+ "requestBody": {
+  "type": "application/json",
+  "parameters": [],
+  "jsonSchema": {
+   "$ref": "#/definitions/301352872"
+  },
+  "mediaType": "application/json",
+  "oasExtensions": "",
+  "required": true,
+  "additionalContentTypes": [],
+  "examples": [
+   {
+    "value": "{\n    \"doneDesc\": \"已完成，掌握了类与对象、集合基础。\",\n    \"gains\": \"理解了面向对象三大特性。\",\n    \"difficulties\": \"泛型部分较抽象。\"\n}",
+    "mediaType": "application/json",
+    "description": ""
+   }
+  ]
+ },
+ "parameters": {
+  "path": [
+   {
+    "id": "taskId#0",
+    "name": "taskId",
+    "required": true,
+    "enable": true,
+    "description": "",
+    "example": "",
+    "type": "string",
+    "schema": {
+     "type": "string",
+     "examples": [
+      "T1"
+     ]
+    },
+    "omitGeneratedExample": false
+   }
+  ],
+  "query": [],
+  "cookie": [],
+  "header": []
+ },
+ "commonParameters": {},
+ "auth": {
+  "type": "securityscheme"
+ },
+ "responses": [
+  {
+   "id": "145312618",
+   "name": "",
+   "code": "200",
+   "contentType": "json",
+   "jsonSchema": {
+    "$ref": "#/definitions/301352871"
+   },
+   "itemSchema": {},
+   "description": "操作成功",
+   "mediaType": "application/json",
+   "headers": [],
+   "oasExtensions": ""
+  },
+  {
+   "id": "342336242",
+   "code": 400,
+   "referencedResponseId": 342336242
+  },
+  {
+   "id": "342336243",
+   "code": 401,
+   "referencedResponseId": 342336243
+  },
+  {
+   "id": "342336245",
+   "code": 404,
+   "referencedResponseId": 342336245
+  },
+  {
+   "id": "342336246",
+   "code": 409,
+   "referencedResponseId": 342336246
+  },
+  {
+   "id": "140194609",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  },
+  {
+   "id": "135496580",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  }
+ ],
+ "responseExamples": [],
+ "codeSamples": [],
+ "projectId": 8662286,
+ "moduleId": 8309868,
+ "folderId": 92650091,
+ "ordering": 78,
+ "responsibleId": 0,
+ "commonResponseStatus": {
+  "342336242": true,
+  "342336243": true,
+  "342336245": true,
+  "342336246": true
+ },
+ "advancedSettings": {
+  "disabledSystemHeaders": {}
+ },
+ "customApiFields": {},
+ "oasExtensions": "",
+ "mockScript": {},
+ "createdAt": "2026-08-04T14:42:57.000Z",
+ "updatedAt": "2026-08-29T04:51:07.000Z",
+ "creatorId": 3510276,
+ "editorId": 1000960460,
+ "creatorUserId": 3510276,
+ "editorUserId": 3779705,
+ "visibility": "INHERITED",
+ "securityScheme": {
+  "schemeGroups": [
+   {
+    "id": "aez-JNie29WKyLQq02p5T",
+    "schemeIds": [
+     1687020
+    ]
+   }
+  ],
+  "required": true,
+  "use": {
+   "id": "aez-JNie29WKyLQq02p5T",
+   "configs": {
+    "1687020": {
+     "authConfigs": {
+      "x-apifox": {
+       "token": "{{bearerToken}}"
+      }
+     }
+    }
+   }
+  },
+  "scopes": {
+   "aez-JNie29WKyLQq02p5T": {
+    "1687020": []
+   }
+  }
+ },
+ "callbacks": ""
+}

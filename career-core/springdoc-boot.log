@@ -1,0 +1,28 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-29T15:38:50.588+08:00  INFO 9576 --- [career-core] [           main] c.r.careercore.CareerCoreApplication     : Starting CareerCoreApplication v0.0.1-SNAPSHOT using Java 17.0.20 with PID 9576 (D:\Zht20241287\career-planner\career-core\target\career-core-0.0.1-SNAPSHOT.jar started by uio8k in D:\Zht20241287\career-planner\career-core)
+2026-08-29T15:38:50.588+08:00  INFO 9576 --- [career-core] [           main] c.r.careercore.CareerCoreApplication     : No active profile set, falling back to 1 default profile: "local"
+2026-08-29T15:38:52.824+08:00  INFO 9576 --- [career-core] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-08-29T15:38:52.843+08:00  INFO 9576 --- [career-core] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-29T15:38:52.843+08:00  INFO 9576 --- [career-core] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-08-29T15:38:52.943+08:00  INFO 9576 --- [career-core] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-08-29T15:38:52.959+08:00  INFO 9576 --- [career-core] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2288 ms
+2026-08-29T15:38:53.090+08:00  INFO 9576 --- [career-core] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-29T15:38:53.409+08:00  INFO 9576 --- [career-core] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@73e4387
+2026-08-29T15:38:53.409+08:00  INFO 9576 --- [career-core] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-29T15:38:55.463+08:00  INFO 9576 --- [career-core] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-08-29T15:38:56.281+08:00  INFO 9576 --- [career-core] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-08-29T15:38:56.312+08:00  INFO 9576 --- [career-core] [           main] c.r.careercore.CareerCoreApplication     : Started CareerCoreApplication in 6.225 seconds (process running for 6.731)
+2026-08-29T15:42:37.709+08:00  INFO 9576 --- [career-core] [nio-8080-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-29T15:42:37.762+08:00  INFO 9576 --- [career-core] [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-29T15:42:37.762+08:00  INFO 9576 --- [career-core] [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-08-29T17:20:40.669+08:00  INFO 9576 --- [career-core] [nio-8080-exec-7] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 993 ms
+2026-08-30T01:14:04.095+08:00  WARN 9576 --- [career-core] [io-8080-exec-10] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'POST' is not supported]

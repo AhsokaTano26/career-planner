@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/assessment-sessions/AS-106/scores",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":{\"sessionId\":\"AS-106\",\"status\":\"COMPLETED\",\"dimensionScores\":[{\"dimensionCode\":\"interest\",\"dimensionName\":\"兴趣\",\"score\":0.0},{\"dimensionCode\":\"values\",\"dimensionName\":\"价值观\",\"score\":0.0},{\"dimensionCode\":\"ability\",\"dimensionName\":\"能力\",\"score\":0.0},{\"dimensionCode\":\"academic\",\"dimensionName\":\"学业\",\"score\":0.0},{\"dimensionCode\":\"tendency\",\"dimensionName\":\"倾向\",\"score\":0.0},{\"dimensionCode\":\"practice\",\"dimensionName\":\"实践\",\"score\":0.0}]},\"traceId\":\"5dfcba66cd091954b7da4f093df49d2e\",\"timestamp\":\"2026-08-29T11:48:16.0181899+08:00\"}"
+}

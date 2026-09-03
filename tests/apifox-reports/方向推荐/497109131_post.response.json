@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/recommendation-results/PS-102/feedback",
+  "status": 404,
+  "body": "{\"code\":\"RESOURCE_NOT_FOUND\",\"message\":\"推荐结果不存在\",\"data\":null,\"traceId\":\"e25ba4b8ad71a6feb024862adccdb9bc\",\"timestamp\":\"2026-08-29T11:50:35.5324748+08:00\"}"
+}

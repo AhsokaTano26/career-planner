@@ -17,5 +17,13 @@
   - Python 解释器由 uv 托管（PEP 668），**不要 `pip install`**；脚本优先纯标准库（json/subprocess），运行用 `& "C:/Users/uio8k/.local/bin/python.exe" script.py`。
   - 生成含反引号的 Markdown 文档用 Python f-string，不要在 PowerShell 字符串插值里混用 `` `$ `` 转义。
   - 全量接口清单：`docs/openapi/career-core-apis-live-summary.md`（124 个接口）；可复跑脚本：`docs/scripts/organize_apifox_apis.py`（项目 ID 8662286，主分支 124 个接口）。
+  - **`pm.environment.set` 跨步骤变量丢失（2026-09-01 坑）**：Apifox 场景用例中，步骤 A 的后置脚本用 `pm.environment.set("xxx", ...)` 设置变量，步骤 B 断言用 `pm.environment.get("xxx")` 读取时可能得到 `undefined` / `null`（runner 内部环境变量传递不稳定）。**可靠做法**：后置脚本用 `pm.variables.set("xxx", ...)`，后续步骤用 `pm.variables.get("xxx")`。同理，断言中读取响应字段时注意 API 实际返回路径（如学生详情返回 `data.profile.userId` 而非 `data.id`），先用 curl 验证真实响应结构再写断言。
   - **`test-case run` 不替换 path 变量（2026-08-15 坑）**：CLI 2.2.9 直接跑单接口测试用例（`apifox test-case run <id> -e <envId>`）时，URL 中 `{taskId}` 不会被替换成实际值（生成的 collection 里 `url.variable` 为空、URL 仍为字面 `{taskId}`），且 `--env-var` / `--global-var` / `--variables` 注入均不生效 → 请求打到字面路径返回 400。**可靠跑法**：先 `apifox test-case run <id> -e <envId> -r json` 生成报告 → 从报告 JSON 提取 `collection` 段另存 → 用 Python 把 URL path 中的 `{taskId}` 替换为实际值（`url.variable` 置空）→ 再 `apifox run <collection.json> -r cli,json` 执行（真实 URL 200 OK）。参考脚本 `docs/scripts/fix_collection_task.py`；示例用例「更新任务-正向 (PATCH /tasks/{taskId})」id=404389855，本地环境 47907998。
+- **Windows 批处理(.bat) 编码与换行（2026-08 坑，start-all.bat 踩过）**：双击 `.bat` 闪退/中文乱码，根因通常是两条：
+  - **UTF-8 BOM 致首行解析失败**：`.bat` 文件若带 UTF-8 BOM（`EF BB BF`），cmd 会把首行 `<BOM>@echo off` 当成非法命令，导致整脚本异常退出/闪退。**批处理文件不要带 BOM**。
+  - **LF 换行致解析异常**：用 Write/编辑器写入时若生成 LF（`\n`）而非 CRLF（`\r\n`），cmd 会整段解析失败直接退出。`.bat` 必须用 **CRLF**。
+  - 正确写法：文件存为 **UTF-8（无 BOM）+ CRLF**；首两行放纯 ASCII（`@echo off`、`chcp 65001 >nul`），用 `chcp 65001` 把控制台切到 UTF-8 后再输出中文，这样 cmd/PowerShell/Windows Terminal 下中文都能正常显示。
+  - 若中文原字节已损坏（既非合法 GBK 也非合法 UTF-8 的废字节），需整体重写；PowerShell 修复示例：`$s=[IO.File]::ReadAllText($p) -replace "`r`n","`n" -replace "`n","`r`n"; [IO.File]::WriteAllText($p,$s,[Text.UTF8Encoding]::new($false))`（无 BOM）。
+  - 反向坑：纯 GBK(ANSI、无 BOM) 在中文 Windows 默认 936 控制台也能正常显示；但若用户在 UTF-8 终端跑就会乱码。综合兼容选「UTF-8 无 BOM + CRLF + chcp 65001」。
+  - 另：Java 启动加上 `-Dfile.encoding=UTF-8`，避免 Spring Boot 在中文 Windows 默认按 GBK 读取 UTF-8 种子脚本（`schema.sql` 等）导致日志/数据乱码。
 - **无 winget / Docker**：安装软件一律手动下载 ZIP/安装包解压配置。

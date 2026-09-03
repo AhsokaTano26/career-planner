@@ -86,7 +86,7 @@
 
 ## 7. 后端（career-core）运行
 
-- **技术栈**：Spring Boot **3.3.4**（pom 管理）+ **Java 17**（pom 要求，与 Docker 一致）+ MySQL + **MyBatis** + Spring Security（JWT）+ Lombok + Validation
+- **技术栈**：Spring Boot **3.3.4**（pom 管理）+ **Java 17**（pom 要求，与 Docker 一致）+ MySQL + **MyBatis** + Spring Security（JWT）+ Lombok + Validation + **springdoc-openapi 2.6.0**（仅本地生成 `/v3/api-docs` 用于同步 Apifox，**非生产镜像必需**，可后续移除）
 - **包结构**：`com.rickgao.careercore`（`modules/<模块>` 下 controller/dto/entity/mapper/service/vo；Mapper XML 在 `resources/mapper/`）
 - **服务端口**：8080
 - **前置依赖**：MySQL 必须先启动（3306 有监听），否则后端启动后查库失败

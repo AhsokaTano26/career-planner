@@ -1,0 +1,189 @@
+{
+ "id": 497109113,
+ "name": "提交并计分",
+ "type": "http",
+ "serverId": "",
+ "preProcessors": [],
+ "postProcessors": [],
+ "inheritPreProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "inheritPostProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "description": "提交整份问卷。计分由后端确定性规则完成（不依赖大模型），相同答案得到相同分数。",
+ "operationId": "assessmentSubmit",
+ "sourceUrl": "",
+ "method": "post",
+ "path": "/api/v1/assessment-sessions/{sessionId}/submit",
+ "tags": [
+  "测评"
+ ],
+ "status": "released",
+ "requestBody": {
+  "type": "application/json",
+  "parameters": [],
+  "jsonSchema": {
+   "$ref": "#/definitions/301352843"
+  },
+  "mediaType": "application/json",
+  "oasExtensions": "",
+  "required": true,
+  "additionalContentTypes": [],
+  "examples": [
+   {
+    "value": "{\n    \"requestId\": \"req-20260901-002\",\n    \"answers\": [\n        {\n            \"questionId\": \"q-holland-1\",\n            \"optionIndex\": 0\n        }\n    ],\n    \"finished\": true\n}",
+    "mediaType": "application/json",
+    "description": ""
+   }
+  ]
+ },
+ "parameters": {
+  "path": [
+   {
+    "id": "sessionId#0",
+    "name": "sessionId",
+    "required": true,
+    "enable": true,
+    "description": "",
+    "example": "",
+    "type": "string",
+    "schema": {
+     "type": "string",
+     "examples": [
+      "AS-20260901-001"
+     ]
+    },
+    "omitGeneratedExample": false
+   }
+  ],
+  "query": [],
+  "cookie": [],
+  "header": []
+ },
+ "commonParameters": {},
+ "auth": {
+  "type": "securityscheme"
+ },
+ "responses": [
+  {
+   "id": "134866448",
+   "name": "",
+   "code": "200",
+   "contentType": "json",
+   "jsonSchema": {
+    "$ref": "#/definitions/301352844"
+   },
+   "itemSchema": {},
+   "description": "操作成功",
+   "mediaType": "application/json",
+   "headers": [],
+   "oasExtensions": ""
+  },
+  {
+   "id": "342336242",
+   "code": 400,
+   "referencedResponseId": 342336242
+  },
+  {
+   "id": "342336243",
+   "code": 401,
+   "referencedResponseId": 342336243
+  },
+  {
+   "id": "342336245",
+   "code": 404,
+   "referencedResponseId": 342336245
+  },
+  {
+   "id": "342336246",
+   "code": 409,
+   "referencedResponseId": 342336246
+  },
+  {
+   "id": "145909890",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  },
+  {
+   "id": "165734523",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  }
+ ],
+ "responseExamples": [],
+ "codeSamples": [],
+ "projectId": 8662286,
+ "moduleId": 8309868,
+ "folderId": 92650087,
+ "ordering": 48,
+ "responsibleId": 0,
+ "commonResponseStatus": {
+  "342336242": true,
+  "342336243": true,
+  "342336245": true,
+  "342336246": true
+ },
+ "advancedSettings": {
+  "disabledSystemHeaders": {}
+ },
+ "customApiFields": {},
+ "oasExtensions": "",
+ "mockScript": {},
+ "createdAt": "2026-08-04T14:42:57.000Z",
+ "updatedAt": "2026-08-29T04:48:56.000Z",
+ "creatorId": 3510276,
+ "editorId": 1000960460,
+ "creatorUserId": 3510276,
+ "editorUserId": 3779705,
+ "visibility": "INHERITED",
+ "securityScheme": {
+  "schemeGroups": [
+   {
+    "id": "_68Wsa_WH3dlViJ8uARlJ",
+    "schemeIds": [
+     1687020
+    ]
+   }
+  ],
+  "required": true,
+  "use": {
+   "id": "_68Wsa_WH3dlViJ8uARlJ",
+   "configs": {
+    "1687020": {
+     "authConfigs": {
+      "x-apifox": {
+       "token": "{{bearerToken}}"
+      }
+     }
+    }
+   }
+  },
+  "scopes": {
+   "_68Wsa_WH3dlViJ8uARlJ": {
+    "1687020": []
+   }
+  }
+ },
+ "callbacks": ""
+}

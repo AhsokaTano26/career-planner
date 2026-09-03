@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 
+from services.desensitizer import mask_free_text
 from services.llm_gateway import generate
 
 _SYSTEM_PROMPT = (
@@ -29,7 +30,7 @@ def generate_plan(direction_id: str, semester: str, goal_summary: str | None = N
     user_prompt = (
         f"方向编码：{direction_id or '未指定'}\n"
         f"学期：{semester or '未指定'}\n"
-        f"目标摘要：{goal_summary or (template or {}).get('goalSummary') or '围绕目标方向打好基础，完成一个小项目'}\n"
+        f"目标摘要：{mask_free_text(goal_summary or (template or {}).get('goalSummary')) or '围绕目标方向打好基础，完成一个小项目'}\n"
         f"参考模板：{json.dumps(template or {}, ensure_ascii=False)}\n"
         "请生成计划草案 JSON。"
     )

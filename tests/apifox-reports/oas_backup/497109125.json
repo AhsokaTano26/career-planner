@@ -1,0 +1,166 @@
+{
+ "id": 497109125,
+ "name": "收藏方向",
+ "type": "http",
+ "serverId": "",
+ "preProcessors": [],
+ "postProcessors": [],
+ "inheritPreProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "inheritPostProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "description": "收藏指定方向（重复收藏幂等返回成功）。",
+ "operationId": "careerFavorite",
+ "sourceUrl": "",
+ "method": "post",
+ "path": "/api/v1/students/me/favorites/{directionId}",
+ "tags": [
+  "路径与方向"
+ ],
+ "status": "released",
+ "requestBody": {
+  "type": "none",
+  "parameters": [],
+  "required": false,
+  "additionalContentTypes": [],
+  "oasExtensions": ""
+ },
+ "parameters": {
+  "path": [
+   {
+    "id": "directionId#0",
+    "name": "directionId",
+    "required": true,
+    "enable": true,
+    "description": "",
+    "example": "",
+    "type": "string",
+    "schema": {
+     "type": "string",
+     "examples": [
+      "employment_backend"
+     ]
+    },
+    "omitGeneratedExample": false
+   }
+  ],
+  "query": [],
+  "cookie": [],
+  "header": []
+ },
+ "commonParameters": {},
+ "auth": {
+  "type": "securityscheme"
+ },
+ "responses": [
+  {
+   "id": "169661132",
+   "name": "",
+   "code": "200",
+   "contentType": "json",
+   "jsonSchema": {
+    "$ref": "#/definitions/301352850"
+   },
+   "itemSchema": {},
+   "description": "操作成功",
+   "mediaType": "application/json",
+   "headers": [],
+   "oasExtensions": ""
+  },
+  {
+   "id": "342336243",
+   "code": 401,
+   "referencedResponseId": 342336243
+  },
+  {
+   "id": "342336245",
+   "code": 404,
+   "referencedResponseId": 342336245
+  },
+  {
+   "id": "175133690",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  },
+  {
+   "id": "113745984",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  }
+ ],
+ "responseExamples": [],
+ "codeSamples": [],
+ "projectId": 8662286,
+ "moduleId": 8309868,
+ "folderId": 92650089,
+ "ordering": 36,
+ "responsibleId": 0,
+ "commonResponseStatus": {
+  "342336243": true,
+  "342336245": true
+ },
+ "advancedSettings": {
+  "disabledSystemHeaders": {}
+ },
+ "customApiFields": {},
+ "oasExtensions": "",
+ "mockScript": {},
+ "createdAt": "2026-08-04T14:42:57.000Z",
+ "updatedAt": "2026-08-29T04:49:46.000Z",
+ "creatorId": 3510276,
+ "editorId": 1000960460,
+ "creatorUserId": 3510276,
+ "editorUserId": 3779705,
+ "visibility": "INHERITED",
+ "securityScheme": {
+  "schemeGroups": [
+   {
+    "id": "Xouzat9Yn8s6hspPy-xWU",
+    "schemeIds": [
+     1687020
+    ]
+   }
+  ],
+  "required": true,
+  "use": {
+   "id": "Xouzat9Yn8s6hspPy-xWU",
+   "configs": {
+    "1687020": {
+     "authConfigs": {
+      "x-apifox": {
+       "token": "{{bearerToken}}"
+      }
+     }
+    }
+   }
+  },
+  "scopes": {
+   "Xouzat9Yn8s6hspPy-xWU": {
+    "1687020": []
+   }
+  }
+ },
+ "callbacks": ""
+}

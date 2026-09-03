@@ -108,4 +108,94 @@ public class IdGenerator {
     public String exportJobId() {
         return next("export_job", "EX-", 3);
     }
+
+    // 以下为 planning/portrait/recommendation 模块引用(补齐编译):seqName 需与 id_sequence 表行一致
+    public String profileSnapshotId() {
+        return next("profile_snapshot", "PS-", 3);
+    }
+
+    public String semesterPlanId() {
+        return next("semester_plan", "SP-", 3);
+    }
+
+    public String planTaskId() {
+        return next("plan_task", "PT-", 3);
+    }
+
+    public String taskCheckinId() {
+        return next("task_checkin", "TC-", 3);
+    }
+
+    public String stageReviewId() {
+        return next("stage_review", "SR-", 3);
+    }
+
+    public String reminderId() {
+        return next("reminder", "RM-", 3);
+    }
+
+    public String recommendationRunId() {
+        return next("recommendation_run", "RR-", 3);
+    }
+
+    public String recommendationResultId() {
+        return next("recommendation_result", "RES-", 3);
+    }
+
+    // 以下为各模块引用(补齐编译):seqName 需与 id_sequence 表行一致
+    public String assessmentSessionId() {
+        return next("assessment_session", "AS-", 3);
+    }
+
+    public String favoriteId() {
+        return next("direction_favorite", "FAV-", 3);
+    }
+
+    public String goalVersionId() {
+        return next("goal_version", "GV-", 3);
+    }
+
+    public String modelConfigId() {
+        return next("model_config", "MC-", 3);
+    }
+
+    public String planVersionId() {
+        return next("plan_version", "PV-", 3);
+    }
+
+    public String promptVersionId() {
+        return next("prompt_version", "PRV-", 3);
+    }
+
+    public String questionId() {
+        return next("question", "Q-", 3);
+    }
+
+    public String questionnaireId() {
+        return next("questionnaire", "QN-", 3);
+    }
+
+    public String questionnaireVersionId() {
+        return next("questionnaire_version", "QNV-", 3);
+    }
+
+    public String questionOptionId() {
+        return next("question_option", "QO-", 3);
+    }
+
+    public String studentGoalId() {
+        return next("student_goal", "SG-", 3);
+    }
+
+    public String aiChatMessageId() {
+        return next("ai_chat_message", "AIM-", 4);
+    }
+
+    public String aiChatFeedbackId() {
+        return next("ai_chat_feedback", "AIF-", 4);
+    }
+
+    public String aiCallLogId() {
+        return next("ai_call_log", "AIL-", 4);
+    }
 }

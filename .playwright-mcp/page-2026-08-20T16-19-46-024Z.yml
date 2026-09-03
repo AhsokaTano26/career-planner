@@ -1,0 +1,93 @@
+- generic [ref=e329]:
+  - complementary [ref=e330]:
+    - generic [ref=e331]:
+      - generic [ref=e332]: C
+      - generic [ref=e333]: CAREER / ARCHIVE
+    - generic [ref=e334]:
+      - generic [ref=e335]: 李
+      - generic [ref=e336]:
+        - generic [ref=e337]: 李明
+        - generic [ref=e338]: 学生工作台 · 在线
+    - navigation [ref=e339]:
+      - paragraph [ref=e340]: 我的生涯
+      - button "◼ 生涯总览" [ref=e341] [cursor=pointer]:
+        - generic [ref=e342]: ◼
+        - text: 生涯总览
+      - button "◼ 个人资料" [ref=e343] [cursor=pointer]:
+        - generic [ref=e344]: ◼
+        - text: 个人资料
+      - button "◼ 经历管理" [ref=e345] [cursor=pointer]:
+        - generic [ref=e346]: ◼
+        - text: 经历管理
+      - button "◼ 生涯测评" [ref=e347] [cursor=pointer]:
+        - generic [ref=e348]: ◼
+        - text: 生涯测评
+      - button "◼ 能力画像" [ref=e349] [cursor=pointer]:
+        - generic [ref=e350]: ◼
+        - text: 能力画像
+    - navigation [ref=e351]:
+      - paragraph [ref=e352]: 探索与行动
+      - button "◼ 路径探索" [ref=e353] [cursor=pointer]:
+        - generic [ref=e354]: ◼
+        - text: 路径探索
+      - button "◼ 方向推荐" [ref=e355] [cursor=pointer]:
+        - generic [ref=e356]: ◼
+        - text: 方向推荐
+      - button "◼ 方向对比" [ref=e357] [cursor=pointer]:
+        - generic [ref=e358]: ◼
+        - text: 方向对比
+      - button "◼ 我的收藏" [ref=e359] [cursor=pointer]:
+        - generic [ref=e360]: ◼
+        - text: 我的收藏
+      - button "◼ 目标管理" [ref=e361] [cursor=pointer]:
+        - generic [ref=e362]: ◼
+        - text: 目标管理
+      - button "◼ 学期计划" [ref=e363] [cursor=pointer]:
+        - generic [ref=e364]: ◼
+        - text: 学期计划
+      - button "◼ 任务看板" [ref=e365] [cursor=pointer]:
+        - generic [ref=e366]: ◼
+        - text: 任务看板
+      - button "◼ 阶段复盘" [ref=e367] [cursor=pointer]:
+        - generic [ref=e368]: ◼
+        - text: 阶段复盘
+    - navigation [ref=e369]:
+      - paragraph [ref=e370]: 支持与设置
+      - button "◼ 任务提醒" [ref=e371] [cursor=pointer]:
+        - generic [ref=e372]: ◼
+        - text: 任务提醒
+      - button "◼ AI 咨询" [ref=e373] [cursor=pointer]:
+        - generic [ref=e374]: ◼
+        - text: AI 咨询
+      - button "◼ 隐私与账户" [active] [ref=e375] [cursor=pointer]:
+        - generic [ref=e376]: ◼
+        - text: 隐私与账户
+    - generic [ref=e377]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=e378]:
+    - generic [ref=e379]:
+      - generic [ref=e380]: 学生工作台 / 2026-2027 · FIRST TERM
+      - generic [ref=e381]:
+        - button "↙ 退出登录" [ref=e382] [cursor=pointer]
+        - button "+ 新建" [ref=e383] [cursor=pointer]
+        - button "●" [ref=e384] [cursor=pointer]
+    - generic [ref=e385]:
+      - generic [ref=e387]:
+        - paragraph [ref=e388]: ACCOUNT / PRIVACY
+        - heading "隐私与账户" [level=1] [ref=e481]
+        - paragraph [ref=e390]: 管理授权、密码、数据导出与删除申请。
+      - generic [ref=e482]:
+        - article [ref=e483]:
+          - generic [ref=e484]:
+            - generic [ref=e485]: 隐私授权
+            - generic [ref=e486]: 请阅读并同意当前 — 版本授权文本
+          - button "同意当前授权" [disabled] [ref=e487] [cursor=pointer]
+        - article [ref=e488]:
+          - generic [ref=e489]:
+            - generic [ref=e490]: 修改密码
+            - generic [ref=e491]: 定期更换密码，保护账户安全。
+          - button "修改密码" [ref=e492] [cursor=pointer]
+        - article [ref=e493]:
+          - generic [ref=e494]:
+            - generic [ref=e495]: 删除申请
+            - generic [ref=e496]: 提交后将进入人工审核流程。
+          - button "提交申请" [ref=e497] [cursor=pointer]

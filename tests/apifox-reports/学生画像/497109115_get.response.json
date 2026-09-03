@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/students/me/profile/latest",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":{\"id\":\"PS-102\",\"version\":2,\"generatedAt\":\"2026-08-29T10:25:52+08:00\",\"sourceVersion\":\"assessment:AS-104\",\"completeness\":0,\"dimensions\":[{\"key\":\"interest\",\"name\":\"兴趣\",\"score\":0.0},{\"key\":\"values\",\"name\":\"价值观\",\"score\":0.0},{\"key\":\"ability\",\"name\":\"能力\",\"score\":0.0},{\"key\":\"academic\",\"name\":\"学业\",\"score\":0.0},{\"key\":\"tendency\",\"name\":\"倾向\",\"score\":0.0},{\"key\":\"practice\",\"name\":\"实践\",\"score\":0.0}],\"summary\":\"你的优势维度在「兴趣」（0），可在「兴趣」方向继续探索提升。\",\"strengths\":[\"兴趣(0)\",\"价值观(0)\"],\"explore\":[\"兴趣(0)\",\"价值观(0)\"],\"feedback\":{\"feedbackType\":\"PARTIAL\",\"comment\":\"学习能力描述与我实际情况基本一致\"}},\"traceId\":\"7b27945faafd11722f4d474ff3abd37b\",\"timestamp\":\"2026-08-29T11:48:25.8308104+08:00\"}"
+}

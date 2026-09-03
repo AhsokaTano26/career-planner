@@ -1,0 +1,100 @@
+- generic [ref=e266]:
+  - complementary [ref=e267]:
+    - generic [ref=e268]:
+      - generic [ref=e269]: C
+      - generic [ref=e270]: CAREER / ARCHIVE
+    - generic [ref=e271]:
+      - generic [ref=e272]: 系
+      - generic [ref=e273]:
+        - generic [ref=e274]: 系统管理员
+        - generic [ref=e275]: 系统管理台 · 在线
+    - navigation [ref=e276]:
+      - paragraph [ref=e277]: 平台配置
+      - button "◼ 运行总览" [ref=e278] [cursor=pointer]:
+        - generic [ref=e279]: ◼
+        - text: 运行总览
+      - button "◼ 用户管理" [ref=e280] [cursor=pointer]:
+        - generic [ref=e281]: ◼
+        - text: 用户管理
+      - button "◼ 白名单" [ref=e282] [cursor=pointer]:
+        - generic [ref=e283]: ◼
+        - text: 白名单
+      - button "◼ 师生关系" [ref=e284] [cursor=pointer]:
+        - generic [ref=e285]: ◼
+        - text: 师生关系
+      - button "◼ 问卷管理" [ref=e286] [cursor=pointer]:
+        - generic [ref=e287]: ◼
+        - text: 问卷管理
+      - button "◼ 方向库" [ref=e288] [cursor=pointer]:
+        - generic [ref=e289]: ◼
+        - text: 方向库
+      - button "◼ 能力标签" [ref=e290] [cursor=pointer]:
+        - generic [ref=e291]: ◼
+        - text: 能力标签
+      - button "◼ 任务模板" [ref=e292] [cursor=pointer]:
+        - generic [ref=e293]: ◼
+        - text: 任务模板
+    - navigation [ref=e294]:
+      - paragraph [ref=e295]: 内容与治理
+      - button "◼ 培养方案" [ref=e296] [cursor=pointer]:
+        - generic [ref=e297]: ◼
+        - text: 培养方案
+      - button "◼ 推荐权重" [ref=e298] [cursor=pointer]:
+        - generic [ref=e299]: ◼
+        - text: 推荐权重
+      - button "◼ 模型与提示词" [active] [ref=e300] [cursor=pointer]:
+        - generic [ref=e301]: ◼
+        - text: 模型与提示词
+      - button "◼ 导出任务" [ref=e302] [cursor=pointer]:
+        - generic [ref=e303]: ◼
+        - text: 导出任务
+      - button "◼ 审计日志" [ref=e304] [cursor=pointer]:
+        - generic [ref=e305]: ◼
+        - text: 审计日志
+    - generic [ref=e306]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=e307]:
+    - generic [ref=e308]:
+      - generic [ref=e309]: 系统管理台 / 2026-2027 · FIRST TERM
+      - generic [ref=e310]:
+        - button "↙ 退出登录" [ref=e311] [cursor=pointer]
+        - button "+ 新建" [ref=e312] [cursor=pointer]
+        - button "●" [ref=e313] [cursor=pointer]
+    - generic [ref=e314]:
+      - generic [ref=e316]:
+        - paragraph [ref=e317]: MODULE / MODELS
+        - heading "模型与提示词" [level=1] [ref=e425]
+        - paragraph
+      - generic [ref=e426]:
+        - generic [ref=e427]:
+          - generic [ref=e428]:
+            - paragraph [ref=e429]: ADMIN / MODELS & PROMPTS
+            - heading "模型与提示词" [level=2] [ref=e430]
+          - button "刷新" [ref=e431] [cursor=pointer]
+        - generic [ref=e432]:
+          - generic [ref=e433]:
+            - paragraph [ref=e434]: MODEL / CONFIG
+            - heading "模型配置" [level=2] [ref=e435]
+            - generic [ref=e436]:
+              - generic [ref=e437]:
+                - generic [ref=e438]:
+                  - generic [ref=e439]: llm.api-key
+                  - generic [ref=e440]: "****3456"
+                - button "编辑" [ref=e441] [cursor=pointer]
+              - generic [ref=e442]:
+                - generic [ref=e443]:
+                  - generic [ref=e444]: llm.provider
+                  - generic [ref=e445]: deepseek
+                - button "编辑" [ref=e446] [cursor=pointer]
+          - generic [ref=e447]:
+            - paragraph [ref=e448]: PROMPT / VERSIONS
+            - heading "提示词版本" [level=2] [ref=e449]
+            - generic [ref=e450]:
+              - generic [ref=e451]:
+                - text: 场景
+                - combobox "场景" [ref=e452]:
+                  - option "recommendation_explain" [selected]
+                  - option "plan_generate"
+                  - option "review_summarize"
+                  - option "career_chat"
+              - button "新建版本 →" [ref=e453] [cursor=pointer]
+            - paragraph [ref=e455]: 暂无提示词版本。

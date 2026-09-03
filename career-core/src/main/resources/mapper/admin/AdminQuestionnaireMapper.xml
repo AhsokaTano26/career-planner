@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminQuestionnaireMapper">
+
+    <resultMap id="QuestionnaireMap" type="com.rickgao.careercore.modules.assessment.entity.Questionnaire">
+        <id property="id" column="id"/>
+        <result property="type" column="type"/>
+        <result property="name" column="name"/>
+        <result property="typeName" column="type_name"/>
+        <result property="icon" column="icon"/>
+        <result property="status" column="status"/>
+        <result property="version" column="version"/>
+        <result property="minutes" column="minutes"/>
+        <result property="tip" column="tip"/>
+        <result property="publishedAt" column="published_at"/>
+        <result property="publishedBy" column="published_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <resultMap id="VersionMap" type="com.rickgao.careercore.modules.assessment.entity.QuestionnaireVersion">
+        <id property="id" column="id"/>
+        <result property="questionnaireId" column="questionnaire_id"/>
+        <result property="version" column="version"/>
+        <result property="status" column="status"/>
+        <result property="questionCount" column="question_count"/>
+        <result property="changeNote" column="change_note"/>
+        <result property="publishedAt" column="published_at"/>
+        <result property="publishedBy" column="published_by"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <resultMap id="QuestionMap" type="com.rickgao.careercore.modules.assessment.entity.Question">
+        <id property="id" column="id"/>
+        <result property="questionnaireVersionId" column="questionnaire_version_id"/>
+        <result property="text" column="text"/>
+        <result property="type" column="type"/>
+        <result property="dim" column="dim"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <resultMap id="OptionMap" type="com.rickgao.careercore.modules.assessment.entity.QuestionOption">
+        <id property="id" column="id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="text" column="text"/>
+        <result property="scoresJson" column="scores_json"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="selectQuestionnairePage" resultMap="QuestionnaireMap">
+        SELECT id, type, name, type_name, icon, status, version, minutes, tip, published_at, published_by, created_at, updated_at
+        FROM questionnaire
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (name LIKE CONCAT('%', #{keyword}, '%') OR type_name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countQuestionnaires" resultType="long">
+        SELECT COUNT(*) FROM questionnaire
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (name LIKE CONCAT('%', #{keyword}, '%') OR type_name LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="findQuestionnaireById" resultMap="QuestionnaireMap">
+        SELECT id, type, name, type_name, icon, status, version, minutes, tip, published_at, published_by, created_at, updated_at
+        FROM questionnaire WHERE id = #{id} LIMIT 1
+    </select>
+
+    <insert id="insertQuestionnaire" parameterType="com.rickgao.careercore.modules.assessment.entity.Questionnaire">
+        INSERT INTO questionnaire (id, type, name, type_name, icon, status, version, minutes, tip)
+        VALUES (#{id}, #{type}, #{name}, #{typeName}, #{icon}, #{status}, #{version}, #{minutes}, #{tip})
+    </insert>
+
+    <update id="updateQuestionnaireMeta" parameterType="com.rickgao.careercore.modules.assessment.entity.Questionnaire">
+        UPDATE questionnaire
+        SET type = #{type}, name = #{name}, type_name = #{typeName}, icon = #{icon},
+            minutes = #{minutes}, tip = #{tip}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateQuestionnaireStatus">
+        UPDATE questionnaire SET status = #{status}, updated_at = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateQuestionnairePublish">
+        UPDATE questionnaire
+        SET status = #{status}, version = #{version}, published_at = #{publishedAt},
+            published_by = #{publishedBy}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <select id="listVersions" resultMap="VersionMap">
+        SELECT id, questionnaire_id, version, status, question_count, change_note, published_at, published_by, created_at
+        FROM questionnaire_version WHERE questionnaire_id = #{questionnaireId} ORDER BY version DESC
+    </select>
+
+    <select id="findVersionById" resultMap="VersionMap">
+        SELECT id, questionnaire_id, version, status, question_count, change_note, published_at, published_by, created_at
+        FROM questionnaire_version WHERE id = #{id} LIMIT 1
+    </select>
+
+    <insert id="insertVersion" parameterType="com.rickgao.careercore.modules.assessment.entity.QuestionnaireVersion">
+        INSERT INTO questionnaire_version (id, questionnaire_id, version, status, question_count, change_note)
+        VALUES (#{id}, #{questionnaireId}, #{version}, #{status}, #{questionCount}, #{changeNote})
+    </insert>
+
+    <update id="updateVersionPublish">
+        UPDATE questionnaire_version
+        SET status = #{status}, published_at = #{publishedAt}, published_by = #{publishedBy}
+        WHERE id = #{id}
+    </update>
+
+    <select id="listQuestions" resultMap="QuestionMap">
+        SELECT id, questionnaire_version_id, text, type, dim, sort_order, created_at
+        FROM question WHERE questionnaire_version_id = #{versionId} ORDER BY sort_order ASC, created_at ASC
+    </select>
+
+    <select id="listOptions" resultMap="OptionMap">
+        SELECT id, question_id, text, scores_json, sort_order, created_at
+        FROM question_option WHERE question_id IN
+        <foreach collection="questionIds" item="qid" open="(" separator="," close=")">
+            #{qid}
+        </foreach>
+        ORDER BY question_id ASC, sort_order ASC
+    </select>
+
+    <insert id="insertQuestion" parameterType="com.rickgao.careercore.modules.assessment.entity.Question">
+        INSERT INTO question (id, questionnaire_version_id, text, type, dim, sort_order)
+        VALUES (#{id}, #{questionnaireVersionId}, #{text}, #{type}, #{dim}, #{sortOrder})
+    </insert>
+
+    <insert id="insertOption" parameterType="com.rickgao.careercore.modules.assessment.entity.QuestionOption">
+        INSERT INTO question_option (id, question_id, text, scores_json, sort_order)
+        VALUES (#{id}, #{questionId}, #{text}, #{scoresJson}, #{sortOrder})
+    </insert>
+
+</mapper>

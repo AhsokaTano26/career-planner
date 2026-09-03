@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/students/me/reminders",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":{\"list\":[],\"page\":1,\"size\":20,\"total\":0,\"totalPages\":0},\"traceId\":\"6a154927397f05bd59f59a08b619da77\",\"timestamp\":\"2026-08-29T11:52:29.4588661+08:00\"}"
+}

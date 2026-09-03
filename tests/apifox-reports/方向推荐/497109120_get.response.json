@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/paths",
+  "status": 404,
+  "body": "{\"code\":\"RESOURCE_NOT_FOUND\",\"message\":\"资源不存在\",\"data\":null,\"traceId\":\"3653371a0b515f16571fc4124c32cc5a\",\"timestamp\":\"2026-08-29T11:49:06.9767221+08:00\"}"
+}

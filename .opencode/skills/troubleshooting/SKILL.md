@@ -11,7 +11,13 @@ description: 本机开发排障与避坑手册（Windows + PowerShell）。遇�
 ## 一、本机常用注意事项（避坑）
 
 - **PowerShell 编码**：PowerShell 管道会把 curl 输出的 UTF-8 按 GBK 解码，导致中文乱码/伪空格。对比接口结果请用 `curl.exe -o 文件` 存原始字节 + `Get-FileHash` 比对，或用 `Get-Content -Encoding utf8` 读取；查库用 `mysql ... -e "SELECT HEX(...)"`。
-- **JSON 请求体**：PowerShell 中 `curl -d "{\"...\"}"` 的 `\"` 不会转义，会原样发送反斜杠导致服务端 JSON 解析失败（500）。请用 `--data-binary @文件`。
+- **JSON 请求体**：PowerShell 中 `curl -d "{\"...\"}"` 的 `\"` 不会转义，会原样发送反斜杠导致服务端 JSON 解析失败（500）。请用 `--data-binary @文件`。另：`curl.exe --data-binary $body` 传 PowerShell 字符串变量时编码可能被破坏（PowerShell 字符串 → UTF-8 字节转换异常），即使变量值看起来正确，实际发出的 JSON 仍会导致 `code: VALIDATION_ERROR / 请求体格式错误或无法解析`。**可靠做法**：用 Python/cmd 预写 JSON 文件，再用 `--data-binary @文件` 发送：
+  ```powershell
+  # 写文件（用 Python 避免 PowerShell 转义）
+  python -c "import json; open(r'C:\temp\login.json','w').write(json.dumps({'account':'A2026001','password':'Adv@2026'}))"
+  # 发送
+  curl.exe -s -X POST http://127.0.0.1:8080/api/v1/auth/login -H "Content-Type: application/json" --data-binary @C:\temp\login.json
+  ```
 - **接口返回字段一般不允许为 null**：成功响应的业务对象字段尽量不返回 `null`，否则可能触发 Apifox 契约校验失败。实现约定：
   - 给 DTO/record 加 `@JsonInclude(JsonInclude.Include.NON_NULL)` 过滤空值；
   - 空态统一为默认值/空串/空数组，而非 `null`；
@@ -29,6 +35,16 @@ description: 本机开发排障与避坑手册（Windows + PowerShell）。遇�
   - `App.vue` 的 `toNumber` 原为 `value.trim()?...`，但 number 类型 input 的 v-model 返回 number，保存资料时报 `value.trim is not a function`；已改为 `value==null||value===''?undefined:Number(value)`。
   - 经历类型下拉原用英文枚举 `project/internship/competition/club`，后端只接受中文 `竞赛/项目/学生工作/志愿服务`，保存经历报 400「经历类别不合法」；已统一为中文值。
 - **LLM API Key（career-ai 集成用）**：本地可用的 DeepSeek key 在 `career-ai/.env`（`LLM_API_KEY=sk-...`，已 gitignore 不入库）。career-core 的 AI 模块从环境变量 `LLM_API_KEY` 读取；本地启动时可从 `career-ai/.env` 取值注入。⚠️ 不要把 key 写进任何会入库的文件。
+- **`start` + `cmd /c` 多命令链转义失败（2026-08-31，`start-all.bat` career-core 无法启动）**：在 bat 脚本中用 `start` 启动带多个 `set` 环境变量 + java 的服务时，容易写成 `start "title" cmd /c "set A=1^&set B=2^&^&java.exe -jar ..."`。问题是 `^&` 转义在嵌套 `cmd /c` 字符串中解析不稳定，尤其当命令尾部有含空格的路径引号时（`"D:\devtools\jdk17\jdk-17.0.20+8\bin\java.exe"`），末尾引号经常被错误解析。**可靠解法**：不尝试在 `start` 行拼接复杂转义，而是把启动命令写入临时 `.bat` 文件，再由 `cmd /c` 执行。例如：
+  ```bat
+  set "_bat=%TEMP%\career-core-run.bat"
+  > "%_bat%" echo @echo off
+  >> "%_bat%" echo set "DB_PASSWORD=%DB_PASSWORD%"
+  >> "%_bat%" echo set "JWT_SECRET=%JWT_SECRET%"
+  >> "%_bat%" echo "%JDK_HOME%\bin\java.exe" -Dfile.encoding=UTF-8 -jar "%PROJECT%\career-core\target\career-core-0.0.1-SNAPSHOT.jar"
+  start "career-core" cmd /c "%_bat%"
+  ```
+  所有 `&`、`|`、`^` 等特殊字符无需任何转义；临时 bat 内容纯净，不依赖复杂引号解析。**通用原则**：需要传环境变量 + 启动命令时，用临时 bat 解耦。
 - **bat 脚本必须 GBK 编码 + CRLF 行尾（2026-08-21 坑，`start-all.bat`/`start-backend.bat` 双击「窗口闪现即消失」）**：本机 cmd 代码页是 936（GBK），bat 文件规范是 **GBK 编码 + CRLF 行尾**。用 AI 工具（write 等）写出的 .bat 默认 UTF-8 + LF，必须转码。两个独立根因，缺一不可：
   - **根因 1：UTF-8 编码 → 中文乱码 + 吞命令**。cmd 按 GBK 逐字节解析 bat，UTF-8 中文 3 字节序列被 GBK 误读成"1.5 个汉字"，残留字节与后面的 ASCII 命令字符拼成一个怪字 → 命令字母被吞（`@echo off` 被吞成 `'R' 不是内部或外部命令`、`set "JAVA_HOME=..."` 被吞成 `'K_HOME"' 不是命令`、`echo` 被吞成 `'?echo'`），`if (...)` 括号失配 → cmd 语法错误直接退出。**解决**：`[IO.File]::WriteAllText(路径, 内容, [Text.Encoding]::GetEncoding(936))` 写为 GBK，并去掉 `chcp 65001`。
   - **根因 2：LF 行尾 → 行首命令与上一行中文合并**。即使转成 GBK，若文件是 LF-only（0 个 CRLF），cmd 期望 CRLF，遇"GBK 汉字紧接 `0x0A`"时把 LF 与上一行内容合并解析，行首 `set "JAVA_` 等命令被上一行中文"吃掉" → 仍是语法错误。**解决**：`-replace "`r?`n","`r`n"` 全量转 CRLF。

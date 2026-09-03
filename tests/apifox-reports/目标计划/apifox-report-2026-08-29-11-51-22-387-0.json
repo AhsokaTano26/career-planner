@@ -1,0 +1,915 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 37,
+      "responseAverage": 37,
+      "responseMin": 37,
+      "responseMax": 37,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787975483125,
+      "completed": 1787975483262
+    },
+    "transfers": {
+      "responseTotal": 162
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "f015354c-6b2a-45c4-8d9f-6aee8768293b",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 37,
+      "responseAverage": 37,
+      "responseMin": 37,
+      "responseMax": 37,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787975483125,
+      "completed": 1787975483262
+    },
+    "transfers": {
+      "responseTotal": 162
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "f015354c-6b2a-45c4-8d9f-6aee8768293b",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408828500
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\目标计划",
+    "outFile": "apifox-report-2026-08-29-11-51-22-387-0",
+    "originalOutFile": "apifox-report-2026-08-29-11-51-22-387-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "e197d154-7ccb-4d00-abfb-520242d37942",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "36997232-7739-4e62-ad33-b216e56eae6a",
+            "name": "编辑计划(PATCH /api/v1/plans/{planId})",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "plans",
+                  "SP-106"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": [
+                  {
+                    "disabled": false,
+                    "type": "string",
+                    "value": "SP-106",
+                    "key": "planId"
+                  }
+                ]
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "PATCH",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {
+                "mode": "raw",
+                "raw": "{}",
+                "type": "application/json"
+              },
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "a6dd4ced-fc7e-48e9-b863-48035fa69306",
+              "id": "a6dd4ced-fc7e-48e9-b863-48035fa69306",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109137,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109137,
+              "httpApiCaseId": 408828500,
+              "httpApiName": "编辑计划",
+              "httpApiPath": "/api/v1/plans/{planId}",
+              "httpApiMethod": "patch",
+              "httpApiCaseName": "PATCH /api/v1/plans/{planId}",
+              "moduleId": 8309868,
+              "serverId": "default"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {
+                "$ref": "#/definitions/301352866"
+              },
+              "examples": []
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "编辑计划"
+      }
+    ],
+    "info": {
+      "name": "编辑计划"
+    },
+    "dataSchemas": {
+      "301352861": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "学期目标标题",
+            "examples": [
+              "掌握 Java 基础与面向对象编程"
+            ]
+          },
+          "abilityTag": {
+            "type": "string",
+            "description": "关联能力标签",
+            "examples": [
+              "programming_basic"
+            ]
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "学期目标",
+        "x-apifox-orders": [
+          "title",
+          "abilityTag"
+        ],
+        "name": "SemesterGoal"
+      },
+      "301352862": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "description": "月份（YYYY-MM）",
+            "examples": [
+              "2026-09"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "任务标题",
+            "examples": [
+              "完成 Java 语法与面向对象章节学习"
+            ]
+          },
+          "taskType": {
+            "type": "string",
+            "description": "任务类型",
+            "enum": [
+              "LEARNING",
+              "PRACTICE",
+              "CAREER",
+              "REVIEW"
+            ]
+          },
+          "estimatedHours": {
+            "type": "number",
+            "description": "预计投入（小时）",
+            "examples": [
+              12
+            ]
+          }
+        },
+        "required": [
+          "month",
+          "title"
+        ],
+        "title": "月度任务模板项",
+        "x-apifox-orders": [
+          "month",
+          "title",
+          "taskType",
+          "estimatedHours"
+        ],
+        "name": "MonthlyTask"
+      },
+      "301352866": {
+        "type": "object",
+        "properties": {
+          "goalSummary": {
+            "type": "string",
+            "description": "目标摘要",
+            "examples": [
+              "本学期完成后端技术基础入门…"
+            ]
+          },
+          "semesterGoals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/301352861"
+            }
+          },
+          "monthlyTasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/301352862"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "examples": [
+                "任务可随课程安排调整"
+              ]
+            }
+          }
+        },
+        "title": "编辑计划请求",
+        "x-apifox-orders": [
+          "goalSummary",
+          "semesterGoals",
+          "monthlyTasks",
+          "notes"
+        ],
+        "name": "PlanUpdate"
+      }
+    },
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8080",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8080",
+      "variable": {
+        "id": "7f942c23-67bb-4282-a8fb-83752bf26ab7",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8080",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8080",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "1f79c7f9-962e-4053-b1ad-afe307b42b89",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "6c2d32bd-089c-4171-a0ed-446733b32d02",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "36997232-7739-4e62-ad33-b216e56eae6a",
+              "name": "编辑计划(PATCH /api/v1/plans/{planId})",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "plans",
+                    "SP-106"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "string",
+                      "value": "SP-106",
+                      "key": "planId"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "type": "application/json"
+                },
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "a6dd4ced-fc7e-48e9-b863-48035fa69306",
+                "id": "a6dd4ced-fc7e-48e9-b863-48035fa69306",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109137,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109137,
+                "httpApiCaseId": 408828500,
+                "httpApiName": "编辑计划",
+                "httpApiPath": "/api/v1/plans/{planId}",
+                "httpApiMethod": "patch",
+                "httpApiCaseName": "PATCH /api/v1/plans/{planId}",
+                "moduleId": 8309868,
+                "serverId": "default"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {
+                  "$ref": "#/definitions/301352866"
+                },
+                "examples": []
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "编辑计划"
+        }
+      ],
+      "info": {
+        "name": "编辑计划"
+      },
+      "dataSchemas": {
+        "301352861": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "学期目标标题",
+              "examples": [
+                "掌握 Java 基础与面向对象编程"
+              ]
+            },
+            "abilityTag": {
+              "type": "string",
+              "description": "关联能力标签",
+              "examples": [
+                "programming_basic"
+              ]
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "title": "学期目标",
+          "x-apifox-orders": [
+            "title",
+            "abilityTag"
+          ],
+          "name": "SemesterGoal"
+        },
+        "301352862": {
+          "type": "object",
+          "properties": {
+            "month": {
+              "type": "string",
+              "description": "月份（YYYY-MM）",
+              "examples": [
+                "2026-09"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "description": "任务标题",
+              "examples": [
+                "完成 Java 语法与面向对象章节学习"
+              ]
+            },
+            "taskType": {
+              "type": "string",
+              "description": "任务类型",
+              "enum": [
+                "LEARNING",
+                "PRACTICE",
+                "CAREER",
+                "REVIEW"
+              ]
+            },
+            "estimatedHours": {
+              "type": "number",
+              "description": "预计投入（小时）",
+              "examples": [
+                12
+              ]
+            }
+          },
+          "required": [
+            "month",
+            "title"
+          ],
+          "title": "月度任务模板项",
+          "x-apifox-orders": [
+            "month",
+            "title",
+            "taskType",
+            "estimatedHours"
+          ],
+          "name": "MonthlyTask"
+        },
+        "301352866": {
+          "type": "object",
+          "properties": {
+            "goalSummary": {
+              "type": "string",
+              "description": "目标摘要",
+              "examples": [
+                "本学期完成后端技术基础入门…"
+              ]
+            },
+            "semesterGoals": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/301352861"
+              }
+            },
+            "monthlyTasks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/301352862"
+              }
+            },
+            "notes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "examples": [
+                  "任务可随课程安排调整"
+                ]
+              }
+            }
+          },
+          "title": "编辑计划请求",
+          "x-apifox-orders": [
+            "goalSummary",
+            "semesterGoals",
+            "monthlyTasks",
+            "notes"
+          ],
+          "name": "PlanUpdate"
+        }
+      },
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8080",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8080",
+        "variable": {
+          "id": "7f942c23-67bb-4282-a8fb-83752bf26ab7",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8080",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8080",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "1f79c7f9-962e-4053-b1ad-afe307b42b89",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "6c2d32bd-089c-4171-a0ed-446733b32d02",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109137,
+        "name": "编辑计划",
+        "path": "/api/v1/plans/{planId}",
+        "method": "patch"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408828500,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "94c4af2b-df55-4ab9-aa0a-6c7014c5a216",
+    "name": "编辑计划"
+  }
+}

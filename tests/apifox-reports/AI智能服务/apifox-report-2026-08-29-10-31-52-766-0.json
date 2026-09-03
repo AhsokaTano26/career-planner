@@ -1,0 +1,863 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 37,
+      "responseAverage": 37,
+      "responseMin": 37,
+      "responseMax": 37,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970713417,
+      "completed": 1787970713598
+    },
+    "transfers": {
+      "responseTotal": 212
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "58222e12-96c9-4f94-abbd-9787a78bd39e",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 37,
+      "responseAverage": 37,
+      "responseMin": 37,
+      "responseMax": 37,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970713417,
+      "completed": 1787970713598
+    },
+    "transfers": {
+      "responseTotal": 212
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "58222e12-96c9-4f94-abbd-9787a78bd39e",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408813110
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\AI智能服务",
+    "outFile": "apifox-report-2026-08-29-10-31-52-766-0",
+    "originalOutFile": "apifox-report-2026-08-29-10-31-52-766-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "97de1f5e-612f-4275-8393-d490c3fd0dd1",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "8befcf49-a1b1-4ad8-b0a3-6b5730e45119",
+            "name": "生成阶段总结(POST /api/v1/ai/review/summarize)",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "ai",
+                  "review",
+                  "summarize"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"studentRef\": \"student_ref_8f3a\", \"cycle\": \"2026-09\", \"reviewContent\": {\"done\": \"完成 Java 语法与通讯录项目\", \"undone\": \"LeetCode 练习未完成\", \"interest\": \"后端兴趣更强\", \"ability\": \"编程能力提升\", \"next\": \"聚焦数据结构\"}, \"taskSummary\": \"完成 4/6 项任务\"}",
+                "type": "application/json"
+              },
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "33b597c3-607e-48d9-9afe-b1c56f4d94ec",
+              "id": "33b597c3-607e-48d9-9afe-b1c56f4d94ec",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109157,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109157,
+              "httpApiCaseId": 408813110,
+              "httpApiName": "生成阶段总结",
+              "httpApiPath": "/api/v1/ai/review/summarize",
+              "httpApiMethod": "post",
+              "httpApiCaseName": "POST /api/v1/ai/review/summarize",
+              "moduleId": 8309868,
+              "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {
+                "$ref": "#/definitions/301352917"
+              },
+              "examples": [
+                {
+                  "value": "{\n    \"studentRef\": \"student_ref_8f3a\",\n    \"cycle\": \"2026-09\",\n    \"reviewContent\": {\n        \"done\": \"完成 Java 语法与通讯录项目\",\n        \"undone\": \"LeetCode 练习未完成\",\n        \"interest\": \"后端兴趣更强\",\n        \"ability\": \"编程能力提升\",\n        \"next\": \"聚焦数据结构\"\n    },\n    \"taskSummary\": \"完成 4/6 项任务\"\n}",
+                  "mediaType": "application/json",
+                  "description": ""
+                }
+              ]
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "生成阶段总结"
+      }
+    ],
+    "info": {
+      "name": "生成阶段总结"
+    },
+    "dataSchemas": {
+      "301352874": {
+        "type": "object",
+        "properties": {
+          "done": {
+            "type": "string",
+            "description": "本阶段完成情况",
+            "examples": [
+              "完成 Java 语法与通讯录项目，通过四六级报名"
+            ]
+          },
+          "undone": {
+            "type": "string",
+            "description": "未完成情况及原因",
+            "examples": [
+              "LeetCode 练习因时间不足未完成一半"
+            ]
+          },
+          "interest": {
+            "type": "string",
+            "description": "方向兴趣变化",
+            "examples": [
+              "后端开发的兴趣比预期更强，尤其喜欢调试解决问题的过程"
+            ]
+          },
+          "ability": {
+            "type": "string",
+            "description": "能力提升",
+            "examples": [
+              "编程能力明显提升，能独立写 300 行左右的程序"
+            ]
+          },
+          "next": {
+            "type": "string",
+            "description": "下一步安排",
+            "examples": [
+              "10 月聚焦数据结构与 SQL，减少并行任务数量"
+            ]
+          }
+        },
+        "title": "复盘内容",
+        "x-apifox-orders": [
+          "done",
+          "undone",
+          "interest",
+          "ability",
+          "next"
+        ],
+        "name": "ReviewContent"
+      },
+      "301352917": {
+        "type": "object",
+        "properties": {
+          "studentRef": {
+            "type": "string",
+            "description": "脱敏学生引用",
+            "examples": [
+              "student_ref_8f3a"
+            ]
+          },
+          "cycle": {
+            "type": "string",
+            "description": "复盘周期",
+            "examples": [
+              "2026-09"
+            ]
+          },
+          "reviewContent": {
+            "$ref": "#/definitions/301352874"
+          },
+          "taskSummary": {
+            "type": "string",
+            "description": "任务完成情况摘要",
+            "examples": [
+              "完成 4/6 项任务"
+            ]
+          }
+        },
+        "required": [
+          "studentRef",
+          "cycle",
+          "reviewContent"
+        ],
+        "title": "复盘总结请求",
+        "x-apifox-orders": [
+          "studentRef",
+          "cycle",
+          "reviewContent",
+          "taskSummary"
+        ],
+        "name": "ReviewSummarizeRequest"
+      }
+    },
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8000",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8000",
+      "variable": {
+        "id": "275e7c7b-7f99-4b71-9f9c-3522ae736ca3",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8000",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "1065c5ad-4f71-4d0c-a1bf-1760fcd0af33",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "ed21dc4a-713b-4e6b-bf87-8dd021f8bf86",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "8befcf49-a1b1-4ad8-b0a3-6b5730e45119",
+              "name": "生成阶段总结(POST /api/v1/ai/review/summarize)",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "ai",
+                    "review",
+                    "summarize"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"studentRef\": \"student_ref_8f3a\", \"cycle\": \"2026-09\", \"reviewContent\": {\"done\": \"完成 Java 语法与通讯录项目\", \"undone\": \"LeetCode 练习未完成\", \"interest\": \"后端兴趣更强\", \"ability\": \"编程能力提升\", \"next\": \"聚焦数据结构\"}, \"taskSummary\": \"完成 4/6 项任务\"}",
+                  "type": "application/json"
+                },
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "33b597c3-607e-48d9-9afe-b1c56f4d94ec",
+                "id": "33b597c3-607e-48d9-9afe-b1c56f4d94ec",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109157,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109157,
+                "httpApiCaseId": 408813110,
+                "httpApiName": "生成阶段总结",
+                "httpApiPath": "/api/v1/ai/review/summarize",
+                "httpApiMethod": "post",
+                "httpApiCaseName": "POST /api/v1/ai/review/summarize",
+                "moduleId": 8309868,
+                "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {
+                  "$ref": "#/definitions/301352917"
+                },
+                "examples": [
+                  {
+                    "value": "{\n    \"studentRef\": \"student_ref_8f3a\",\n    \"cycle\": \"2026-09\",\n    \"reviewContent\": {\n        \"done\": \"完成 Java 语法与通讯录项目\",\n        \"undone\": \"LeetCode 练习未完成\",\n        \"interest\": \"后端兴趣更强\",\n        \"ability\": \"编程能力提升\",\n        \"next\": \"聚焦数据结构\"\n    },\n    \"taskSummary\": \"完成 4/6 项任务\"\n}",
+                    "mediaType": "application/json",
+                    "description": ""
+                  }
+                ]
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "生成阶段总结"
+        }
+      ],
+      "info": {
+        "name": "生成阶段总结"
+      },
+      "dataSchemas": {
+        "301352874": {
+          "type": "object",
+          "properties": {
+            "done": {
+              "type": "string",
+              "description": "本阶段完成情况",
+              "examples": [
+                "完成 Java 语法与通讯录项目，通过四六级报名"
+              ]
+            },
+            "undone": {
+              "type": "string",
+              "description": "未完成情况及原因",
+              "examples": [
+                "LeetCode 练习因时间不足未完成一半"
+              ]
+            },
+            "interest": {
+              "type": "string",
+              "description": "方向兴趣变化",
+              "examples": [
+                "后端开发的兴趣比预期更强，尤其喜欢调试解决问题的过程"
+              ]
+            },
+            "ability": {
+              "type": "string",
+              "description": "能力提升",
+              "examples": [
+                "编程能力明显提升，能独立写 300 行左右的程序"
+              ]
+            },
+            "next": {
+              "type": "string",
+              "description": "下一步安排",
+              "examples": [
+                "10 月聚焦数据结构与 SQL，减少并行任务数量"
+              ]
+            }
+          },
+          "title": "复盘内容",
+          "x-apifox-orders": [
+            "done",
+            "undone",
+            "interest",
+            "ability",
+            "next"
+          ],
+          "name": "ReviewContent"
+        },
+        "301352917": {
+          "type": "object",
+          "properties": {
+            "studentRef": {
+              "type": "string",
+              "description": "脱敏学生引用",
+              "examples": [
+                "student_ref_8f3a"
+              ]
+            },
+            "cycle": {
+              "type": "string",
+              "description": "复盘周期",
+              "examples": [
+                "2026-09"
+              ]
+            },
+            "reviewContent": {
+              "$ref": "#/definitions/301352874"
+            },
+            "taskSummary": {
+              "type": "string",
+              "description": "任务完成情况摘要",
+              "examples": [
+                "完成 4/6 项任务"
+              ]
+            }
+          },
+          "required": [
+            "studentRef",
+            "cycle",
+            "reviewContent"
+          ],
+          "title": "复盘总结请求",
+          "x-apifox-orders": [
+            "studentRef",
+            "cycle",
+            "reviewContent",
+            "taskSummary"
+          ],
+          "name": "ReviewSummarizeRequest"
+        }
+      },
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8000",
+        "variable": {
+          "id": "275e7c7b-7f99-4b71-9f9c-3522ae736ca3",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8000",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8000",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "1065c5ad-4f71-4d0c-a1bf-1760fcd0af33",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "ed21dc4a-713b-4e6b-bf87-8dd021f8bf86",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109157,
+        "name": "生成阶段总结",
+        "path": "/api/v1/ai/review/summarize",
+        "method": "post"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408813110,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "5b1034ee-3ebd-40e9-b93c-c3d9edf248cd",
+    "name": "生成阶段总结"
+  }
+}

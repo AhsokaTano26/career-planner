@@ -14,7 +14,10 @@ INSERT IGNORE INTO id_sequence (seq_name, next_val) VALUES
 ('student_profile', 1),
 ('student_experience', 1),
 ('deletion_request', 1),
-('operation_audit_log', 1);
+('operation_audit_log', 1),
+('ai_chat_message', 1),
+('ai_chat_feedback', 1),
+('ai_call_log', 1);
 
 -- 隐私授权文档 v1.0(发布版本;version 与 Apifox 接口的 currentVersion 一致)
 INSERT INTO consent_document (id, version, title, content, status, published_at)

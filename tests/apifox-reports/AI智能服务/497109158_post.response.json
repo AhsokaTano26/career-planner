@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/ai/pdf/parse",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":{\"jobId\":\"CJ-001\",\"status\":\"FAILED\",\"itemCount\":null,\"confidence\":null},\"traceId\":\"8712fd2b5fd4bd048535ff98b0fb6804\",\"timestamp\":\"2026-08-29T11:54:17.187762+08:00\"}"
+}

@@ -21821,7 +21821,6 @@
           }
         },
         "required": [
-          "studentRef",
           "sessionId",
           "question"
         ],
@@ -21839,6 +21838,12 @@
       "ChatResponse": {
         "type": "object",
         "properties": {
+          "messageId": {
+            "type": "string",
+            "description": "消息 ID（用于回答反馈 /api/v1/ai/chat/{messageId}/feedback）",
+            "nullable": true,
+            "example": "MSG-001"
+          },
           "answer": {
             "type": "string",
             "description": "回答内容",
@@ -24208,8 +24213,7 @@
       "AiChatRequest": {
         "required": [
           "question",
-          "sessionId",
-          "studentRef"
+          "sessionId"
         ],
         "type": "object",
         "properties": {

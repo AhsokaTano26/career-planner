@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/goal-versions",
+  "status": 404,
+  "body": "{\"code\":\"RESOURCE_NOT_FOUND\",\"message\":\"资源不存在\",\"data\":null,\"traceId\":\"131781f2fd06f233f00ec331b3abd772\",\"timestamp\":\"2026-08-29T11:51:01.7306237+08:00\"}"
+}

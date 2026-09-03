@@ -1,0 +1,191 @@
+{
+ "id": 497109116,
+ "name": "画像版本列表",
+ "type": "http",
+ "serverId": "",
+ "preProcessors": [],
+ "postProcessors": [],
+ "inheritPreProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "inheritPostProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "description": "列出历史画像快照（每次重新计算生成新版本）。",
+ "operationId": "profileVersions",
+ "sourceUrl": "",
+ "method": "get",
+ "path": "/api/v1/students/me/profile/versions",
+ "tags": [
+  "学生画像"
+ ],
+ "status": "released",
+ "requestBody": {
+  "type": "none",
+  "parameters": [],
+  "required": false,
+  "additionalContentTypes": [],
+  "oasExtensions": ""
+ },
+ "parameters": {
+  "path": [],
+  "query": [
+   {
+    "id": "ZHuBonrtrO",
+    "name": "page",
+    "required": false,
+    "enable": true,
+    "description": "页码，从 1 开始",
+    "example": "",
+    "type": "integer",
+    "schema": {
+     "type": "integer",
+     "minimum": 1,
+     "default": 1
+    },
+    "omitGeneratedExample": false
+   },
+   {
+    "id": "d308nQruya",
+    "name": "size",
+    "required": false,
+    "enable": true,
+    "description": "每页条数（最大 100）",
+    "example": "",
+    "type": "integer",
+    "schema": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 100,
+     "default": 20
+    },
+    "omitGeneratedExample": false
+   },
+   {
+    "id": "kWwkcWu3io",
+    "name": "sort",
+    "required": false,
+    "enable": true,
+    "description": "排序，如 `-createdAt`（desc）或 `createdAt`（asc）",
+    "example": "",
+    "type": "string",
+    "schema": {
+     "type": "string",
+     "examples": [
+      "-createdAt"
+     ]
+    },
+    "omitGeneratedExample": false
+   }
+  ],
+  "cookie": [],
+  "header": []
+ },
+ "commonParameters": {},
+ "auth": {
+  "type": "securityscheme"
+ },
+ "responses": [
+  {
+   "id": "180254787",
+   "name": "",
+   "code": "200",
+   "contentType": "json",
+   "jsonSchema": {
+    "$ref": "#/definitions/301352846"
+   },
+   "itemSchema": {},
+   "description": "操作成功",
+   "mediaType": "application/json",
+   "headers": [],
+   "oasExtensions": ""
+  },
+  {
+   "id": "342336243",
+   "code": 401,
+   "referencedResponseId": 342336243
+  },
+  {
+   "id": "119697099",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  },
+  {
+   "id": "117922795",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  }
+ ],
+ "responseExamples": [],
+ "codeSamples": [],
+ "projectId": 8662286,
+ "moduleId": 8309868,
+ "folderId": 92650088,
+ "ordering": 12,
+ "responsibleId": 0,
+ "commonResponseStatus": {
+  "342336243": true
+ },
+ "advancedSettings": {
+  "disabledSystemHeaders": {}
+ },
+ "customApiFields": {},
+ "oasExtensions": "",
+ "mockScript": {},
+ "createdAt": "2026-08-04T14:42:57.000Z",
+ "updatedAt": "2026-08-29T04:49:09.000Z",
+ "creatorId": 3510276,
+ "editorId": 1000960460,
+ "creatorUserId": 3510276,
+ "editorUserId": 3779705,
+ "visibility": "INHERITED",
+ "securityScheme": {
+  "schemeGroups": [
+   {
+    "id": "qVlTvX4SImcDLzFOrDEi2",
+    "schemeIds": [
+     1687020
+    ]
+   }
+  ],
+  "required": true,
+  "use": {
+   "id": "qVlTvX4SImcDLzFOrDEi2",
+   "configs": {
+    "1687020": {
+     "authConfigs": {
+      "x-apifox": {
+       "token": "{{bearerToken}}"
+      }
+     }
+    }
+   }
+  },
+  "scopes": {
+   "qVlTvX4SImcDLzFOrDEi2": {
+    "1687020": []
+   }
+  }
+ },
+ "callbacks": ""
+}

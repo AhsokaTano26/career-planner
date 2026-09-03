@@ -31,4 +31,7 @@ public interface AdminDirectionMapper {
     int updateContent(CareerDirection direction);
 
     int updateStatus(@Param("id") String id, @Param("status") String status);
+
+    /** 查询已发布方向(推荐服务引用,补齐编译)。 */
+    List<CareerDirection> selectAllPublished();
 }

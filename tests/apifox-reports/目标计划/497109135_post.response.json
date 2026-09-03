@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/students/me/plans/draft",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":{\"id\":\"SP-106\",\"version\":\"P-v1\",\"status\":\"DRAFT\",\"source\":\"AI\",\"goalSummary\":\"围绕目标方向打好基础，完成一个小项目\",\"semesterGoals\":[{\"title\":\"打好方向基础\",\"abilityTag\":null}],\"monthlyTasks\":[{\"month\":\"2026-08\",\"title\":\"完成基础课程学习\",\"taskType\":\"LEARNING\",\"estimatedHours\":20.0},{\"month\":\"2026-09\",\"title\":\"参与一个项目实践\",\"taskType\":\"PRACTICE\",\"estimatedHours\":20.0},{\"month\":\"2026-10\",\"title\":\"参加行业讲座\",\"taskType\":\"CAREER\",\"estimatedHours\":20.0},{\"month\":\"2026-11\",\"title\":\"整理学习心得与复盘\",\"taskType\":\"REVIEW\",\"estimatedHours\":20.0}],\"notes\":[\"模板生成\"],\"confirmedAt\":null,\"updatedAt\":null},\"traceId\":\"5cd5f580332a9ebfdebc2aed66e6b0f9\",\"timestamp\":\"2026-08-29T11:51:09.7524592+08:00\"}"
+}

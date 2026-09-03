@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from services.desensitizer import desensitize
+from services.desensitizer import mask_free_text
 from services.llm_gateway import generate
 
 _SYSTEM_PROMPT = (
@@ -25,7 +25,8 @@ def chat(question: str, context: dict | None = None, *, user_ref: str | None = N
     :return: 模型回答文本
     """
     messages = [{"role": "system", "content": _SYSTEM_PROMPT}]
-    messages.append({"role": "user", "content": desensitize(_build_prompt(question, context))})
+    # 自由文本截断到咨询上限 1500 字 + 脱敏（spec 4.2）
+    messages.append({"role": "user", "content": mask_free_text(_build_prompt(question, context), limit=1500)})
     # max_tokens 需覆盖推理模型的 reasoning 预算，否则推理占满后 content 为空（deepseek-v4-flash 实测）
     return generate(messages, temperature=0.7, max_tokens=2000, scene="career_chat", user_ref=user_ref)
 

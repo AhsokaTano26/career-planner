@@ -1,0 +1,40 @@
+- main [ref=e291]:
+  - generic [ref=e292]:
+    - generic [ref=e293]: CAREER ARCHIVE / 01
+    - generic [ref=e294]: 生涯规划系统
+  - generic [ref=e295]:
+    - generic [ref=e296]:
+      - paragraph [ref=e297]: CAREER PLANNING SYSTEM
+      - heading "把每一次探索， 留下证据。" [level=1] [ref=e298]:
+        - generic [ref=e299]: 把每一次探索，
+        - emphasis [ref=e300]: 留下证据。
+      - paragraph [ref=e301]: 账号所属角色由系统自动识别并进入对应工作台。
+      - generic [ref=e302]:
+        - generic [ref=e303]: PROFILE
+        - generic [ref=e304]: ASSESSMENT
+        - generic [ref=e305]: PLAN
+        - generic [ref=e306]: REVIEW
+    - generic [ref=e307]:
+      - paragraph [ref=e308]: REGISTER / ACCESS
+      - heading "白名单注册" [level=2] [ref=e319]
+      - generic [ref=e320]:
+        - text: 学号
+        - textbox "学号" [ref=e321]:
+          - /placeholder: 例如：2026011301
+      - generic [ref=e322]:
+        - text: 姓名
+        - textbox "姓名" [ref=e323]:
+          - /placeholder: 请输入姓名
+      - generic [ref=e324]:
+        - text: 班级（可选）
+        - textbox "班级（可选）" [ref=e325]:
+          - /placeholder: 例如：软件 2601
+      - generic [ref=e326]:
+        - text: 白名单校验码
+        - textbox "白名单校验码" [ref=e327]:
+          - /placeholder: 输入校验码
+      - button "提交注册 →" [ref=e328] [cursor=pointer]
+      - generic [ref=e315]:
+        - button "登录" [ref=e316] [cursor=pointer]
+        - button "注册" [active] [ref=e317] [cursor=pointer]
+        - button "忘记密码" [ref=e318] [cursor=pointer]

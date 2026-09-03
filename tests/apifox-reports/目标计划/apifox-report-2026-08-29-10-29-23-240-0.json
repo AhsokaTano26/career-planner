@@ -1,0 +1,807 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 35,
+      "responseAverage": 35,
+      "responseMin": 35,
+      "responseMax": 35,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970563890,
+      "completed": 1787970564021
+    },
+    "transfers": {
+      "responseTotal": 162
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "c5d06104-901e-45ef-8693-5838809b5687",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 35,
+      "responseAverage": 35,
+      "responseMin": 35,
+      "responseMax": 35,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970563890,
+      "completed": 1787970564021
+    },
+    "transfers": {
+      "responseTotal": 162
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "c5d06104-901e-45ef-8693-5838809b5687",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408812907
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\目标计划",
+    "outFile": "apifox-report-2026-08-29-10-29-23-240-0",
+    "originalOutFile": "apifox-report-2026-08-29-10-29-23-240-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "52d05d4c-59d7-4ddf-bc36-cff24df9e3f1",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "03706ad5-accf-418b-8b3e-3e17217ce6ff",
+            "name": "新增任务(POST /api/v1/tasks)",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "tasks"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"month\": \"2026-10\", \"title\": \"完成《数据结构》栈与队列的学习与练习\", \"type\": \"LEARNING\", \"estHours\": 10}",
+                "type": "application/json"
+              },
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "c7301598-64cc-4d17-b7d0-7bd1e007b34b",
+              "id": "c7301598-64cc-4d17-b7d0-7bd1e007b34b",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109141,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109141,
+              "httpApiCaseId": 408812907,
+              "httpApiName": "新增任务",
+              "httpApiPath": "/api/v1/tasks",
+              "httpApiMethod": "post",
+              "httpApiCaseName": "POST /api/v1/tasks",
+              "moduleId": 8309868,
+              "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {
+                "$ref": "#/definitions/301352869"
+              },
+              "examples": [
+                {
+                  "value": "{\n    \"month\": \"2026-10\",\n    \"title\": \"完成《数据结构》栈与队列的学习与练习\",\n    \"type\": \"LEARNING\",\n    \"estHours\": 10\n}",
+                  "mediaType": "application/json",
+                  "description": ""
+                }
+              ]
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "新增任务"
+      }
+    ],
+    "info": {
+      "name": "新增任务"
+    },
+    "dataSchemas": {
+      "301352869": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "description": "月份（YYYY-MM）",
+            "examples": [
+              "2026-10"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "任务标题",
+            "examples": [
+              "完成《数据结构》栈与队列的学习与练习"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "任务类型",
+            "enum": [
+              "LEARNING",
+              "PRACTICE",
+              "CAREER",
+              "REVIEW"
+            ]
+          },
+          "estHours": {
+            "type": "number",
+            "description": "预计投入（小时）",
+            "examples": [
+              10
+            ]
+          },
+          "deadline": {
+            "type": "string",
+            "description": "建议完成时间（选填）",
+            "format": "date"
+          },
+          "abilityTags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "examples": [
+                "algorithm_basic"
+              ]
+            }
+          }
+        },
+        "required": [
+          "month",
+          "title",
+          "type"
+        ],
+        "title": "新增任务请求",
+        "x-apifox-orders": [
+          "month",
+          "title",
+          "type",
+          "estHours",
+          "deadline",
+          "abilityTags"
+        ],
+        "name": "TaskRequest"
+      }
+    },
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8000",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8000",
+      "variable": {
+        "id": "6ef1a7df-17c7-45b5-8694-b0399cc3e0be",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8000",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "096e5685-3c8a-4117-a9a6-2c4e19719250",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "7942d941-ac6d-4f28-b7b3-5d13e5dd7816",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "03706ad5-accf-418b-8b3e-3e17217ce6ff",
+              "name": "新增任务(POST /api/v1/tasks)",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "tasks"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"month\": \"2026-10\", \"title\": \"完成《数据结构》栈与队列的学习与练习\", \"type\": \"LEARNING\", \"estHours\": 10}",
+                  "type": "application/json"
+                },
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "c7301598-64cc-4d17-b7d0-7bd1e007b34b",
+                "id": "c7301598-64cc-4d17-b7d0-7bd1e007b34b",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109141,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109141,
+                "httpApiCaseId": 408812907,
+                "httpApiName": "新增任务",
+                "httpApiPath": "/api/v1/tasks",
+                "httpApiMethod": "post",
+                "httpApiCaseName": "POST /api/v1/tasks",
+                "moduleId": 8309868,
+                "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {
+                  "$ref": "#/definitions/301352869"
+                },
+                "examples": [
+                  {
+                    "value": "{\n    \"month\": \"2026-10\",\n    \"title\": \"完成《数据结构》栈与队列的学习与练习\",\n    \"type\": \"LEARNING\",\n    \"estHours\": 10\n}",
+                    "mediaType": "application/json",
+                    "description": ""
+                  }
+                ]
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "新增任务"
+        }
+      ],
+      "info": {
+        "name": "新增任务"
+      },
+      "dataSchemas": {
+        "301352869": {
+          "type": "object",
+          "properties": {
+            "month": {
+              "type": "string",
+              "description": "月份（YYYY-MM）",
+              "examples": [
+                "2026-10"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "description": "任务标题",
+              "examples": [
+                "完成《数据结构》栈与队列的学习与练习"
+              ]
+            },
+            "type": {
+              "type": "string",
+              "description": "任务类型",
+              "enum": [
+                "LEARNING",
+                "PRACTICE",
+                "CAREER",
+                "REVIEW"
+              ]
+            },
+            "estHours": {
+              "type": "number",
+              "description": "预计投入（小时）",
+              "examples": [
+                10
+              ]
+            },
+            "deadline": {
+              "type": "string",
+              "description": "建议完成时间（选填）",
+              "format": "date"
+            },
+            "abilityTags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "examples": [
+                  "algorithm_basic"
+                ]
+              }
+            }
+          },
+          "required": [
+            "month",
+            "title",
+            "type"
+          ],
+          "title": "新增任务请求",
+          "x-apifox-orders": [
+            "month",
+            "title",
+            "type",
+            "estHours",
+            "deadline",
+            "abilityTags"
+          ],
+          "name": "TaskRequest"
+        }
+      },
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8000",
+        "variable": {
+          "id": "6ef1a7df-17c7-45b5-8694-b0399cc3e0be",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8000",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8000",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "096e5685-3c8a-4117-a9a6-2c4e19719250",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "7942d941-ac6d-4f28-b7b3-5d13e5dd7816",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109141,
+        "name": "新增任务",
+        "path": "/api/v1/tasks",
+        "method": "post"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408812907,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "aaf53171-c3ed-43da-bb81-481244739075",
+    "name": "新增任务"
+  }
+}

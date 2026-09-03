@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.planning.mapper.PlanningMapper">
+
+    <!-- ==================== 学生目标 student_goal ==================== -->
+    <resultMap id="StudentGoalMap" type="com.rickgao.careercore.modules.planning.entity.StudentGoal">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="goalType" column="goal_type"/>
+        <result property="directionId" column="direction_id"/>
+        <result property="name" column="name"/>
+        <result property="status" column="status"/>
+        <result property="chosenAt" column="chosen_at"/>
+        <result property="versionNo" column="version_no"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="selectGoals" resultMap="StudentGoalMap">
+        SELECT id, student_id, goal_type, direction_id, name, status, chosen_at, version_no, created_at, updated_at
+        FROM student_goal
+        WHERE student_id = #{studentId}
+        ORDER BY goal_type ASC
+    </select>
+
+    <select id="selectGoalById" resultMap="StudentGoalMap">
+        SELECT id, student_id, goal_type, direction_id, name, status, chosen_at, version_no, created_at, updated_at
+        FROM student_goal
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectGoalByType" resultMap="StudentGoalMap">
+        SELECT id, student_id, goal_type, direction_id, name, status, chosen_at, version_no, created_at, updated_at
+        FROM student_goal
+        WHERE student_id = #{studentId}
+          AND goal_type = #{goalType}
+          AND status = 'ACTIVE'
+        LIMIT 1
+    </select>
+
+    <insert id="insertGoal" parameterType="com.rickgao.careercore.modules.planning.entity.StudentGoal">
+        INSERT INTO student_goal (id, student_id, goal_type, direction_id, name, status, chosen_at, version_no)
+        VALUES (#{id}, #{studentId}, #{goalType}, #{directionId}, #{name}, #{status}, #{chosenAt}, #{versionNo})
+    </insert>
+
+    <update id="updateGoal" parameterType="com.rickgao.careercore.modules.planning.entity.StudentGoal">
+        UPDATE student_goal
+        SET direction_id = #{directionId},
+            name = #{name},
+            chosen_at = #{chosenAt},
+            version_no = #{versionNo}
+        WHERE id = #{id}
+    </update>
+
+    <update id="disableGoal">
+        UPDATE student_goal SET status = 'DISABLED' WHERE id = #{id}
+    </update>
+
+    <select id="countActiveGoals" resultType="int">
+        SELECT COUNT(*) FROM student_goal
+        WHERE student_id = #{studentId} AND status = 'ACTIVE'
+    </select>
+
+    <!-- ==================== 目标版本 goal_version ==================== -->
+    <resultMap id="GoalVersionMap" type="com.rickgao.careercore.modules.planning.entity.GoalVersion">
+        <id property="id" column="id"/>
+        <result property="goalId" column="goal_id"/>
+        <result property="versionNo" column="version_no"/>
+        <result property="changeReason" column="change_reason"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="selectGoalVersions" resultMap="GoalVersionMap">
+        SELECT id, goal_id, version_no, change_reason, created_at
+        FROM goal_version
+        WHERE goal_id = #{goalId}
+        ORDER BY created_at DESC, version_no DESC
+    </select>
+
+    <insert id="insertGoalVersion" parameterType="com.rickgao.careercore.modules.planning.entity.GoalVersion">
+        INSERT INTO goal_version (id, goal_id, version_no, change_reason)
+        VALUES (#{id}, #{goalId}, #{versionNo}, #{changeReason})
+    </insert>
+
+    <!-- ==================== 学期计划 semester_plan ==================== -->
+    <resultMap id="SemesterPlanMap" type="com.rickgao.careercore.modules.planning.entity.SemesterPlan">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="versionNo" column="version_no"/>
+        <result property="status" column="status"/>
+        <result property="source" column="source"/>
+        <result property="goalSummary" column="goal_summary"/>
+        <result property="semesterGoalsJson" column="semester_goals_json"/>
+        <result property="monthlyTasksJson" column="monthly_tasks_json"/>
+        <result property="notesJson" column="notes_json"/>
+        <result property="confirmedAt" column="confirmed_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="selectPlanById" resultMap="SemesterPlanMap">
+        SELECT id, student_id, version_no, status, source, goal_summary, semester_goals_json,
+               monthly_tasks_json, notes_json, confirmed_at, created_at, updated_at
+        FROM semester_plan
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectPlansByStudent" resultMap="SemesterPlanMap">
+        SELECT id, student_id, version_no, status, source, goal_summary, semester_goals_json,
+               monthly_tasks_json, notes_json, confirmed_at, created_at, updated_at
+        FROM semester_plan
+        WHERE student_id = #{studentId}
+        ORDER BY created_at DESC, version_no DESC
+    </select>
+
+    <select id="selectLatestPlanByStatus" resultMap="SemesterPlanMap">
+        SELECT id, student_id, version_no, status, source, goal_summary, semester_goals_json,
+               monthly_tasks_json, notes_json, confirmed_at, created_at, updated_at
+        FROM semester_plan
+        WHERE student_id = #{studentId}
+          AND status = #{status}
+        ORDER BY created_at DESC, version_no DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectLatestPlan" resultMap="SemesterPlanMap">
+        SELECT id, student_id, version_no, status, source, goal_summary, semester_goals_json,
+               monthly_tasks_json, notes_json, confirmed_at, created_at, updated_at
+        FROM semester_plan
+        WHERE student_id = #{studentId}
+        ORDER BY created_at DESC, version_no DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insertPlan" parameterType="com.rickgao.careercore.modules.planning.entity.SemesterPlan">
+        INSERT INTO semester_plan (id, student_id, version_no, status, source, goal_summary,
+                                   semester_goals_json, monthly_tasks_json, notes_json, confirmed_at)
+        VALUES (#{id}, #{studentId}, #{versionNo}, #{status}, #{source}, #{goalSummary},
+                #{semesterGoalsJson}, #{monthlyTasksJson}, #{notesJson}, #{confirmedAt})
+    </insert>
+
+    <update id="updatePlan" parameterType="com.rickgao.careercore.modules.planning.entity.SemesterPlan">
+        UPDATE semester_plan
+        SET status = #{status},
+            source = #{source},
+            goal_summary = #{goalSummary},
+            semester_goals_json = #{semesterGoalsJson},
+            monthly_tasks_json = #{monthlyTasksJson},
+            notes_json = #{notesJson},
+            confirmed_at = #{confirmedAt}
+        WHERE id = #{id}
+    </update>
+
+    <select id="countPlans" resultType="long">
+        SELECT COUNT(*) FROM semester_plan WHERE student_id = #{studentId}
+    </select>
+
+    <!-- ==================== 计划版本 plan_version ==================== -->
+    <resultMap id="PlanVersionMap" type="com.rickgao.careercore.modules.planning.entity.PlanVersion">
+        <id property="id" column="id"/>
+        <result property="planId" column="plan_id"/>
+        <result property="versionNo" column="version_no"/>
+        <result property="contentJson" column="content_json"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="selectPlanVersions" resultMap="PlanVersionMap">
+        SELECT id, plan_id, version_no, content_json, created_at
+        FROM plan_version
+        WHERE plan_id = #{planId}
+        ORDER BY created_at DESC, version_no DESC
+    </select>
+
+    <insert id="insertPlanVersion" parameterType="com.rickgao.careercore.modules.planning.entity.PlanVersion">
+        INSERT INTO plan_version (id, plan_id, version_no, content_json)
+        VALUES (#{id}, #{planId}, #{versionNo}, #{contentJson})
+    </insert>
+
+    <!-- ==================== 计划任务 plan_task ==================== -->
+    <resultMap id="PlanTaskMap" type="com.rickgao.careercore.modules.planning.entity.PlanTask">
+        <id property="id" column="id"/>
+        <result property="planId" column="plan_id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="month" column="month"/>
+        <result property="title" column="title"/>
+        <result property="taskType" column="task_type"/>
+        <result property="estHours" column="est_hours"/>
+        <result property="status" column="status"/>
+        <result property="deadline" column="deadline"/>
+        <result property="abilityTagsJson" column="ability_tags_json"/>
+        <result property="note" column="note"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="selectTaskById" resultMap="PlanTaskMap">
+        SELECT id, plan_id, student_id, month, title, task_type, est_hours, status, deadline,
+               ability_tags_json, note, created_at, updated_at
+        FROM plan_task
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectTasksByPlan" resultMap="PlanTaskMap">
+        SELECT id, plan_id, student_id, month, title, task_type, est_hours, status, deadline,
+               ability_tags_json, note, created_at, updated_at
+        FROM plan_task
+        WHERE plan_id = #{planId}
+        ORDER BY month ASC, created_at ASC
+    </select>
+
+    <select id="selectTasksByStudent" resultMap="PlanTaskMap">
+        SELECT id, plan_id, student_id, month, title, task_type, est_hours, status, deadline,
+               ability_tags_json, note, created_at, updated_at
+        FROM plan_task
+        WHERE student_id = #{studentId}
+        <if test="month != null and month != ''">
+            AND month = #{month}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        ORDER BY month ASC, created_at ASC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countTasks" resultType="long">
+        SELECT COUNT(*) FROM plan_task
+        WHERE student_id = #{studentId}
+        <if test="month != null and month != ''">
+            AND month = #{month}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+    </select>
+
+    <insert id="insertTask" parameterType="com.rickgao.careercore.modules.planning.entity.PlanTask">
+        INSERT INTO plan_task (id, plan_id, student_id, month, title, task_type, est_hours, status,
+                               deadline, ability_tags_json, note)
+        VALUES (#{id}, #{planId}, #{studentId}, #{month}, #{title}, #{taskType}, #{estHours}, #{status},
+                #{deadline}, #{abilityTagsJson}, #{note})
+    </insert>
+
+    <update id="updateTask" parameterType="com.rickgao.careercore.modules.planning.entity.PlanTask">
+        UPDATE plan_task
+        SET month = #{month},
+            title = #{title},
+            task_type = #{taskType},
+            est_hours = #{estHours},
+            status = #{status},
+            deadline = #{deadline},
+            ability_tags_json = #{abilityTagsJson},
+            note = #{note}
+        WHERE id = #{id}
+    </update>
+
+    <!-- ==================== 任务打卡 task_checkin ==================== -->
+    <resultMap id="TaskCheckinMap" type="com.rickgao.careercore.modules.planning.entity.TaskCheckin">
+        <id property="id" column="id"/>
+        <result property="taskId" column="task_id"/>
+        <result property="doneDesc" column="done_desc"/>
+        <result property="gains" column="gains"/>
+        <result property="difficulties" column="difficulties"/>
+        <result property="proofUrl" column="proof_url"/>
+        <result property="checkedInAt" column="checked_in_at"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="selectCheckinById" resultMap="TaskCheckinMap">
+        SELECT id, task_id, done_desc, gains, difficulties, proof_url, checked_in_at, created_at
+        FROM task_checkin
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectLatestCheckinByTask" resultMap="TaskCheckinMap">
+        SELECT id, task_id, done_desc, gains, difficulties, proof_url, checked_in_at, created_at
+        FROM task_checkin
+        WHERE task_id = #{taskId}
+        ORDER BY checked_in_at DESC, created_at DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insertCheckin" parameterType="com.rickgao.careercore.modules.planning.entity.TaskCheckin">
+        INSERT INTO task_checkin (id, task_id, done_desc, gains, difficulties, proof_url, checked_in_at)
+        VALUES (#{id}, #{taskId}, #{doneDesc}, #{gains}, #{difficulties}, #{proofUrl}, #{checkedInAt})
+    </insert>
+
+    <!-- ==================== 阶段复盘 stage_review ==================== -->
+    <resultMap id="StageReviewMap" type="com.rickgao.careercore.modules.planning.entity.StageReview">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="cycle" column="cycle"/>
+        <result property="status" column="status"/>
+        <result property="contentJson" column="content_json"/>
+        <result property="aiSummary" column="ai_summary"/>
+        <result property="aiSuggestJson" column="ai_suggest_json"/>
+        <result property="advisorRequested" column="advisor_requested"/>
+        <result property="advisorReply" column="advisor_reply"/>
+        <result property="submittedAt" column="submitted_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <select id="selectReviewById" resultMap="StageReviewMap">
+        SELECT id, student_id, cycle, status, content_json, ai_summary, ai_suggest_json,
+               advisor_requested, advisor_reply, submitted_at, created_at, updated_at
+        FROM stage_review
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectReviewsByStudent" resultMap="StageReviewMap">
+        SELECT id, student_id, cycle, status, content_json, ai_summary, ai_suggest_json,
+               advisor_requested, advisor_reply, submitted_at, created_at, updated_at
+        FROM stage_review
+        WHERE student_id = #{studentId}
+        ORDER BY submitted_at DESC, created_at DESC
+    </select>
+
+    <select id="selectLatestReviewByStudent" resultMap="StageReviewMap">
+        SELECT id, student_id, cycle, status, content_json, ai_summary, ai_suggest_json,
+               advisor_requested, advisor_reply, submitted_at, created_at, updated_at
+        FROM stage_review
+        WHERE student_id = #{studentId}
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
+    <insert id="insertReview" parameterType="com.rickgao.careercore.modules.planning.entity.StageReview">
+        INSERT INTO stage_review (id, student_id, cycle, status, content_json, ai_summary,
+                                  ai_suggest_json, advisor_requested, advisor_reply, submitted_at)
+        VALUES (#{id}, #{studentId}, #{cycle}, #{status}, #{contentJson}, #{aiSummary},
+                #{aiSuggestJson}, #{advisorRequested}, #{advisorReply}, #{submittedAt})
+    </insert>
+
+    <update id="updateReview" parameterType="com.rickgao.careercore.modules.planning.entity.StageReview">
+        UPDATE stage_review
+        SET cycle = #{cycle},
+            status = #{status},
+            content_json = #{contentJson},
+            ai_summary = #{aiSummary},
+            ai_suggest_json = #{aiSuggestJson},
+            advisor_requested = #{advisorRequested},
+            advisor_reply = #{advisorReply},
+            submitted_at = #{submittedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- ==================== 站内提醒 reminder ==================== -->
+    <resultMap id="ReminderMap" type="com.rickgao.careercore.modules.planning.entity.Reminder">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="type" column="type"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="isRead" column="is_read"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="selectReminderById" resultMap="ReminderMap">
+        SELECT id, student_id, type, title, content, is_read, created_at
+        FROM reminder
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectRemindersByStudent" resultMap="ReminderMap">
+        SELECT id, student_id, type, title, content, is_read, created_at
+        FROM reminder
+        WHERE student_id = #{studentId}
+        <if test="unreadOnly != null and unreadOnly">
+            AND is_read = 0
+        </if>
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countReminders" resultType="long">
+        SELECT COUNT(*) FROM reminder
+        WHERE student_id = #{studentId}
+        <if test="unreadOnly != null and unreadOnly">
+            AND is_read = 0
+        </if>
+    </select>
+
+    <insert id="insertReminder" parameterType="com.rickgao.careercore.modules.planning.entity.Reminder">
+        INSERT INTO reminder (id, student_id, type, title, content, is_read)
+        VALUES (#{id}, #{studentId}, #{type}, #{title}, #{content}, #{isRead})
+    </insert>
+
+    <update id="markReminderRead">
+        UPDATE reminder SET is_read = 1 WHERE id = #{id}
+    </update>
+
+    <select id="countUnreadReminders" resultType="int">
+        SELECT COUNT(*) FROM reminder
+        WHERE student_id = #{studentId} AND is_read = 0
+    </select>
+
+</mapper>

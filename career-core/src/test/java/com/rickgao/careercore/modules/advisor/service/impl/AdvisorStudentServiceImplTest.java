@@ -29,6 +29,7 @@ import com.rickgao.careercore.modules.advisor.vo.AttentionStudentVO;
 import com.rickgao.careercore.modules.advisor.vo.StudentDetailViewVO;
 import com.rickgao.careercore.modules.student.entity.StudentProfile;
 import com.rickgao.careercore.modules.student.mapper.StudentExperienceMapper;
+import com.rickgao.careercore.modules.student.model.BasicInfo;
 import com.rickgao.careercore.modules.student.mapper.StudentProfileMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -423,5 +424,26 @@ class AdvisorStudentServiceImplTest {
         comment.setAdviceType("COMMENT");
         comment.setCreatedAt(LocalDateTime.of(2026, 8, 3, 10, 0));
         return comment;
+    }
+
+    @Test
+    void getDetail_手机号脱敏展示() {
+        StudentProfile profile = new StudentProfile();
+        profile.setUserId("S1001");
+        profile.setName("张三");
+        BasicInfo basic = new BasicInfo();
+        basic.setPhone("13812346721");
+        profile.setBasic(basic);
+        when(studentProfileMapper.findByUserId("S1001")).thenReturn(profile);
+        when(studentExperienceMapper.findAllByStudentId("S1001")).thenReturn(List.of());
+        when(queryMapper.selectLatestSnapshot("S1001")).thenReturn(null);
+        when(queryMapper.selectLatestRun("S1001")).thenReturn(null);
+        when(queryMapper.selectActiveGoals(List.of("S1001"))).thenReturn(List.of());
+        when(queryMapper.selectLatestConfirmedPlan("S1001")).thenReturn(null);
+        when(advisorCommentMapper.findByStudentId("S1001")).thenReturn(List.of());
+
+        StudentDetailViewVO vo = service.getDetail("A1001", "S1001");
+
+        assertEquals("138****6721", vo.getProfile().getBasic().getPhone());
     }
 }

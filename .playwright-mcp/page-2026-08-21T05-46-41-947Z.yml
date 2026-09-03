@@ -1,0 +1,84 @@
+- generic [ref=e266]:
+  - complementary [ref=e267]:
+    - generic [ref=e268]:
+      - generic [ref=e269]: C
+      - generic [ref=e270]: CAREER / ARCHIVE
+    - generic [ref=e271]:
+      - generic [ref=e272]: 系
+      - generic [ref=e273]:
+        - generic [ref=e274]: 系统管理员
+        - generic [ref=e275]: 系统管理台 · 在线
+    - navigation [ref=e276]:
+      - paragraph [ref=e277]: 平台配置
+      - button "◼ 运行总览" [ref=e278] [cursor=pointer]:
+        - generic [ref=e279]: ◼
+        - text: 运行总览
+      - button "◼ 用户管理" [ref=e280] [cursor=pointer]:
+        - generic [ref=e281]: ◼
+        - text: 用户管理
+      - button "◼ 白名单" [ref=e282] [cursor=pointer]:
+        - generic [ref=e283]: ◼
+        - text: 白名单
+      - button "◼ 师生关系" [ref=e284] [cursor=pointer]:
+        - generic [ref=e285]: ◼
+        - text: 师生关系
+      - button "◼ 问卷管理" [ref=e286] [cursor=pointer]:
+        - generic [ref=e287]: ◼
+        - text: 问卷管理
+      - button "◼ 方向库" [ref=e288] [cursor=pointer]:
+        - generic [ref=e289]: ◼
+        - text: 方向库
+      - button "◼ 能力标签" [ref=e290] [cursor=pointer]:
+        - generic [ref=e291]: ◼
+        - text: 能力标签
+      - button "◼ 任务模板" [ref=e292] [cursor=pointer]:
+        - generic [ref=e293]: ◼
+        - text: 任务模板
+    - navigation [ref=e294]:
+      - paragraph [ref=e295]: 内容与治理
+      - button "◼ 培养方案" [ref=e296] [cursor=pointer]:
+        - generic [ref=e297]: ◼
+        - text: 培养方案
+      - button "◼ 推荐权重" [ref=e298] [cursor=pointer]:
+        - generic [ref=e299]: ◼
+        - text: 推荐权重
+      - button "◼ 模型与提示词" [ref=e300] [cursor=pointer]:
+        - generic [ref=e301]: ◼
+        - text: 模型与提示词
+      - button "◼ 导出任务" [ref=e302] [cursor=pointer]:
+        - generic [ref=e303]: ◼
+        - text: 导出任务
+      - button "◼ 审计日志" [ref=e304] [cursor=pointer]:
+        - generic [ref=e305]: ◼
+        - text: 审计日志
+    - generic [ref=e306]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=e307]:
+    - generic [ref=e308]:
+      - generic [ref=e309]: 系统管理台 / 2026-2027 · FIRST TERM
+      - generic [ref=e310]:
+        - button "↙ 退出登录" [ref=e311] [cursor=pointer]
+        - button "+ 新建" [ref=e312] [cursor=pointer]
+        - button "●" [ref=e313] [cursor=pointer]
+    - generic [ref=e314]:
+      - generic [ref=e316]:
+        - paragraph [ref=e317]: ADMIN / OPERATIONS
+        - heading "配置、治理与可追溯" [level=1] [ref=e318]
+        - paragraph [ref=e319]: 所有发布、导入、AI 调用和导出都保留操作记录。
+      - generic [ref=e320]:
+        - generic [ref=e321]:
+          - generic [ref=e322]:
+            - paragraph [ref=e323]: ADMIN / LIVE DATA
+            - heading "运行总览" [level=2] [ref=e324]
+          - button "刷新" [ref=e326] [cursor=pointer]
+        - generic [ref=e327]:
+          - generic [ref=e328]: 共 0 条记录
+          - generic [ref=e329]:
+            - generic [ref=e330]: 搜索
+            - textbox "搜索" [ref=e331]:
+              - /placeholder: 搜索名称、编号或状态
+        - generic [ref=e332]:
+          - generic [ref=e333]:
+            - generic [ref=e334]: 编号
+            - generic [ref=e335]: 内容
+            - generic [ref=e336]: 状态
+          - paragraph [ref=e337]: 暂无记录。

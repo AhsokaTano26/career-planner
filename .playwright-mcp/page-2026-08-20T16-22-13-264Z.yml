@@ -1,0 +1,93 @@
+- generic [ref=e539]:
+  - complementary [ref=e540]:
+    - generic [ref=e541]:
+      - generic [ref=e542]: C
+      - generic [ref=e543]: CAREER / ARCHIVE
+    - generic [ref=e544]:
+      - generic [ref=e545]: 李
+      - generic [ref=e546]:
+        - generic [ref=e547]: 李明
+        - generic [ref=e548]: 学生工作台 · 在线
+    - navigation [ref=e549]:
+      - paragraph [ref=e550]: 我的生涯
+      - button "◼ 生涯总览" [ref=e551] [cursor=pointer]:
+        - generic [ref=e552]: ◼
+        - text: 生涯总览
+      - button "◼ 个人资料" [ref=e553] [cursor=pointer]:
+        - generic [ref=e554]: ◼
+        - text: 个人资料
+      - button "◼ 经历管理" [ref=e555] [cursor=pointer]:
+        - generic [ref=e556]: ◼
+        - text: 经历管理
+      - button "◼ 生涯测评" [ref=e557] [cursor=pointer]:
+        - generic [ref=e558]: ◼
+        - text: 生涯测评
+      - button "◼ 能力画像" [ref=e559] [cursor=pointer]:
+        - generic [ref=e560]: ◼
+        - text: 能力画像
+    - navigation [ref=e561]:
+      - paragraph [ref=e562]: 探索与行动
+      - button "◼ 路径探索" [ref=e563] [cursor=pointer]:
+        - generic [ref=e564]: ◼
+        - text: 路径探索
+      - button "◼ 方向推荐" [ref=e565] [cursor=pointer]:
+        - generic [ref=e566]: ◼
+        - text: 方向推荐
+      - button "◼ 方向对比" [ref=e567] [cursor=pointer]:
+        - generic [ref=e568]: ◼
+        - text: 方向对比
+      - button "◼ 我的收藏" [ref=e569] [cursor=pointer]:
+        - generic [ref=e570]: ◼
+        - text: 我的收藏
+      - button "◼ 目标管理" [ref=e571] [cursor=pointer]:
+        - generic [ref=e572]: ◼
+        - text: 目标管理
+      - button "◼ 学期计划" [ref=e573] [cursor=pointer]:
+        - generic [ref=e574]: ◼
+        - text: 学期计划
+      - button "◼ 任务看板" [ref=e575] [cursor=pointer]:
+        - generic [ref=e576]: ◼
+        - text: 任务看板
+      - button "◼ 阶段复盘" [ref=e577] [cursor=pointer]:
+        - generic [ref=e578]: ◼
+        - text: 阶段复盘
+    - navigation [ref=e579]:
+      - paragraph [ref=e580]: 支持与设置
+      - button "◼ 任务提醒" [ref=e581] [cursor=pointer]:
+        - generic [ref=e582]: ◼
+        - text: 任务提醒
+      - button "◼ AI 咨询" [ref=e583] [cursor=pointer]:
+        - generic [ref=e584]: ◼
+        - text: AI 咨询
+      - button "◼ 隐私与账户" [ref=e585] [cursor=pointer]:
+        - generic [ref=e586]: ◼
+        - text: 隐私与账户
+    - generic [ref=e587]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=e588]:
+    - generic [ref=e589]:
+      - generic [ref=e590]: 学生工作台 / 2026-2027 · FIRST TERM
+      - generic [ref=e591]:
+        - button "↙ 退出登录" [ref=e592] [cursor=pointer]
+        - button "+ 新建" [ref=e593] [cursor=pointer]
+        - button "●" [ref=e594] [cursor=pointer]
+    - generic [ref=e595]:
+      - generic [ref=e597]:
+        - paragraph [ref=e598]: CAREER / OVERVIEW
+        - heading "从了解自己开始" [level=1] [ref=e599]
+        - paragraph [ref=e600]: 每一份认真回答，都会让你的下一步更清晰。
+      - generic [ref=e602]:
+        - generic [ref=e603]:
+          - text: PROFILE / LIVE
+          - heading "李明" [level=2] [ref=e604]
+        - generic [ref=e605]: —%
+      - generic [ref=e608]:
+        - generic [ref=e609]:
+          - paragraph [ref=e610]: PROFILE / NEXT
+          - heading "档案信息已完善" [level=2] [ref=e611]
+          - generic [ref=e612]:
+            - paragraph [ref=e613]: 可继续维护个人经历，后续测评、推荐和计划服务上线后会使用这些信息。
+            - button "维护个人资料 →" [ref=e614] [cursor=pointer]
+        - generic [ref=e615]:
+          - paragraph [ref=e616]: PROFILE / COMPLETENESS
+          - generic [ref=e617]: "0"
+          - text: / 0 已填写字段

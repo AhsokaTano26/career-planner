@@ -102,3 +102,20 @@ INSERT IGNORE INTO id_sequence (seq_name, next_val) VALUES
 ('curriculum_version', 100),
 ('course', 100),
 ('course_ability_tag', 100);
+
+-- 种子数据:培养方案导入任务 + 待审核条目(供 CRUD 冒烟测试使用)
+INSERT IGNORE INTO curriculum_import_job
+    (id, filename, file_type, status, total_items, parsed_items, confidence, created_at)
+VALUES
+    ('CJ-001', '2026培养方案.pdf', 'PDF', 'REVIEW_REQUIRED', 3, 3, 86.00, '2026-08-26 10:00:00');
+
+INSERT IGNORE INTO curriculum_import_item
+    (id, job_id, course_code, course_name, semester, credits, hours, category, module,
+     prerequisites_json, ability_tags_json, confidence, page_ref, status)
+VALUES
+    ('IT-001', 'CJ-001', 'CS101', '程序设计基础', '2026-2027-1', 4, 64, '专业基础', '必修',
+     '["CS100"]', '["programming_basic"]', 92.00, '第 12 页', 'PENDING'),
+    ('IT-002', 'CJ-001', 'CS201', '数据结构', '2026-2027-2', 4, 64, '专业核心', '必修',
+     '["CS101"]', '["programming_basic","algorithm"]', 88.00, '第 30 页', 'PENDING'),
+    ('IT-003', 'CJ-001', 'CS202', '数据结构(重修版)', '2026-2027-2', 4, 64, '专业核心', '必修',
+     '["CS101"]', '["algorithm"]', 61.00, '第 31 页', 'PENDING');

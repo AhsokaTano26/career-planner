@@ -8,3 +8,4 @@
 - **注释约定**：所有 Demo 简化/增强/兼容逻辑处必须用注释标明「Demo 精简点 / 后续迭代替换位置」，便于后续识别替换。
 - **语言与编码**：代码与数据统一 UTF-8；与用户使用中文交流。
 - **版本对齐**：修改任何依赖（pom.xml / package.json / requirements.txt）前先对照「本机 vs Docker 对齐表」（见 `project-environment.md` 第 3 节），确保本地与 Docker 一致；修改后必须同步更新 `project-environment.md`。
+- **测试期修 bug**：详见 `test-phase.md`（进入测试阶段后 AI 应优先遵守）。

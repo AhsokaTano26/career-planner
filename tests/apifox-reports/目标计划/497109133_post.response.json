@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/students/me/goals",
+  "status": 400,
+  "body": "{\"code\":\"VALIDATION_ERROR\",\"message\":\"方向不存在：employment_backend\",\"data\":null,\"traceId\":\"25c68a48b7eefa6e17f8dac3099a3c4e\",\"timestamp\":\"2026-08-29T11:50:53.5947776+08:00\"}"
+}
