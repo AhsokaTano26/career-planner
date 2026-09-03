@@ -25,3 +25,17 @@ career-core-backup-*/
 career-core-backup-20260815-105330/
 run_resp.json
 
+# Local one-click start script (machine-specific, never commit)
+start-all.bat
+start_all.bat
+
+# OpenAPI 临时备份与拉取产物（避免污染仓库；正式源是 Apifox 项目 + docs/openapi/career-core-apis-live.yaml）
+docs/openapi/_apifox_main.json
+docs/openapi/_apifox_pulled.yaml
+docs/openapi/_premerge_backup.yaml
+docs/openapi/_local_backup_pre_sync.yaml
+docs/openapi/_*.yaml
+docs/openapi/_*.json
+!docs/openapi/career-core-apis-live.yaml
+!docs/openapi/career-core-apis-live-summary.md
+
