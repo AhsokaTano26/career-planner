@@ -79,7 +79,7 @@ class AdminWhitelistServiceImplTest {
     }
 
     @Test
-    void createWhitelist_generatesVerifyCodeWhenBlank() {
+    void createWhitelist_generatesInitialPasswordWhenBlank() {
         when(studentWhitelistMapper.findByStudentNo("2026110001")).thenReturn(null);
         WhitelistCreate dto = new WhitelistCreate();
         dto.setStudentNo("2026110001");
@@ -89,8 +89,8 @@ class AdminWhitelistServiceImplTest {
 
         ArgumentCaptor<StudentWhitelist> captor = ArgumentCaptor.forClass(StudentWhitelist.class);
         verify(adminWhitelistMapper).insert(captor.capture());
-        assertNotNull(captor.getValue().getVerifyCode());
-        assertTrue(captor.getValue().getVerifyCode().matches("\\d{6}"));
+        assertNotNull(captor.getValue().getInitialPassword());
+        assertTrue(captor.getValue().getInitialPassword().matches("\\d{6}"));
         assertEquals("WL-100", result.getId());
     }
 
@@ -136,7 +136,7 @@ class AdminWhitelistServiceImplTest {
         assertEquals(1, result.getFailures().get(0).getRow());
         ArgumentCaptor<StudentWhitelist> captor = ArgumentCaptor.forClass(StudentWhitelist.class);
         verify(adminWhitelistMapper).insert(captor.capture());
-        assertNotNull(captor.getValue().getVerifyCode());
+        assertNotNull(captor.getValue().getInitialPassword());
     }
 
     @Test

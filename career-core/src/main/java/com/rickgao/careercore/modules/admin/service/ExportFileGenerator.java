@@ -81,7 +81,7 @@ public class ExportFileGenerator {
         for (StudentWhitelist w : mapper.selectWhitelistExport(bool(filters.get("used")))) {
             rows.add(Arrays.asList(
                     w.getId(), w.getStudentNo(), w.getName(), w.getClassName(),
-                    w.getVerifyCode(), String.valueOf(w.getUsed()),
+                    w.getInitialPassword(), String.valueOf(w.getUsed()),
                     w.getCreatedAt() == null ? "" : w.getCreatedAt().toString()));
         }
         return toCsv(header, rows);

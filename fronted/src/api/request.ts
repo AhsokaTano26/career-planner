@@ -4,7 +4,7 @@
  * internal token and must be reached through a server-side gateway.
  */
 export type ApiEnvelope<T> = { code: string; message: string; data: T; traceId?: string; timestamp?: string }
-export type User = { id:string; username:string; name:string; role:'STUDENT'|'ADVISOR'|'ADMIN'; studentNo?:string; grade?:string; majorCategory?:string; className?:string; consentAgreed?:boolean }
+export type User = { id:string; username:string; name:string; role:'STUDENT'|'ADVISOR'|'ADMIN'; studentNo?:string; grade?:string; majorCategory?:string; className?:string; consentAgreed?:boolean; passwordChangeRequired?:boolean }
 export type Token = { accessToken:string; refreshToken:string; expiresIn:number; tokenType:string; firstLogin:boolean; user:User }
 export type ConsentStatus = { agreed:boolean; version?:string; agreedAt?:string; currentVersion:string; currentVersionPublishedAt?:string; content?:string }
 export type Experience = { id:string; type:string; title:string; startDate:string; endDate?:string; description?:string; attachmentUrl?:string }
@@ -72,6 +72,24 @@ export async function request<T>(path:string, init:RequestInit = {}): Promise<T>
   }
   return body.data
 }
+
+export async function downloadFile(path:string):Promise<{blob:Blob; filename:string}> {
+  const headers = new Headers()
+  if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
+  headers.set('X-Request-Id', crypto.randomUUID())
+  let response = await fetch(`${base}${path}`, { headers, credentials:'include' })
+  if (response.status === 401 && await renewAccessToken()) {
+    headers.set('Authorization', `Bearer ${accessToken}`)
+    response = await fetch(`${base}${path}`, { headers, credentials:'include' })
+  }
+  if (!response.ok) {
+    if (response.status === 401) clearAuthSession()
+    throw new Error(`下载失败（HTTP ${response.status}）`)
+  }
+  const disposition = response.headers.get('Content-Disposition') || ''
+  const filename = /filename="?([^";]+)"?/i.exec(disposition)?.[1] || 'export.csv'
+  return { blob: await response.blob(), filename: decodeURIComponent(filename) }
+}
 const get = <T>(path:string) => request<T>(path)
 const post = <T>(path:string, data?:unknown) => request<T>(path, { method:'POST', body:data === undefined ? undefined : JSON.stringify(data) })
 const patch = <T>(path:string, data:unknown) => request<T>(path, { method:'PATCH', body:JSON.stringify(data) })
@@ -81,16 +99,17 @@ const formPost = <T>(path:string, data:FormData) => request<T>(path, { method:'P
 export const api = {
   auth: {
     login: (data:{account:string;password:string;role?:string}) => post<Token>('/auth/login', data),
-    register: (data:{studentNo:string;name:string;className?:string;verifyCode:string}) => post<Token>('/auth/register', data),
+    register: (data:{studentNo:string;name:string;className?:string;initialPassword:string}) => post<Token>('/auth/register', data),
     me: () => get<User>('/auth/me'), logout: () => post<void>('/auth/logout'),
-    refresh:(data:{refreshToken:string})=>post<Token>('/auth/refresh',data), resetPassword:(data:unknown)=>post<void>('/auth/password/reset',data),
+    updateMe: (data:{name:string}) => patch<User>('/auth/me', data),
+    resetPassword:(data:unknown)=>post<void>('/auth/password/reset',data),
     changePassword: (data:{oldPassword:string;newPassword:string}) => patch<void>('/auth/me/password', data),
     consentStatus: () => get<ConsentStatus>('/auth/privacy-consent/status'),
     consent: (data:{version:string}) => post<ConsentStatus>('/auth/privacy-consent', data),
   },
   student: {
     me: () => get<Profile>('/students/me'), update: (data:Partial<Profile>) => patch<Profile>('/students/me', data),
-    completeness: () => get<Completeness>('/students/me/completeness'), experiences: () => get<Experience[]>('/students/me/experiences'),
+    completeness: () => get<Completeness>('/students/me/completeness'), experiences: () => get<Experience[]>('/students/me/experiences?size=100'),
     addExperience: (data:Omit<Experience,'id'|'attachmentUrl'> & {attachment?:string}) => post<Experience>('/students/me/experiences', data),
     updateExperience: (id:string, data:Omit<Experience,'id'|'attachmentUrl'> & {attachment?:string}) => patch<Experience>(`/students/me/experiences/${id}`, data),
     deleteExperience: (id:string) => del<void>(`/students/me/experiences/${id}`),
@@ -104,17 +123,14 @@ export const api = {
     writeAdvice:(id:string,data:unknown) => post<unknown>(`/advisor/students/${id}/advice`,data),
   },
   admin: {
-    users: () => get<unknown>('/admin/users'), whitelist: () => get<unknown>('/admin/whitelist'), relations: () => get<unknown>('/admin/relations'),
-    directions: () => get<unknown>('/admin/directions'), abilities: () => get<unknown>('/admin/abilities'), templates: () => get<unknown>('/admin/templates'),
-    curricula: () => get<unknown>('/admin/curricula/jobs'), weights: () => get<unknown>('/admin/weights'), exports: () => get<unknown>('/admin/exports'),
-    operationLogs: () => get<unknown>('/admin/logs/operations'),
+    weights: () => get<unknown>('/admin/weights'),
     createWhitelist: (data:unknown) => post<unknown>('/admin/whitelist', data), createRelations: (data:unknown) => post<unknown>('/admin/relations', data),
     createDirection: (data:unknown) => post<unknown>('/admin/directions', data), createAbility: (data:unknown) => post<unknown>('/admin/abilities', data),
     createTemplate: (data:unknown) => post<unknown>('/admin/templates', data), createWeights: (data:unknown) => post<unknown>('/admin/weights', data), createExport: (data:unknown) => post<unknown>('/admin/exports', data),
     updateUser:(id:string,data:unknown)=>patch<void>(`/admin/users/${id}`,data), deleteWhitelist:(id:string)=>del<void>(`/admin/whitelist/${id}`), deleteRelation:(id:string)=>del<void>(`/admin/relations/${id}`),
     updateDirection:(id:string,data:unknown)=>patch<unknown>(`/admin/directions/${id}`,data), updateAbility:(id:string,data:unknown)=>patch<unknown>(`/admin/abilities/${id}`,data), updateTemplate:(id:string,data:unknown)=>patch<unknown>(`/admin/templates/${id}`,data),
-    setDirectionStatus:(id:string,data:unknown)=>patch<unknown>(`/admin/directions/${id}/status`,data), aiLogs:()=>get<unknown>('/admin/logs/ai'),
-    curriculumJob:(id:string)=>get<unknown>(`/admin/curricula/jobs/${id}`), curriculumItems:(jobId:string)=>get<unknown>(`/admin/curricula/items?jobId=${encodeURIComponent(jobId)}`), curriculumVersions:()=>get<unknown>('/admin/curricula/versions'),
+    setDirectionStatus:(id:string,data:unknown)=>patch<unknown>(`/admin/directions/${id}/status`,data),
+    curriculumJob:(id:string)=>get<unknown>(`/admin/curricula/jobs/${id}`),
     importWhitelist:(file:File)=>{const data=new FormData();data.append('file',file);return formPost<unknown>('/admin/whitelist/import',data)}, importCurriculum:(file:File)=>{const data=new FormData();data.append('file',file);return formPost<unknown>('/admin/curricula/import',data)},
     reviewCurriculumItem:(id:string,data:unknown)=>patch<unknown>(`/admin/curricula/items/${id}`,data), batchReviewCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/items/batch',data), publishCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/publish',data),
   },

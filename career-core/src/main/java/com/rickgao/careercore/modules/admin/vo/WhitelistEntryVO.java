@@ -15,4 +15,6 @@ public class WhitelistEntryVO {
     private String className;
     private Boolean used;
     private LocalDateTime createdAt;
+    /** 仅在服务端自动生成时返回一次；列表查询永不返回。 */
+    private String generatedInitialPassword;
 }

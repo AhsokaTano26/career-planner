@@ -26,6 +26,8 @@ public class SysUser {
     private String majorCategory;
     private String className;
     private Boolean consentAgreed;
+    /** 是否必须先修改初始密码后才能使用业务功能 */
+    private Boolean passwordChangeRequired;
     private LocalDateTime lastLoginAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

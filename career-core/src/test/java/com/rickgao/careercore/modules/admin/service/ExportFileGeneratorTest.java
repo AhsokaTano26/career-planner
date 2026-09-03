@@ -34,7 +34,7 @@ class ExportFileGeneratorTest {
         row.setStudentNo("2026011301");
         row.setName("李明");
         row.setClassName("计科2601");
-        row.setVerifyCode("202601");
+        row.setInitialPassword("202601");
         row.setUsed(false);
         when(mapper.selectWhitelistExport(any())).thenReturn(List.of(row));
 

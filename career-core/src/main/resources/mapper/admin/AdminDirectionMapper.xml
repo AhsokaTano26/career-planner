@@ -6,8 +6,27 @@
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="path" column="path"/>
+        <result property="icon" column="icon"/>
+        <result property="intro" column="intro"/>
         <result property="status" column="status"/>
         <result property="sortOrder" column="sort_order"/>
+        <result property="target" column="target_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.JsonTypeHandler"
+                javaType="com.rickgao.careercore.modules.admin.vo.AdminDirectionVO$Target"/>
+        <result property="minAbility" column="min_ability"/>
+        <result property="minAcademic" column="min_academic"/>
+        <result property="learning" column="learning_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="abilities" column="abilities_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="courses" column="courses_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="activities" column="activities_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="pathDesc" column="path_desc_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
+        <result property="misconceptions" column="misconceptions_json"
+                typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
         <result property="applicableMajors" column="applicable_majors_json"
                 typeHandler="com.rickgao.careercore.common.typehandler.StringListJsonTypeHandler"/>
         <result property="updatedAt" column="updated_at"/>
@@ -38,7 +57,10 @@
     </resultMap>
 
     <select id="selectDirectionPage" resultMap="AdminDirectionVOMap">
-        SELECT id, name, path, status, sort_order, applicable_majors_json, updated_at
+        SELECT id, name, path, icon, intro, target_json, min_ability, min_academic,
+               learning_json, abilities_json, courses_json, activities_json,
+               path_desc_json, misconceptions_json, sort_order, applicable_majors_json,
+               status, updated_at
         FROM career_direction
         WHERE deleted = 0
         <if test="path != null">

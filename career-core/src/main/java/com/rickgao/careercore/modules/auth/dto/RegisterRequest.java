@@ -21,7 +21,7 @@ public class RegisterRequest {
     @Size(max = 50, message = "班级长度不能超过 50")
     private String className;
 
-    @NotBlank(message = "校验码不能为空")
-    @Size(max = 32, message = "校验码长度不能超过 32")
-    private String verifyCode;
+    @NotBlank(message = "初始密码不能为空")
+    @Size(max = 32, message = "初始密码长度不能超过 32")
+    private String initialPassword;
 }

@@ -28,7 +28,7 @@ import java.util.Set;
 
 /**
  * 管理端-白名单服务实现。
- * CSV 约定:UTF-8(兼容 BOM)、无表头、列=学号,班级,校验码;总行数上限 700;重复学号该行失败。
+ * CSV 约定:UTF-8(兼容 BOM)、无表头、列=学号,班级,初始密码;总行数上限 700;重复学号该行失败。
  */
 @Service
 public class AdminWhitelistServiceImpl implements AdminWhitelistService {
@@ -111,11 +111,14 @@ public class AdminWhitelistServiceImpl implements AdminWhitelistService {
         entry.setId(idGenerator.whitelistId());
         entry.setStudentNo(studentNo);
         entry.setClassName(StringUtils.hasText(dto.getClassName()) ? dto.getClassName().trim() : null);
-        entry.setVerifyCode(StringUtils.hasText(dto.getVerifyCode())
-                ? dto.getVerifyCode().trim()
-                : generateVerifyCode());
+        boolean generated = !StringUtils.hasText(dto.getInitialPassword());
+        entry.setInitialPassword(generated ? generateInitialPassword() : dto.getInitialPassword().trim());
         adminWhitelistMapper.insert(entry);
-        return toVO(entry);
+        WhitelistEntryVO vo = toVO(entry);
+        if (generated) {
+            vo.setGeneratedInitialPassword(entry.getInitialPassword());
+        }
+        return vo;
     }
 
     private WhitelistImportResultVO doImportWhitelist(MultipartFile file) {
@@ -136,6 +139,7 @@ public class AdminWhitelistServiceImpl implements AdminWhitelistService {
         }
         WhitelistImportResultVO result = new WhitelistImportResultVO();
         List<WhitelistImportResultVO.Failure> failures = new ArrayList<>();
+        List<WhitelistImportResultVO.GeneratedInitialPassword> generatedInitialPasswords = new ArrayList<>();
         List<WhitelistCsvParser.Row> validRows = new ArrayList<>();
         Set<String> seen = new HashSet<>();
         for (WhitelistCsvParser.Row row : rows) {
@@ -160,14 +164,20 @@ public class AdminWhitelistServiceImpl implements AdminWhitelistService {
             entry.setId(idGenerator.whitelistId());
             entry.setStudentNo(row.getStudentNo());
             entry.setClassName(StringUtils.hasText(row.getClassName()) ? row.getClassName().trim() : null);
-            entry.setVerifyCode(StringUtils.hasText(row.getVerifyCode())
-                    ? row.getVerifyCode().trim()
-                    : generateVerifyCode());
+            boolean generated = !StringUtils.hasText(row.getInitialPassword());
+            entry.setInitialPassword(generated ? generateInitialPassword() : row.getInitialPassword().trim());
             adminWhitelistMapper.insert(entry);
+            if (generated) {
+                WhitelistImportResultVO.GeneratedInitialPassword item = new WhitelistImportResultVO.GeneratedInitialPassword();
+                item.setStudentNo(entry.getStudentNo());
+                item.setInitialPassword(entry.getInitialPassword());
+                generatedInitialPasswords.add(item);
+            }
         }
         result.setSuccessCount(validRows.size());
         result.setFailCount(failures.size());
         result.setFailures(failures);
+        result.setGeneratedInitialPasswords(generatedInitialPasswords);
         return result;
     }
 
@@ -189,7 +199,7 @@ public class AdminWhitelistServiceImpl implements AdminWhitelistService {
         return vo;
     }
 
-    private String generateVerifyCode() {
+    private String generateInitialPassword() {
         return String.format("%06d", RANDOM.nextInt(1_000_000));
     }
 

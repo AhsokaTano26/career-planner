@@ -249,11 +249,29 @@ public class AdminDirectionServiceImpl implements AdminDirectionService {
         vo.setId(direction.getId());
         vo.setName(direction.getName());
         vo.setPath(direction.getPath());
+        vo.setIcon(direction.getIcon());
+        vo.setIntro(direction.getIntro());
         vo.setStatus(direction.getStatus());
         vo.setSortOrder(direction.getSortOrder());
+        vo.setTarget(parseTarget(direction.getTargetJson()));
+        vo.setMinAbility(direction.getMinAbility() == null ? null : direction.getMinAbility().doubleValue());
+        vo.setMinAcademic(direction.getMinAcademic() == null ? null : direction.getMinAcademic().doubleValue());
+        vo.setLearning(parseStringList(direction.getLearningJson()));
+        vo.setAbilities(parseStringList(direction.getAbilitiesJson()));
+        vo.setCourses(parseStringList(direction.getCoursesJson()));
+        vo.setActivities(parseStringList(direction.getActivitiesJson()));
+        vo.setPathDesc(parseStringList(direction.getPathDescJson()));
+        vo.setMisconceptions(parseStringList(direction.getMisconceptionsJson()));
         vo.setApplicableMajors(parseStringList(direction.getApplicableMajorsJson()));
         vo.setUpdatedAt(direction.getUpdatedAt());
         return vo;
+    }
+
+    private AdminDirectionVO.Target parseTarget(String json) {
+        return StringUtils.hasText(json)
+                ? JsonUtil.parse(json, new TypeReference<AdminDirectionVO.Target>() {
+        })
+                : null;
     }
 
     private List<String> parseStringList(String json) {

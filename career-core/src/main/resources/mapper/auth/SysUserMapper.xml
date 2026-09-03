@@ -14,6 +14,7 @@
         <result property="majorCategory" column="major_category"/>
         <result property="className" column="class_name"/>
         <result property="consentAgreed" column="consent_agreed"/>
+        <result property="passwordChangeRequired" column="password_change_required"/>
         <result property="lastLoginAt" column="last_login_at"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
@@ -22,7 +23,7 @@
 
     <sql id="baseColumns">
         id, student_no, username, name, password_hash, role, status, grade, major_category,
-        class_name, consent_agreed, last_login_at, created_at, updated_at, deleted
+        class_name, consent_agreed, password_change_required, last_login_at, created_at, updated_at, deleted
     </sql>
 
     <select id="findById" resultMap="SysUserMap">
@@ -45,9 +46,9 @@
 
     <insert id="insert" parameterType="com.rickgao.careercore.modules.auth.entity.SysUser">
         INSERT INTO sys_user (id, student_no, username, name, password_hash, role, status, grade,
-                              major_category, class_name, consent_agreed, last_login_at, created_at, updated_at, deleted)
+                              major_category, class_name, consent_agreed, password_change_required, last_login_at, created_at, updated_at, deleted)
         VALUES (#{id}, #{studentNo}, #{username}, #{name}, #{passwordHash}, #{role}, #{status}, #{grade},
-                #{majorCategory}, #{className}, #{consentAgreed}, #{lastLoginAt}, NOW(), NOW(), 0)
+                #{majorCategory}, #{className}, #{consentAgreed}, #{passwordChangeRequired}, #{lastLoginAt}, NOW(), NOW(), 0)
     </insert>
 
     <update id="updateBasic" parameterType="com.rickgao.careercore.modules.auth.entity.SysUser">
@@ -61,9 +62,15 @@
         WHERE id = #{id}
     </update>
 
+    <update id="updateOwnName">
+        UPDATE sys_user
+        SET name = #{name}, updated_at = NOW()
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
     <update id="updatePassword">
         UPDATE sys_user
-        SET password_hash = #{passwordHash}, updated_at = NOW()
+        SET password_hash = #{passwordHash}, password_change_required = #{passwordChangeRequired}, updated_at = NOW()
         WHERE id = #{id}
     </update>
 

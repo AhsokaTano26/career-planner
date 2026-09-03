@@ -23,4 +23,5 @@ public class CurrentUserVO {
     private String majorCategory;
     private String className;
     private Boolean consentAgreed;
+    private Boolean passwordChangeRequired;
 }

@@ -55,6 +55,9 @@ public class SecurityConfig {
                         // Vite production output is served from /assets; it must remain publicly readable
                         // so the login page itself can load before a JWT exists.
                         .requestMatchers("/", "/index.html", "/test.html", "/static/**", "/assets/**", "/favicon.ico").permitAll()
+                        // SPA history 模式深层路由：直接访问 /student/xxx 等时放行并回退到 index.html，
+                        // 由前端路由守卫完成登录与角色校验（真正的数据接口仍在 /api/v1/** 上受保护）。
+                        .requestMatchers("/login", "/student/**", "/advisor/**", "/admin/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) ->
