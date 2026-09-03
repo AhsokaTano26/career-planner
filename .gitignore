@@ -25,3 +25,5 @@ career-core-backup-*/
 career-core-backup-20260815-105330/
 run_resp.json
 
+# Local Git worktrees
+.worktrees/
