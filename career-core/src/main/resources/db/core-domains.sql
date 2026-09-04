@@ -22,6 +22,21 @@ CREATE TABLE IF NOT EXISTS assessment_session (
     KEY idx_session_student_status (student_id, status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='测评会话';
 
+-- advisor-domain.sql may have created the earlier minimal table first.
+-- These upgrades are append-only and safe to run repeatedly on MySQL 8.
+ALTER TABLE assessment_session
+    ADD COLUMN IF NOT EXISTS total_questions INT NOT NULL DEFAULT 0 COMMENT '题目总数';
+ALTER TABLE assessment_session
+    ADD COLUMN IF NOT EXISTS answered_questions INT NOT NULL DEFAULT 0 COMMENT '已答题数';
+ALTER TABLE assessment_session
+    ADD COLUMN IF NOT EXISTS started_at DATETIME DEFAULT NULL COMMENT '开始时间';
+ALTER TABLE assessment_session
+    ADD COLUMN IF NOT EXISTS updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间';
+ALTER TABLE assessment_session
+    ADD COLUMN IF NOT EXISTS finished_at DATETIME DEFAULT NULL COMMENT '完成时间';
+ALTER TABLE assessment_session
+    ADD COLUMN IF NOT EXISTS score_json JSON DEFAULT NULL COMMENT '六维得分';
+
 -- ---------- 画像快照 ----------
 CREATE TABLE IF NOT EXISTS profile_snapshot (
     id             VARCHAR(32) NOT NULL COMMENT '快照 ID',
@@ -38,6 +53,27 @@ CREATE TABLE IF NOT EXISTS profile_snapshot (
     PRIMARY KEY (id),
     KEY idx_snapshot_student (student_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='画像快照';
+
+-- advisor-domain.sql may have created the earlier minimal table first.
+-- These upgrades are append-only and safe to run repeatedly on MySQL 8.
+ALTER TABLE profile_snapshot
+    ADD COLUMN IF NOT EXISTS source_version VARCHAR(64) DEFAULT NULL COMMENT '来源版本(测评/档案版本)';
+ALTER TABLE profile_snapshot
+    ADD COLUMN IF NOT EXISTS dimension_json JSON DEFAULT NULL COMMENT '六维得分 [{key,name,score}]';
+ALTER TABLE profile_snapshot
+    ADD COLUMN IF NOT EXISTS summary VARCHAR(1000) DEFAULT NULL COMMENT '画像摘要';
+ALTER TABLE profile_snapshot
+    ADD COLUMN IF NOT EXISTS strengths_json JSON DEFAULT NULL COMMENT '优势标签';
+ALTER TABLE profile_snapshot
+    ADD COLUMN IF NOT EXISTS explore_json JSON DEFAULT NULL COMMENT '待探索点';
+ALTER TABLE profile_snapshot
+    ADD COLUMN IF NOT EXISTS feedback_json JSON DEFAULT NULL COMMENT '反馈 {feedbackType,comment}';
+ALTER TABLE profile_snapshot
+    ADD COLUMN IF NOT EXISTS version_no INT NOT NULL DEFAULT 1 COMMENT '版本号';
+ALTER TABLE profile_snapshot
+    ADD COLUMN IF NOT EXISTS completeness INT NOT NULL DEFAULT 0 COMMENT '完整度(0-100)';
+ALTER TABLE profile_snapshot
+    ADD COLUMN IF NOT EXISTS created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间';
 
 -- ---------- 推荐批次 ----------
 CREATE TABLE IF NOT EXISTS recommendation_run (

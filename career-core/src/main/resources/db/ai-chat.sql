@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS ai_chat_message (
   support_reason VARCHAR(500) NOT NULL DEFAULT '',
   message_group VARCHAR(64) NOT NULL DEFAULT '' COMMENT '同一次对话共享 message_group（即原始 messageId）',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  KEY idx_user_created (user_id, created_at),
-  KEY idx_session (session_id, created_at),
-  KEY idx_group (message_group)
+  KEY idx_ai_chat_message_user_created (user_id, created_at),
+  KEY idx_ai_chat_message_session (session_id, created_at),
+  KEY idx_ai_chat_message_group (message_group)
 );
 
 CREATE TABLE IF NOT EXISTS ai_chat_feedback (
@@ -27,5 +27,5 @@ CREATE TABLE IF NOT EXISTS ai_chat_feedback (
   comment VARCHAR(500) DEFAULT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uk_message_group (message_group),
-  KEY idx_user_created (user_id, created_at)
+  KEY idx_ai_chat_feedback_user_created (user_id, created_at)
 );
