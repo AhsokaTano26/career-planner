@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.admin.mapper.AdminModelConfigMapper">
+
+    <resultMap id="ModelConfigMap" type="com.rickgao.careercore.modules.admin.entity.ModelConfig">
+        <id property="id" column="id"/>
+        <result property="configKey" column="config_key"/>
+        <result property="configValue" column="config_value"/>
+        <result property="updatedBy" column="updated_by"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="ModelConfigMap">
+        SELECT id, config_key, config_value, updated_by, updated_at, created_at
+        FROM model_config ORDER BY config_key ASC
+    </select>
+
+    <select id="findByKey" resultMap="ModelConfigMap">
+        SELECT id, config_key, config_value, updated_by, updated_at, created_at
+        FROM model_config WHERE config_key = #{configKey} LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.admin.entity.ModelConfig">
+        INSERT INTO model_config (id, config_key, config_value, updated_by)
+        VALUES (#{id}, #{configKey}, #{configValue}, #{updatedBy})
+    </insert>
+
+    <update id="updateValue">
+        UPDATE model_config
+        SET config_value = #{configValue}, updated_by = #{updatedBy}, updated_at = NOW()
+        WHERE config_key = #{configKey}
+    </update>
+
+</mapper>
+

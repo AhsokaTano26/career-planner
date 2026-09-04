@@ -136,4 +136,10 @@ public class IdGenerator {
     public String reminderId() { return next("reminder", "REM-", 4); }
     public String recommendationRunId() { return next("recommendation_run", "RUN-", 4); }
     public String recommendationResultId() { return next("recommendation_result", "REC-", 4); }
+    public String modelConfigId() { return next("model_config", "MODEL-", 4); }
+    public String promptVersionId() { return next("prompt_version", "PROMPT-", 4); }
+    public String questionnaireId() { return next("questionnaire", "QNR-", 4); }
+    public String questionnaireVersionId() { return next("questionnaire_version", "QNV-", 4); }
+    public String questionId() { return next("question", "Q-", 4); }
+    public String questionOptionId() { return next("question_option", "OPT-", 4); }
 }
