@@ -121,6 +121,11 @@ export const api = {
     updateExperience: (id:string, data:Omit<Experience,'id'|'attachmentUrl'> & {attachment?:string}) => patch<Experience>(`/students/me/experiences/${id}`, data),
     deleteExperience: (id:string) => del<void>(`/students/me/experiences/${id}`),
     requestDeletion: (reason:string) => post<void>('/students/me/deletion-request', { reason }),
+    questionnaires:()=>get<unknown[]>('/questionnaires'), questionnaire:(id:string)=>get<unknown>(`/questionnaires/${id}`),
+    assessmentSessions:()=>get<unknown[]>('/assessment-sessions'), createAssessment:(data:unknown)=>post<unknown>('/assessment-sessions',data), saveAssessment:(id:string,data:unknown)=>request<unknown>(`/assessment-sessions/${id}/answers`,{method:'PUT',body:JSON.stringify(data)}), submitAssessment:(id:string)=>post<unknown>(`/assessment-sessions/${id}/submit`),
+    latestPortrait:()=>get<unknown>('/students/me/profile/latest'), refreshPortrait:()=>post<unknown>('/students/me/profile/refresh'), portraitVersions:()=>get<unknown[]>('/students/me/profile/versions'),
+    recommendationRuns:()=>get<unknown>('/students/me/recommendations/runs/latest'), createRecommendation:(data:unknown)=>post<unknown>('/students/me/recommendations/runs',data),
+    goals:()=>get<unknown>('/students/me/goals'), saveGoals:(data:unknown)=>post<unknown>('/students/me/goals',data), latestPlan:()=>get<unknown>('/students/me/plans/latest'), draftPlan:(data:unknown)=>post<unknown>('/students/me/plans/draft',data), confirmPlan:(data:unknown)=>post<unknown>('/students/me/plans/confirm',data), tasks:()=>get<unknown>('/students/me/tasks'), createTask:(data:unknown)=>post<unknown>('/students/me/tasks',data),
   },
   advisor: {
     statistics: () => get<unknown>('/advisor/statistics'), attention: () => get<unknown[]>('/advisor/attention'),

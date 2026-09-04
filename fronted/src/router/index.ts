@@ -13,6 +13,7 @@ import StudentOverviewPage from '../views/student/StudentOverviewPage.vue'
 import StudentProfilePage from '../views/student/StudentProfilePage.vue'
 import StudentExperiencesPage from '../views/student/StudentExperiencesPage.vue'
 import StudentPrivacyPage from '../views/student/StudentPrivacyPage.vue'
+import StudentDevelopmentPage from '../views/student/StudentDevelopmentPage.vue'
 import AdvisorDashboardPage from '../views/advisor/AdvisorDashboardPage.vue'
 import AdvisorStudentsPage from '../views/advisor/AdvisorStudentsPage.vue'
 import AdvisorAttentionPage from '../views/advisor/AdvisorAttentionPage.vue'
@@ -26,7 +27,7 @@ export type MenuGroups = Record<Exclude<Role, 'ADMIN'>, MenuGroup[]>
 
 export const menuGroups: MenuGroups = {
   STUDENT: [
-    { group: '个人档案', links: [['/student/overview', '档案概览'], ['/student/profile', '个人资料'], ['/student/experiences', '经历管理']] },
+    { group: '个人档案', links: [['/student/overview', '档案概览'], ['/student/profile', '个人资料'], ['/student/experiences', '经历管理'], ['/student/development', '测评与发展']] },
     { group: '账户设置', links: [['/student/privacy', '隐私与账户']] },
   ],
   ADVISOR: [
@@ -53,6 +54,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'profile', name: 'student-profile', component: StudentProfilePage },
       { path: 'experiences', name: 'student-experiences', component: StudentExperiencesPage },
       { path: 'privacy', name: 'student-privacy', component: StudentPrivacyPage },
+      { path: 'development', name: 'student-development', component: StudentDevelopmentPage },
     ],
   },
   {
