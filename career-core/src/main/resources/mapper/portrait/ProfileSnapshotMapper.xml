@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.portrait.mapper.ProfileSnapshotMapper">
+
+    <resultMap id="ProfileSnapshotMap" type="com.rickgao.careercore.modules.portrait.entity.ProfileSnapshot">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="sourceVersion" column="source_version"/>
+        <result property="dimensionJson" column="dimension_json"/>
+        <result property="summary" column="summary"/>
+        <result property="strengthsJson" column="strengths_json"/>
+        <result property="exploreJson" column="explore_json"/>
+        <result property="feedbackJson" column="feedback_json"/>
+        <result property="versionNo" column="version_no"/>
+        <result property="completeness" column="completeness"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.portrait.entity.ProfileSnapshot">
+        INSERT INTO profile_snapshot (id, student_id, source_version, dimension_json, summary,
+                                      strengths_json, explore_json, feedback_json, version_no, completeness)
+        VALUES (#{id}, #{studentId}, #{sourceVersion}, #{dimensionJson}, #{summary},
+                #{strengthsJson}, #{exploreJson}, #{feedbackJson}, #{versionNo}, #{completeness})
+    </insert>
+
+    <select id="findById" resultMap="ProfileSnapshotMap">
+        SELECT id, student_id, source_version, dimension_json, summary, strengths_json, explore_json,
+               feedback_json, version_no, completeness, created_at
+        FROM profile_snapshot
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="findLatestByStudent" resultMap="ProfileSnapshotMap">
+        SELECT id, student_id, source_version, dimension_json, summary, strengths_json, explore_json,
+               feedback_json, version_no, completeness, created_at
+        FROM profile_snapshot
+        WHERE student_id = #{studentId}
+        ORDER BY version_no DESC, created_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="listByStudent" resultMap="ProfileSnapshotMap">
+        SELECT id, student_id, source_version, dimension_json, summary, strengths_json, explore_json,
+               feedback_json, version_no, completeness, created_at
+        FROM profile_snapshot
+        WHERE student_id = #{studentId}
+        ORDER BY version_no DESC, created_at DESC
+    </select>
+
+    <update id="updateFeedback">
+        UPDATE profile_snapshot
+        SET feedback_json = #{feedbackJson}
+        WHERE id = #{id}
+    </update>
+
+</mapper>
+

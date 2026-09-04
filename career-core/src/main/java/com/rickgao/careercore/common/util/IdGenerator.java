@@ -116,4 +116,24 @@ public class IdGenerator {
     public String aiChatFeedbackId() {
         return next("ai_chat_feedback", "AIF-", 4);
     }
+
+    public String assessmentSessionId() {
+        return next("assessment_session", "AS-", 4);
+    }
+
+    public String profileSnapshotId() {
+        return next("profile_snapshot", "PS-", 4);
+    }
+
+    public String favoriteId() { return next("student_favorite", "FAV-", 4); }
+    public String goalVersionId() { return next("goal_version", "GV-", 4); }
+    public String studentGoalId() { return next("student_goal", "GOAL-", 4); }
+    public String semesterPlanId() { return next("semester_plan", "PLAN-", 4); }
+    public String planVersionId() { return next("plan_version", "PV-", 4); }
+    public String planTaskId() { return next("plan_task", "TASK-", 4); }
+    public String taskCheckinId() { return next("task_checkin", "CHK-", 4); }
+    public String stageReviewId() { return next("stage_review", "REV-", 4); }
+    public String reminderId() { return next("reminder", "REM-", 4); }
+    public String recommendationRunId() { return next("recommendation_run", "RUN-", 4); }
+    public String recommendationResultId() { return next("recommendation_result", "REC-", 4); }
 }

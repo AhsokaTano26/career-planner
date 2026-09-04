@@ -31,4 +31,6 @@ public interface AdminDirectionMapper {
     int updateContent(CareerDirection direction);
 
     int updateStatus(@Param("id") String id, @Param("status") String status);
+
+    List<CareerDirection> selectAllPublished();
 }

@@ -141,4 +141,14 @@
         WHERE id = #{id}
     </update>
 
+    <select id="selectAllPublished" resultMap="CareerDirectionMap">
+        SELECT id, name, path, icon, intro, target_json, min_ability, min_academic,
+               learning_json, abilities_json, courses_json, activities_json,
+               path_desc_json, misconceptions_json, sort_order, applicable_majors_json,
+               status, updated, created_at, updated_at, deleted
+        FROM career_direction
+        WHERE deleted = 0 AND status = 'PUBLISHED'
+        ORDER BY sort_order ASC
+    </select>
+
 </mapper>
