@@ -92,6 +92,13 @@ export async function downloadFile(path:string):Promise<{blob:Blob; filename:str
 }
 const get = <T>(path:string) => request<T>(path)
 const post = <T>(path:string, data?:unknown) => request<T>(path, { method:'POST', body:data === undefined ? undefined : JSON.stringify(data) })
+const postRaw = async <T>(path:string, data:unknown):Promise<T> => {
+  const headers = new Headers({'Content-Type':'application/json', 'X-Request-Id':crypto.randomUUID()})
+  if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
+  const response = await fetch(`${base}${path}`, { method:'POST', headers, credentials:'include', body:JSON.stringify(data) })
+  if (!response.ok) throw new Error(`请求失败（HTTP ${response.status}）`)
+  return response.json() as Promise<T>
+}
 const patch = <T>(path:string, data:unknown) => request<T>(path, { method:'PATCH', body:JSON.stringify(data) })
 const del = <T>(path:string) => request<T>(path, { method:'DELETE' })
 const formPost = <T>(path:string, data:FormData) => request<T>(path, { method:'POST', body:data })
@@ -133,5 +140,19 @@ export const api = {
     curriculumJob:(id:string)=>get<unknown>(`/admin/curricula/jobs/${id}`),
     importWhitelist:(file:File)=>{const data=new FormData();data.append('file',file);return formPost<unknown>('/admin/whitelist/import',data)}, importCurriculum:(file:File)=>{const data=new FormData();data.append('file',file);return formPost<unknown>('/admin/curricula/import',data)},
     reviewCurriculumItem:(id:string,data:unknown)=>patch<unknown>(`/admin/curricula/items/${id}`,data), batchReviewCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/items/batch',data), publishCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/publish',data),
+  },
+  gateway: {
+    generate: (data:unknown) => post<unknown>('/gateway/generate', data),
+    chatCompletions: (data:unknown) => postRaw<unknown>('/gateway/chat/completions', data),
+  },
+  ai: {
+    chat: (data:unknown) => post<unknown>('/ai/chat', data),
+    chatHistory: (params:{page?:number;size?:number}={}) => get<unknown>(`/ai/chat/history?page=${params.page ?? 1}&size=${params.size ?? 20}`),
+    chatFeedback: (id:string,data:unknown) => post<unknown>(`/ai/chat/${id}/feedback`,data),
+    chatFeedbackFallback: (data:unknown) => post<unknown>('/ai/chat/feedback',data),
+    reviewSummarize:(data:unknown)=>post<unknown>('/ai/review/summarize',data),
+    recommendationExplain:(data:unknown)=>post<unknown>('/ai/recommendation/explain',data),
+    planGenerate:(data:unknown)=>post<unknown>('/ai/plan/generate',data),
+    pdfParse:(data:unknown)=>post<unknown>('/ai/pdf/parse',data),
   },
 }
