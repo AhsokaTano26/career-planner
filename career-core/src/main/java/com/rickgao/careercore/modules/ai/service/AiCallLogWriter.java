@@ -1,9 +1,14 @@
 package com.rickgao.careercore.modules.ai.service;
 
+import com.rickgao.careercore.modules.admin.entity.AiCallLog;
+import com.rickgao.careercore.modules.admin.mapper.AiCallLogMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.UUID;
 
 /**
  * AI 调用日志写入器（Phase 2）。
@@ -14,10 +19,33 @@ import java.security.MessageDigest;
 @Service
 public class AiCallLogWriter {
 
+    private final AiCallLogMapper aiCallLogMapper;
+
+    public AiCallLogWriter(AiCallLogMapper aiCallLogMapper) {
+        this.aiCallLogMapper = aiCallLogMapper;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void write(String requestId, String scene, String userRef, String promptVersion,
                       String modelName, long durationMs, String status,
                       Integer tokenEstimate, String requestHash, String inputHash) {
-        // 管理端 AI 审计模块会在后续阶段提供持久化实现；此阶段不让日志依赖阻塞 AI 业务。
+        try {
+            AiCallLog log = new AiCallLog();
+            log.setId("AIL-" + UUID.randomUUID().toString().replace("-", "").substring(0, 28));
+            log.setRequestId(requestId);
+            log.setScene(scene);
+            log.setUserRef(userRef);
+            log.setPromptVersion(promptVersion);
+            log.setModelName(modelName);
+            log.setDurationMs((int) Math.min(Integer.MAX_VALUE, Math.max(0, durationMs)));
+            log.setStatus(status);
+            log.setTokenEstimate(tokenEstimate);
+            log.setRequestHash(requestHash);
+            log.setInputHash(inputHash);
+            aiCallLogMapper.insert(log);
+        } catch (Exception ignored) {
+            // 审计日志不能阻断主链路；重复 requestId 或数据库暂不可用时安全降级。
+        }
     }
 
     public String sha256Short(Object value) {

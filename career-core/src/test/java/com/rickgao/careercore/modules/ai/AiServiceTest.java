@@ -9,6 +9,7 @@ import com.rickgao.careercore.modules.ai.dto.AiChatFeedbackRequest;
 import com.rickgao.careercore.modules.ai.dto.AiChatRequest;
 import com.rickgao.careercore.modules.ai.service.AiService;
 import com.rickgao.careercore.modules.ai.service.LlmGateway;
+import com.rickgao.careercore.modules.admin.mapper.AiCallLogMapper;
 import com.rickgao.careercore.modules.ai.vo.AiChatHistoryVO;
 import com.rickgao.careercore.modules.ai.vo.AiChatVO;
 import com.rickgao.careercore.security.LoginUser;
@@ -34,6 +35,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -98,7 +100,8 @@ class AiServiceTest {
     @Test
     void gatewayRejectsMissingInternalTokenBeforeCallingHttpClient() {
         LlmGateway gateway = new LlmGateway(
-                "", "http://career-ai:8000", "default", 30, new ObjectMapper(), new com.rickgao.careercore.modules.ai.service.AiCallLogWriter());
+                "", "http://career-ai:8000", "default", 30, new ObjectMapper(),
+                new com.rickgao.careercore.modules.ai.service.AiCallLogWriter(mock(AiCallLogMapper.class)));
 
         BizException error = assertThrows(BizException.class,
                 () -> gateway.generate(List.of(

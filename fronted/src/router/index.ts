@@ -7,6 +7,7 @@ import DefaultLayout from '../layouts/DefaultLayout.vue'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import AdminModuleView from '../views/admin/AdminModuleView.vue'
 import AiPlaygroundPage from '../views/admin/AiPlaygroundPage.vue'
+import AdminAiManagementPage from '../views/admin/AdminAiManagementPage.vue'
 import ErrorView from '../views/ErrorView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import StudentOverviewPage from '../views/student/StudentOverviewPage.vue'
@@ -89,6 +90,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'exports', name: 'admin-exports', component: AdminModuleView, props: { module: 'exports' } },
       { path: 'logs', name: 'admin-logs', component: AdminModuleView, props: { module: 'logs' } },
       { path: 'ai-playground', name: 'admin-ai-playground', component: AiPlaygroundPage },
+      { path: 'ai-management', name: 'admin-ai-management', component: AdminAiManagementPage },
     ],
   },
   {

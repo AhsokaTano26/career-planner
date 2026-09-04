@@ -242,6 +242,7 @@ class AdvisorStudentServiceImplTest {
     // ---------- 测试数据 ----------
 
     private void stubDefaultAggregates() {
+        LocalDateTime now = LocalDateTime.now();
         when(queryMapper.selectAssessedStudentIds(any())).thenReturn(List.of("S1001", "S1002", "S1003", "S1004"));
         when(queryMapper.selectActiveGoals(any())).thenReturn(List.of(
                 goal("S1001", "PRIMARY", "employment_backend", "后端开发工程师", "后端开发", 2),
@@ -251,11 +252,11 @@ class AdvisorStudentServiceImplTest {
                 rate("S1001", 3L, 2L),
                 rate("S1004", 2L, 1L)));
         when(queryMapper.selectLastReview(any())).thenReturn(List.of(
-                review("S1001", LocalDateTime.of(2026, 8, 2, 9, 0)),
-                review("S1002", LocalDateTime.of(2026, 6, 20, 15, 0)),
-                review("S1003", LocalDateTime.of(2026, 8, 5, 10, 0)),
-                review("S1004", LocalDateTime.of(2026, 7, 1, 10, 0)),
-                review("S1006", LocalDateTime.of(2026, 8, 6, 10, 0))));
+                review("S1001", now.minusDays(5)),
+                review("S1002", now.minusDays(40)),
+                review("S1003", now.minusDays(3)),
+                review("S1004", now.minusDays(40)),
+                review("S1006", now.minusDays(4))));
         when(queryMapper.selectPendingGuidanceStudentIds(any())).thenReturn(List.of("S1002"));
         when(queryMapper.selectGoalChangeCounts(any(), any())).thenReturn(List.of(change("S1002", 3L)));
         when(queryMapper.selectProfileBasics(any())).thenReturn(List.of(
