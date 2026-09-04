@@ -108,4 +108,12 @@ public class IdGenerator {
     public String exportJobId() {
         return next("export_job", "EX-", 3);
     }
+
+    public String aiChatMessageId() {
+        return next("ai_chat_message", "AIM-", 4);
+    }
+
+    public String aiChatFeedbackId() {
+        return next("ai_chat_feedback", "AIF-", 4);
+    }
 }

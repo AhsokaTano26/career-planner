@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.ai.mapper.AiChatFeedbackMapper">
+
+    <resultMap id="AiChatFeedbackMap" type="com.rickgao.careercore.modules.ai.entity.AiChatFeedback">
+        <id property="id" column="id"/>
+        <result property="messageGroup" column="message_group"/>
+        <result property="userId" column="user_id"/>
+        <result property="feedbackType" column="feedback_type"/>
+        <result property="comment" column="comment"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="upsert" parameterType="com.rickgao.careercore.modules.ai.entity.AiChatFeedback">
+        INSERT INTO ai_chat_feedback (id, message_group, user_id, feedback_type, comment)
+        VALUES (#{id}, #{messageGroup}, #{userId}, #{feedbackType}, #{comment})
+        ON DUPLICATE KEY UPDATE
+          feedback_type = VALUES(feedback_type),
+          comment = VALUES(comment)
+    </insert>
+
+    <insert id="insert" parameterType="com.rickgao.careercore.modules.ai.entity.AiChatFeedback">
+        INSERT INTO ai_chat_feedback (id, message_group, user_id, feedback_type, comment)
+        VALUES (#{id}, #{messageGroup}, #{userId}, #{feedbackType}, #{comment})
+    </insert>
+
+</mapper>

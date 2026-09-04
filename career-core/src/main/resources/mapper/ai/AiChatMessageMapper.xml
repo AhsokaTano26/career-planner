@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rickgao.careercore.modules.ai.mapper.AiChatMessageMapper">
+
+    <resultMap id="AiChatMessageMap" type="com.rickgao.careercore.modules.ai.entity.AiChatMessage">
+        <id property="id" column="id"/>
+        <result property="sessionId" column="session_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="role" column="role"/>
+        <result property="content" column="content"/>
+        <result property="needsHumanSupport" column="needs_human_support"/>
+        <result property="supportReason" column="support_reason"/>
+        <result property="messageGroup" column="message_group"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insertBatch" parameterType="list">
+        INSERT INTO ai_chat_message
+          (id, session_id, user_id, role, content, needs_human_support, support_reason, message_group)
+        VALUES
+        <foreach collection="list" item="m" separator=",">
+            (#{m.id}, #{m.sessionId}, #{m.userId}, #{m.role}, #{m.content},
+             #{m.needsHumanSupport}, #{m.supportReason}, #{m.messageGroup})
+        </foreach>
+    </insert>
+
+    <select id="findByUserId" resultMap="AiChatMessageMap">
+        SELECT id, session_id, user_id, role, content, needs_human_support, support_reason, message_group, created_at
+        FROM ai_chat_message
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC, id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countByUserId" resultType="long">
+        SELECT COUNT(*) FROM ai_chat_message WHERE user_id = #{userId}
+    </select>
+
+    <select id="existsByMessageGroupAndUserId" resultType="int">
+        SELECT COUNT(*) FROM ai_chat_message WHERE message_group = #{messageGroup} AND user_id = #{userId}
+    </select>
+
+    <select id="findLatestAssistant" resultMap="AiChatMessageMap">
+        SELECT id, session_id, user_id, role, content, needs_human_support, support_reason, message_group, created_at
+        FROM ai_chat_message
+        WHERE user_id = #{userId} AND role = 'assistant'
+        ORDER BY created_at DESC, id DESC
+        LIMIT 1
+    </select>
+
+</mapper>
