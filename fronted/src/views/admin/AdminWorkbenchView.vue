@@ -56,6 +56,7 @@ const filters = ref<Record<string,string>>({}), modal = ref(false), submitting =
 const logTab = ref<'operations'|'ai'>('operations'), curriculumTab = ref<'jobs'|'items'|'versions'>('jobs'), selectedJob = ref<Row|null>(null), jobDetail = ref<Row|null>(null), selectedItems = ref<string[]>([]), batchAction = ref('APPROVE')
 const generatedInitialPasswords = ref<{studentNo:string;initialPassword:string}[]>([])
 const deleteTarget = ref<Row|null>(null)
+const promptScenes = ref<string[]>([])
 const questionnaireVersions = ref<Row[]>([]), questionnaireTitle = ref(''), questionnaireId = ref(''), questionnaireDetail = ref<Row|null>(null), questionnaireBusy = ref(false), publishVersionId = ref('')
 let curriculumPollTimer:number|undefined
 const title = computed(() => names[props.module] || '管理工作台')
@@ -82,6 +83,12 @@ async function load() {
   try {
     const apply = (data:unknown) => { if (seq === loadSeq) normalizePage(data) }
     if (props.module === 'weights') { apply(await api.admin.weights()); return }
+    if (props.module === 'prompts') {
+      const [scenes, prompts] = await Promise.all([api.admin.promptScenes(), api.admin.prompts(filters.value.scene || undefined)])
+      promptScenes.value = scenes.filter((scene): scene is string => typeof scene === 'string')
+      apply(prompts)
+      return
+    }
     if (props.module === 'curricula') {
       if (curriculumTab.value === 'items') {
         if (!selectedJob.value?.id) { rows.value=[]; total.value=0; return }
@@ -96,7 +103,7 @@ async function load() {
       if (logTab.value === 'ai') { delete values.action; delete values.operator } else { delete values.scene; delete values.status }
       apply(logTab.value === 'ai' ? await api.admin.aiLogs({...values,page:page.value,size:20}) : await api.admin.operationLogs({...values,page:page.value,size:20})); return
     }
-    const listMethods:Record<string,(params:Record<string,unknown>)=>Promise<unknown>>={users:api.admin.users,whitelist:api.admin.whitelist,relations:api.admin.relations,'admin-directions':api.admin.directions,abilities:api.admin.abilities,templates:api.admin.templates,exports:api.admin.exports,questionnaires:api.admin.questionnaires,prompts:(params)=>api.admin.prompts(String(params.scene || '') || undefined)}
+    const listMethods:Record<string,(params:Record<string,unknown>)=>Promise<unknown>>={users:api.admin.users,whitelist:api.admin.whitelist,relations:api.admin.relations,'admin-directions':api.admin.directions,abilities:api.admin.abilities,templates:api.admin.templates,exports:api.admin.exports,questionnaires:api.admin.questionnaires}
     const listMethod=listMethods[props.module]
     if (listMethod) apply(await listMethod({...filters.value,page:page.value,size:20}))
   } catch (e) { if (seq === loadSeq) error.value=getErrorMessage(e) } finally { if (seq === loadSeq) loading.value=false }
@@ -251,7 +258,7 @@ onBeforeUnmount(clearCurriculumPolling)
     <div class="section-head"><div><p class="eyebrow">管理数据</p><h2>{{ title }}</h2></div><div class="list-actions"><button class="outline-btn" @click="load">刷新</button><button v-if="['whitelist','relations','admin-directions','abilities','templates','weights','exports','questionnaires','prompts'].includes(props.module)" class="primary-btn compact-btn" @click="openCreate()">新建</button><label v-if="props.module==='whitelist'||props.module==='curricula'" class="outline-btn file-btn">导入文件<input type="file" :accept="props.module==='whitelist'?'.csv,text/csv':'.pdf,.doc,.docx'" @change="importFile"/></label></div></div>
     <div v-if="props.module==='logs'" class="tab-bar"><button :class="{active:logTab==='operations'}" @click="switchLog('operations')">操作日志</button><button :class="{active:logTab==='ai'}" @click="switchLog('ai')">模型调用日志</button></div>
     <div v-if="props.module==='curricula'" class="tab-bar"><button :class="{active:curriculumTab==='jobs'}" @click="switchCurriculum('jobs')">导入任务</button><button :class="{active:curriculumTab==='items'}" :disabled="!selectedJob" @click="switchCurriculum('items')">课程校核</button><button :class="{active:curriculumTab==='versions'}" @click="switchCurriculum('versions')">已发布版本</button><button class="outline-btn compact-btn" @click="openCreate('curriculumPublish')">发布方案</button></div>
-    <form v-if="currentFilters.length" class="admin-filters" @submit.prevent="resetAndLoad"><label v-for="field in currentFilters" :key="field.key">{{ field.label }}<select v-if="field.type==='select'" v-model="filters[field.key]"><option v-for="option in field.options" :key="option" :value="option">{{ optionText(option) }}</option></select><input v-else v-model.trim="filters[field.key]" :placeholder="field.placeholder || `输入${field.label}`"/></label><button class="outline-btn" type="submit">应用筛选</button></form>
+    <form v-if="currentFilters.length" class="admin-filters" @submit.prevent="resetAndLoad"><label v-for="field in currentFilters" :key="field.key">{{ field.label }}<select v-if="field.type==='select'||(props.module==='prompts'&&field.key==='scene')" v-model="filters[field.key]"><option value="">全部</option><option v-for="option in (props.module==='prompts'&&field.key==='scene'?promptScenes:field.options)" :key="option" :value="option">{{ optionText(option) }}</option></select><input v-else v-model.trim="filters[field.key]" :placeholder="field.placeholder || `输入${field.label}`"/></label><button class="outline-btn" type="submit">应用筛选</button></form>
     <div v-if="props.module==='curricula' && jobDetail" class="job-detail"><b>当前任务：{{ rowTitle(jobDetail) }}</b><span v-for="item in detailLines(jobDetail).filter(Boolean)" :key="item">{{ item }}</span></div>
     <div v-if="props.module==='curricula' && curriculumTab==='items'" class="batch-tools"><span>已选 {{ selectedItems.length }} 条</span><select v-model="batchAction"><option value="APPROVE">批量通过</option><option value="REJECT">批量驳回</option></select><button class="outline-btn" @click="batchReview">执行批量审核</button></div>
     <div v-if="props.module==='weights' && rows.length" class="weight-records"><article v-for="(row,index) in rows" :key="rowId(row) || String(row.version)" :style="{ '--i': index }" class="weight-card"><div class="weight-card-head"><div><p class="eyebrow">推荐权重</p><h3>{{ row.version || '未命名版本' }}</h3></div><em :class="String(row.status || '').toLowerCase()">{{ statusText(row.status) }}</em></div><div class="weight-facts"><div><small>最低匹配置信度</small><b>{{ confidence(row.minConfidence) }}</b></div><div><small>每次推荐数量</small><b>{{ row.topN || '—' }} 个方向</b></div></div><div class="weight-bars"><div v-for="key in weightKeys" :key="key"><span>{{ weightLabels[key] }}</span><i><b :style="{ width: barWidth(row,key) }"/></i><strong>{{ percent(weightValue(row,key)) }}</strong></div></div></article></div>
