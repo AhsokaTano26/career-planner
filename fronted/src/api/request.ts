@@ -103,6 +103,14 @@ const patch = <T>(path:string, data:unknown) => request<T>(path, { method:'PATCH
 const del = <T>(path:string) => request<T>(path, { method:'DELETE' })
 const formPost = <T>(path:string, data:FormData) => request<T>(path, { method:'POST', body:data })
 
+export function toQuery(params: Record<string, unknown>): string {
+  const query = new URLSearchParams()
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') query.set(key, String(value))
+  })
+  return query.toString()
+}
+
 export const api = {
   auth: {
     login: (data:{account:string;password:string;role?:string}) => post<Token>('/auth/login', data),
@@ -128,9 +136,9 @@ export const api = {
     directions:(path?:string)=>get<unknown[]>(`/students/me/directions${path?`?path=${encodeURIComponent(path)}`:''}`), direction:(id:string)=>get<unknown>(`/students/me/directions/${id}`), favorites:()=>get<unknown[]>('/students/me/favorites'), addFavorite:(id:string)=>post<unknown>(`/students/me/favorites/${id}`), removeFavorite:(id:string)=>del<unknown>(`/students/me/favorites/${id}`),
     goals:()=>get<unknown>('/students/me/goals'), saveGoals:(data:{primaryDirectionId?:string;backupDirectionId?:string;changeReason?:string})=>post<unknown>('/students/me/goals',data), updateGoals:(data:{primaryDirectionId?:string;backupDirectionId?:string;changeReason?:string})=>request<unknown>('/students/me/goals',{method:'PUT',body:JSON.stringify(data)}), goalVersions:()=>get<unknown[]>('/students/me/goals/versions'),
     latestPlan:()=>get<unknown>('/students/me/plans/latest'), plans:()=>get<unknown[]>('/students/me/plans'), plan:(id:string)=>get<unknown>(`/students/me/plans/${id}`), draftPlan:(data:{directionId?:string;useAi?:boolean;requestId?:string})=>post<unknown>('/students/me/plans/draft',data), confirmPlan:(data:{confirm:boolean})=>post<unknown>('/students/me/plans/confirm',data), updatePlan:(data:unknown)=>request<unknown>('/students/me/plans',{method:'PUT',body:JSON.stringify(data)}),
-    tasks:(params:{month?:string;status?:string;page?:number;size?:number}={})=>{const q=new URLSearchParams();Object.entries({page:1,size:20,...params}).forEach(([k,v])=>{if(v!==undefined&&v!=='')q.set(k,String(v))});return get<unknown>(`/students/me/tasks?${q}`)}, task:(id:string)=>get<unknown>(`/students/me/tasks/${id}`), createTask:(data:unknown)=>post<unknown>('/students/me/tasks',data), updateTask:(id:string,data:unknown)=>request<unknown>(`/students/me/tasks/${id}`,{method:'PUT',body:JSON.stringify(data)}), checkinTask:(id:string,data:unknown)=>post<unknown>(`/students/me/tasks/${id}/checkin`,data),
+    tasks:(params:{month?:string;status?:string;page?:number;size?:number}={})=>get<unknown>(`/students/me/tasks?${toQuery({page:1,size:20,...params})}`), task:(id:string)=>get<unknown>(`/students/me/tasks/${id}`), createTask:(data:unknown)=>post<unknown>('/students/me/tasks',data), updateTask:(id:string,data:unknown)=>request<unknown>(`/students/me/tasks/${id}`,{method:'PUT',body:JSON.stringify(data)}), checkinTask:(id:string,data:unknown)=>post<unknown>(`/students/me/tasks/${id}/checkin`,data),
     reviews:()=>get<unknown[]>('/reviews'), review:(id:string)=>get<unknown>(`/reviews/${id}`), createReview:(data:unknown)=>post<unknown>('/reviews/drafts',data), updateReview:(id:string,data:unknown)=>request<unknown>(`/reviews/${id}/draft`,{method:'PUT',body:JSON.stringify(data)}), submitReview:(id:string)=>post<unknown>(`/reviews/${id}/submit`), summarizeReview:(id:string)=>post<unknown>(`/reviews/${id}/ai-summary`), adoptAdvice:(id:string,data:{adopt:boolean})=>post<unknown>(`/reviews/${id}/adopt-advice`,data), requestGuidance:(id:string,data:{message?:string})=>post<unknown>(`/reviews/${id}/guidance-request`,data),
-    reminders:(params:{unreadOnly?:boolean;page?:number;size?:number}={})=>get<unknown>(`/students/me/reminders?unreadOnly=${params.unreadOnly??false}&page=${params.page??1}&size=${params.size??20}`), unreadReminderCount:()=>get<{count:number}>('/students/me/reminders/unread-count'), markReminderRead:(id:string)=>post<unknown>(`/students/me/reminders/${id}/read`), generateReminders:()=>post<unknown[]>('/students/me/reminders/generate'),
+    reminders:(params:{unreadOnly?:boolean;page?:number;size?:number}={})=>get<unknown>(`/students/me/reminders?${toQuery({unreadOnly:false,page:1,size:20,...params})}`), unreadReminderCount:()=>get<{count:number}>('/students/me/reminders/unread-count'), markReminderRead:(id:string)=>post<unknown>(`/students/me/reminders/${id}/read`), generateReminders:()=>post<unknown[]>('/students/me/reminders/generate'),
   },
   advisor: {
     statistics: () => get<unknown>('/advisor/statistics'), attention: () => get<unknown[]>('/advisor/attention'),
@@ -140,6 +148,18 @@ export const api = {
     writeAdvice:(id:string,data:unknown) => post<unknown>(`/advisor/students/${id}/advice`,data),
   },
   admin: {
+    users:(params:Record<string,unknown>={})=>get<unknown>(`/admin/users?${toQuery({page:1,size:20,...params})}`),
+    whitelist:(params:Record<string,unknown>={})=>get<unknown>(`/admin/whitelist?${toQuery({page:1,size:20,...params})}`),
+    relations:(params:Record<string,unknown>={})=>get<unknown>(`/admin/relations?${toQuery({page:1,size:20,...params})}`),
+    directions:(params:Record<string,unknown>={})=>get<unknown>(`/admin/directions?${toQuery({page:1,size:20,...params})}`),
+    abilities:(params:Record<string,unknown>={})=>get<unknown>(`/admin/abilities?${toQuery({page:1,size:20,...params})}`),
+    templates:(params:Record<string,unknown>={})=>get<unknown>(`/admin/templates?${toQuery({page:1,size:20,...params})}`),
+    exports:(params:Record<string,unknown>={})=>get<unknown>(`/admin/exports?${toQuery({page:1,size:20,...params})}`),
+    aiLogs:(params:Record<string,unknown>={})=>get<unknown>(`/admin/logs/ai?${toQuery({page:1,size:20,...params})}`),
+    operationLogs:(params:Record<string,unknown>={})=>get<unknown>(`/admin/logs/operations?${toQuery({page:1,size:20,...params})}`),
+    curriculumJobs:(params:Record<string,unknown>={})=>get<unknown>(`/admin/curricula/jobs?${toQuery({page:1,size:20,...params})}`),
+    curriculumItems:(params:Record<string,unknown>)=>get<unknown>(`/admin/curricula/items?${toQuery({page:1,size:20,...params})}`),
+    curriculumVersions:(params:Record<string,unknown>={})=>get<unknown>(`/admin/curricula/versions?${toQuery({page:1,size:20,...params})}`),
     weights: () => get<unknown>('/admin/weights'),
     createWhitelist: (data:unknown) => post<unknown>('/admin/whitelist', data), createRelations: (data:unknown) => post<unknown>('/admin/relations', data),
     createDirection: (data:unknown) => post<unknown>('/admin/directions', data), createAbility: (data:unknown) => post<unknown>('/admin/abilities', data),
@@ -152,7 +172,7 @@ export const api = {
     reviewCurriculumItem:(id:string,data:unknown)=>patch<unknown>(`/admin/curricula/items/${id}`,data), batchReviewCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/items/batch',data), publishCurriculum:(data:unknown)=>post<unknown>('/admin/curricula/publish',data),
     modelConfigs:()=>get<unknown[]>('/admin/model-configs'), updateModelConfig:(key:string,data:{configValue:string})=>request<unknown>(`/admin/model-configs/${key}`,{method:'PUT',body:JSON.stringify(data)}),
     promptScenes:()=>get<unknown[]>('/admin/prompts/scenes'), prompts:(scene?:string)=>get<unknown[]>(`/admin/prompts${scene?`?scene=${encodeURIComponent(scene)}`:''}`), createPrompt:(data:{scene:string;version:string;content:string})=>post<unknown>('/admin/prompts',data), publishPrompt:(id:string)=>post<unknown>(`/admin/prompts/${id}/publish`),
-    questionnaires:(params:{keyword?:string;page?:number;size?:number}={})=>{const q=new URLSearchParams();Object.entries({page:1,size:20,...params}).forEach(([k,v])=>{if(v!==undefined&&v!=='')q.set(k,String(v))});return get<unknown>(`/admin/questionnaires?${q}`)}, createQuestionnaire:(data:unknown)=>post<unknown>('/admin/questionnaires',data), updateQuestionnaire:(id:string,data:unknown)=>patch<unknown>(`/admin/questionnaires/${id}`,data), updateQuestionnaireStatus:(id:string,data:{status:string})=>patch<unknown>(`/admin/questionnaires/${id}/status`,data), questionnaireVersions:(id:string)=>get<unknown[]>(`/admin/questionnaires/${id}/versions`), questionnaireVersion:(qid:string,vid:string)=>get<unknown>(`/admin/questionnaires/${qid}/versions/${vid}`), createQuestionnaireVersion:(id:string,data:unknown)=>post<unknown>(`/admin/questionnaires/${id}/versions`,data), publishQuestionnaireVersion:(qid:string,vid:string)=>post<unknown>(`/admin/questionnaires/${qid}/versions/${vid}/publish`),
+    questionnaires:(params:{keyword?:string;page?:number;size?:number}={})=>get<unknown>(`/admin/questionnaires?${toQuery({page:1,size:20,...params})}`), createQuestionnaire:(data:unknown)=>post<unknown>('/admin/questionnaires',data), updateQuestionnaire:(id:string,data:unknown)=>patch<unknown>(`/admin/questionnaires/${id}`,data), updateQuestionnaireStatus:(id:string,data:{status:string})=>patch<unknown>(`/admin/questionnaires/${id}/status`,data), questionnaireVersions:(id:string)=>get<unknown[]>(`/admin/questionnaires/${id}/versions`), questionnaireVersion:(qid:string,vid:string)=>get<unknown>(`/admin/questionnaires/${qid}/versions/${vid}`), createQuestionnaireVersion:(id:string,data:unknown)=>post<unknown>(`/admin/questionnaires/${id}/versions`,data), publishQuestionnaireVersion:(qid:string,vid:string)=>post<unknown>(`/admin/questionnaires/${qid}/versions/${vid}/publish`),
   },
   gateway: {
     generate: (data:unknown) => post<unknown>('/gateway/generate', data),

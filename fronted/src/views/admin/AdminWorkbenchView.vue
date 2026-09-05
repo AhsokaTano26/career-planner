@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { api, downloadFile, getErrorMessage, request } from '../../api/request'
+import { api, downloadFile, getErrorMessage } from '../../api/request'
 import BaseModal from '../../components/BaseModal.vue'
 
 type Row = Record<string, unknown>
@@ -11,11 +11,11 @@ const emit = defineEmits<{ notice:[message:string] }>()
 const names:Record<string,string> = {
   'admin-overview':'运行总览', users:'用户管理', whitelist:'白名单', relations:'师生关系',
   'admin-directions':'方向库', abilities:'能力标签', templates:'任务模板', curricula:'培养方案',
-  weights:'推荐权重', exports:'导出任务', logs:'审计日志',
+  weights:'推荐权重', exports:'导出任务', logs:'审计日志', questionnaires:'问卷管理', prompts:'提示词管理',
 }
 const endpoints:Record<string,string> = {
   users:'/admin/users', whitelist:'/admin/whitelist', relations:'/admin/relations', 'admin-directions':'/admin/directions',
-  abilities:'/admin/abilities', templates:'/admin/templates', exports:'/admin/exports',
+  abilities:'/admin/abilities', templates:'/admin/templates', exports:'/admin/exports', questionnaires:'/admin/questionnaires', prompts:'/admin/prompts',
 }
 const filterSpecs:Record<string,Field[]> = {
   users:[{key:'role',label:'角色',type:'select',options:['','STUDENT','ADVISOR','ADMIN']},{key:'status',label:'状态',type:'select',options:['','ACTIVE','DISABLED']},{key:'keyword',label:'关键词'}],
@@ -23,7 +23,7 @@ const filterSpecs:Record<string,Field[]> = {
   relations:[{key:'advisorId',label:'辅导员编号'}],
   'admin-directions':[{key:'path',label:'路径',type:'select',options:['','graduate','employment','overseas']},{key:'status',label:'状态',type:'select',options:['','DRAFT','PUBLISHED','DISABLED']},{key:'keyword',label:'关键词'}],
   abilities:[{key:'category',label:'分类'},{key:'keyword',label:'关键词'}],
-  templates:[{key:'directionId',label:'方向编号'}],
+  templates:[{key:'directionId',label:'方向编号'}], questionnaires:[{key:'keyword',label:'关键词'}], prompts:[{key:'scene',label:'场景'}],
   logs:[{key:'scene',label:'场景'},{key:'status',label:'状态'},{key:'action',label:'操作类型'},{key:'operator',label:'操作人'},{key:'from',label:'开始时间',type:'text',placeholder:'2026-09-01T00:00:00'},{key:'to',label:'结束时间',type:'text',placeholder:'2026-09-30T23:59:59'}],
   curricula:[{key:'status',label:'审核状态',type:'select',options:['','PENDING','APPROVED','REJECTED','MERGED']}],
 }
@@ -44,6 +44,7 @@ const editorSpecs:Record<string,Field[]> = {
   templates:[{key:'id',label:'模板编码',required:true},{key:'directionId',label:'方向编码',required:true},{key:'name',label:'模板名称',required:true},{key:'goalSummary',label:'目标摘要',type:'textarea'},{key:'semesterGoals',label:'学期目标',type:'textarea',placeholder:'每行一条：目标名称｜能力标签'},{key:'monthlyTasks',label:'月度任务',type:'textarea',placeholder:'每行一条：月份｜任务名称｜类型｜预计小时'},{key:'status',label:'状态',type:'select',options:['DRAFT','PUBLISHED','DISABLED']}],
   weights:[{key:'version',label:'版本号',required:true},{key:'interest',label:'兴趣权重',type:'number',required:true},{key:'values',label:'价值观权重',type:'number',required:true},{key:'ability',label:'能力权重',type:'number',required:true},{key:'academic',label:'学业权重',type:'number',required:true},{key:'tendency',label:'倾向权重',type:'number',required:true},{key:'practice',label:'实践权重',type:'number',required:true},{key:'minConfidence',label:'最低置信度',type:'number'},{key:'topN',label:'推荐条数',type:'number'}],
   exports:[{key:'type',label:'导出类型',type:'select',required:true,options:['STUDENT_DATA','WHITELIST','OPERATION_LOG','AI_LOG','DIRECTION_LIB']},{key:'scope',label:'导出范围说明',type:'textarea'},{key:'filters',label:'筛选条件',type:'textarea',placeholder:'每行一条：字段名｜字段值'}],
+  prompts:[{key:'scene',label:'场景',required:true},{key:'version',label:'版本号',required:true},{key:'content',label:'提示词内容',type:'textarea',required:true}],
   curriculumItem:[{key:'courseCode',label:'课程代码'},{key:'courseName',label:'课程名称'},{key:'semester',label:'开课学期'},{key:'credits',label:'学分',type:'number'},{key:'hours',label:'学时',type:'number'},{key:'category',label:'课程类别'},{key:'module',label:'课程模块'},{key:'prerequisites',label:'先修课程',type:'textarea',placeholder:'每行一门先修课程'},{key:'abilityTags',label:'能力标签',type:'textarea',placeholder:'每行一个能力标签'},{key:'status',label:'审核结果',type:'select',options:['APPROVED','REJECTED']}],
   curriculumPublish:[{key:'jobId',label:'解析任务编号',required:true},{key:'name',label:'方案名称',required:true},{key:'major',label:'适用专业',required:true}],
 }
@@ -81,18 +82,20 @@ async function load() {
     if (props.module === 'curricula') {
       if (curriculumTab.value === 'items') {
         if (!selectedJob.value?.id) { rows.value=[]; total.value=0; return }
-        apply(await request(`/admin/curricula/items?${query({...filters.value,jobId:String(selectedJob.value.id)})}`))
-      } else if (curriculumTab.value === 'versions') apply(await request(`/admin/curricula/versions?${query()}`))
-      else apply(await request(`/admin/curricula/jobs?${query()}`))
+        apply(await api.admin.curriculumItems({...filters.value,jobId:String(selectedJob.value.id),page:page.value,size:20}))
+      } else if (curriculumTab.value === 'versions') apply(await api.admin.curriculumVersions({page:page.value,size:20}))
+      else apply(await api.admin.curriculumJobs({...filters.value,page:page.value,size:20}))
       return
     }
     if (props.module === 'logs') {
       const values = {...filters.value}
       const endpoint = logTab.value === 'ai' ? '/admin/logs/ai' : '/admin/logs/operations'
       if (logTab.value === 'ai') { delete values.action; delete values.operator } else { delete values.scene; delete values.status }
-      apply(await request(`${endpoint}?${query(values)}`)); return
+      apply(logTab.value === 'ai' ? await api.admin.aiLogs({...values,page:page.value,size:20}) : await api.admin.operationLogs({...values,page:page.value,size:20})); return
     }
-    apply(await request(`${endpoints[props.module]}?${query(filters.value)}`))
+    const listMethods:Record<string,(params:Record<string,unknown>)=>Promise<unknown>>={users:api.admin.users,whitelist:api.admin.whitelist,relations:api.admin.relations,'admin-directions':api.admin.directions,abilities:api.admin.abilities,templates:api.admin.templates,exports:api.admin.exports,questionnaires:api.admin.questionnaires,prompts:(params)=>api.admin.prompts(String(params.scene || '') || undefined)}
+    const listMethod=listMethods[props.module]
+    if (listMethod) apply(await listMethod({...filters.value,page:page.value,size:20}))
   } catch (e) { if (seq === loadSeq) error.value=getErrorMessage(e) } finally { if (seq === loadSeq) loading.value=false }
 }
 function resetAndLoad(){ page.value=1; load() }
@@ -201,6 +204,8 @@ async function save(){ submitting.value=true; try { const data=payload(), id=edi
   else if(props.module==='templates') editing.value ? await api.admin.updateTemplate(id,data) : await api.admin.createTemplate(data)
   else if(props.module==='weights') await api.admin.createWeights(data)
   else if(props.module==='exports') await api.admin.createExport(data)
+  else if(props.module==='questionnaires') editing.value ? await api.admin.updateQuestionnaire(id,data) : await api.admin.createQuestionnaire(data)
+  else if(props.module==='prompts') await api.admin.createPrompt(data as {scene:string;version:string;content:string})
   modal.value=false; emit('notice','保存成功'); await load()
   } catch(e){ emit('notice',getErrorMessage(e)) } finally { submitting.value=false }
 }
@@ -232,7 +237,7 @@ onBeforeUnmount(clearCurriculumPolling)
     <p>通过左侧菜单维护账户、方向库、任务模板、培养方案、导出任务与审计记录。所有数据均由当前后端接口返回。</p>
   </section>
   <section v-else class="card data-list-card admin-workbench">
-    <div class="section-head"><div><p class="eyebrow">管理数据</p><h2>{{ title }}</h2></div><div class="list-actions"><button class="outline-btn" @click="load">刷新</button><button v-if="['whitelist','relations','admin-directions','abilities','templates','weights','exports'].includes(props.module)" class="primary-btn compact-btn" @click="openCreate()">新建</button><label v-if="props.module==='whitelist'||props.module==='curricula'" class="outline-btn file-btn">导入文件<input type="file" :accept="props.module==='whitelist'?'.csv,text/csv':'.pdf,.doc,.docx'" @change="importFile"/></label></div></div>
+    <div class="section-head"><div><p class="eyebrow">管理数据</p><h2>{{ title }}</h2></div><div class="list-actions"><button class="outline-btn" @click="load">刷新</button><button v-if="['whitelist','relations','admin-directions','abilities','templates','weights','exports','questionnaires','prompts'].includes(props.module)" class="primary-btn compact-btn" @click="openCreate()">新建</button><label v-if="props.module==='whitelist'||props.module==='curricula'" class="outline-btn file-btn">导入文件<input type="file" :accept="props.module==='whitelist'?'.csv,text/csv':'.pdf,.doc,.docx'" @change="importFile"/></label></div></div>
     <div v-if="props.module==='logs'" class="tab-bar"><button :class="{active:logTab==='operations'}" @click="switchLog('operations')">操作日志</button><button :class="{active:logTab==='ai'}" @click="switchLog('ai')">模型调用日志</button></div>
     <div v-if="props.module==='curricula'" class="tab-bar"><button :class="{active:curriculumTab==='jobs'}" @click="switchCurriculum('jobs')">导入任务</button><button :class="{active:curriculumTab==='items'}" :disabled="!selectedJob" @click="switchCurriculum('items')">课程校核</button><button :class="{active:curriculumTab==='versions'}" @click="switchCurriculum('versions')">已发布版本</button><button class="outline-btn compact-btn" @click="openCreate('curriculumPublish')">发布方案</button></div>
     <form v-if="currentFilters.length" class="admin-filters" @submit.prevent="resetAndLoad"><label v-for="field in currentFilters" :key="field.key">{{ field.label }}<select v-if="field.type==='select'" v-model="filters[field.key]"><option v-for="option in field.options" :key="option" :value="option">{{ optionText(option) }}</option></select><input v-else v-model.trim="filters[field.key]" :placeholder="field.placeholder || `输入${field.label}`"/></label><button class="outline-btn" type="submit">应用筛选</button></form>
@@ -240,7 +245,7 @@ onBeforeUnmount(clearCurriculumPolling)
     <div v-if="props.module==='curricula' && curriculumTab==='items'" class="batch-tools"><span>已选 {{ selectedItems.length }} 条</span><select v-model="batchAction"><option value="APPROVE">批量通过</option><option value="REJECT">批量驳回</option></select><button class="outline-btn" @click="batchReview">执行批量审核</button></div>
     <div v-if="props.module==='weights' && rows.length" class="weight-records"><article v-for="(row,index) in rows" :key="rowId(row) || String(row.version)" :style="{ '--i': index }" class="weight-card"><div class="weight-card-head"><div><p class="eyebrow">推荐权重</p><h3>{{ row.version || '未命名版本' }}</h3></div><em :class="String(row.status || '').toLowerCase()">{{ statusText(row.status) }}</em></div><div class="weight-facts"><div><small>最低匹配置信度</small><b>{{ confidence(row.minConfidence) }}</b></div><div><small>每次推荐数量</small><b>{{ row.topN || '—' }} 个方向</b></div></div><div class="weight-bars"><div v-for="key in weightKeys" :key="key"><span>{{ weightLabels[key] }}</span><i><b :style="{ width: barWidth(row,key) }"/></i><strong>{{ percent(weightValue(row,key)) }}</strong></div></div></article></div>
     <div v-if="loading" class="skeleton-group"><div class="skeleton" style="height:46px;margin-bottom:14px"></div><div v-for="i in 6" :key="i" class="skeleton" style="height:56px;margin-bottom:10px"></div></div><p v-else-if="error" class="empty error-state">{{ error }}</p>
-    <template v-else-if="props.module!=='weights'"><div class="list-summary"><span>共 <b>{{ total }}</b> 条记录</span><span v-if="isPage">第 {{ page }} / {{ totalPages }} 页</span></div><div class="enhanced-list"><div class="list-columns"><span v-for="heading in columnLabels()" :key="heading">{{ heading }}</span></div><article v-for="(row,index) in rows" :key="rowId(row)" :style="{ '--i': index }"><small v-if="props.module==='curricula'&&curriculumTab==='items'"><input v-model="selectedItems" type="checkbox" :value="rowId(row)"/></small><small v-else>{{ rowId(row) || '—' }}</small><div><b>{{ rowTitle(row) }}</b><span>{{ detailLines(row).filter(Boolean).join(' · ') || '—' }}</span></div><div class="row-actions"><em v-if="rowStatus(row)!=='—'" :class="rowStatusClass(row)">{{ rowStatus(row) }}</em><button v-if="props.module==='users'||props.module==='abilities'||props.module==='templates'||(props.module==='admin-directions')" class="outline-btn" @click="openEdit(row)">编辑</button><button v-if="props.module==='whitelist'||props.module==='relations'" class="outline-btn" @click="askDelete(row)">删除</button><button v-if="props.module==='admin-directions'" class="outline-btn" @click="changeDirectionStatus(row)">{{ String(row.status)==='PUBLISHED'?'停用':'发布' }}</button><button v-if="props.module==='exports'" class="outline-btn" :disabled="String(row.status)!=='COMPLETED'" @click="download(row)">下载</button><button v-if="props.module==='curricula'&&curriculumTab==='jobs'" class="outline-btn" @click="openJob(row,true)">查看并校核</button><button v-if="props.module==='curricula'&&curriculumTab==='items'" class="outline-btn" @click="openEdit(row,'curriculumItem')">审核编辑</button></div></article><p v-if="!rows.length" class="empty">暂无记录。</p></div><div v-if="isPage&&totalPages>1" class="admin-pagination"><button class="outline-btn" :disabled="page<=1" @click="nextPage(-1)">上一页</button><span>{{ page }} / {{ totalPages }}</span><button class="outline-btn" :disabled="page>=totalPages" @click="nextPage(1)">下一页</button></div></template>
+    <template v-else-if="props.module!=='weights'"><div class="list-summary"><span>共 <b>{{ total }}</b> 条记录</span><span v-if="isPage">第 {{ page }} / {{ totalPages }} 页</span></div><div class="enhanced-list"><div class="list-columns"><span v-for="heading in columnLabels()" :key="heading">{{ heading }}</span></div><article v-for="(row,index) in rows" :key="rowId(row)" :style="{ '--i': index }"><small v-if="props.module==='curricula'&&curriculumTab==='items'"><input v-model="selectedItems" type="checkbox" :value="rowId(row)"/></small><small v-else>{{ rowId(row) || '—' }}</small><div><b>{{ rowTitle(row) }}</b><span>{{ detailLines(row).filter(Boolean).join(' · ') || '—' }}</span></div><div class="row-actions"><em v-if="rowStatus(row)!=='—'" :class="rowStatusClass(row)">{{ rowStatus(row) }}</em><button v-if="props.module==='users'||props.module==='abilities'||props.module==='templates'||props.module==='admin-directions'||props.module==='questionnaires'" class="outline-btn" @click="openEdit(row)">编辑</button><button v-if="props.module==='whitelist'||props.module==='relations'" class="outline-btn" @click="askDelete(row)">删除</button><button v-if="props.module==='admin-directions'" class="outline-btn" @click="changeDirectionStatus(row)">{{ String(row.status)==='PUBLISHED'?'停用':'发布' }}</button><button v-if="props.module==='exports'" class="outline-btn" :disabled="String(row.status)!=='COMPLETED'" @click="download(row)">下载</button><button v-if="props.module==='curricula'&&curriculumTab==='jobs'" class="outline-btn" @click="openJob(row,true)">查看并校核</button><button v-if="props.module==='curricula'&&curriculumTab==='items'" class="outline-btn" @click="openEdit(row,'curriculumItem')">审核编辑</button></div></article><p v-if="!rows.length" class="empty">暂无记录。</p></div><div v-if="isPage&&totalPages>1" class="admin-pagination"><button class="outline-btn" :disabled="page<=1" @click="nextPage(-1)">上一页</button><span>{{ page }} / {{ totalPages }}</span><button class="outline-btn" :disabled="page>=totalPages" @click="nextPage(1)">下一页</button></div></template>
   </section>
   <Transition name="modal"><BaseModal v-if="modal" @close="modal=false"><form class="modal-card admin-editor" @submit.prevent="save"><p class="eyebrow">{{ editing ? '编辑' : '新建' }}</p><h2>{{ editKind==='curriculumItem'?'审核课程条目':editKind==='curriculumPublish'?'发布培养方案':title }}</h2><label v-for="field in currentFields" :key="field.key">{{ field.label }}<select v-if="field.type==='select'" v-model="form[field.key]" :required="field.required"><option value="" disabled>请选择</option><option v-for="option in field.options" :key="option" :value="option">{{optionText(option)}}</option></select><textarea v-else-if="field.type==='textarea'" v-model="form[field.key]" :required="field.required" :placeholder="field.placeholder"/><input v-else v-model.trim="form[field.key]" :type="field.type==='number'?'number':'text'" :min="numberBounds(field)?.min" :max="numberBounds(field)?.max" step="any" :required="field.required" :placeholder="field.placeholder"/></label><div><button type="button" class="outline-btn" @click="modal=false">取消</button><button class="primary-btn" :disabled="submitting">{{submitting?'正在保存…':'保存'}}</button></div></form></BaseModal></Transition>
   <Transition name="modal"><BaseModal v-if="generatedInitialPasswords.length" :closeable="false"><section class="modal-card generated-password-dialog" role="dialog" aria-modal="true" aria-labelledby="generated-password-title"><p class="eyebrow">账户创建完成</p><h2 id="generated-password-title">请记录初始密码</h2><p>以下密码由系统自动生成，仅在本次提示中显示。学生首次登录后必须修改密码。</p><div class="generated-password-list"><div v-for="item in generatedInitialPasswords" :key="item.studentNo"><span>{{item.studentNo}}</span><code>{{item.initialPassword}}</code></div></div><div><button class="primary-btn" @click="generatedInitialPasswords=[]">我已记录</button></div></section></BaseModal></Transition>

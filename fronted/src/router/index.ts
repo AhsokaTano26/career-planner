@@ -89,6 +89,8 @@ const routes: RouteRecordRaw[] = [
       { path: 'weights', name: 'admin-weights', component: AdminModuleView, props: { module: 'weights' } },
       { path: 'exports', name: 'admin-exports', component: AdminModuleView, props: { module: 'exports' } },
       { path: 'logs', name: 'admin-logs', component: AdminModuleView, props: { module: 'logs' } },
+      { path: 'questionnaires', name: 'admin-questionnaires', component: AdminModuleView, props: { module: 'questionnaires' } },
+      { path: 'prompts', name: 'admin-prompts', component: AdminModuleView, props: { module: 'prompts' } },
       { path: 'ai-playground', name: 'admin-ai-playground', component: AiPlaygroundPage },
       { path: 'ai-management', name: 'admin-ai-management', component: AdminAiManagementPage },
     ],
