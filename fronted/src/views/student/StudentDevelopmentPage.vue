@@ -9,7 +9,7 @@ import { useToast } from '../../composables/useToast'
 type Row = Record<string, any>
 const { show } = useToast()
 const active = ref('assessment'), busy = ref('')
-const questionnaires = ref<Row[]>([]), sessions = ref<Row[]>([]), questionnaire = ref<Row|null>(null), activeSession = ref<Row|null>(null), answers = ref<Record<string, number>>({}), scores = ref<Row|null>(null)
+const questionnaires = ref<Row[]>([]), sessions = ref<Row[]>([]), questionnaire = ref<Row|null>(null), questionnaireVersions = ref<Row[]>([]), activeSession = ref<Row|null>(null), answers = ref<Record<string, number>>({}), scores = ref<Row|null>(null)
 const portrait = ref<Row|null>(null), portraitVersions = ref<Row[]>([]), portraitFeedback = ref('HELPFUL'), portraitComment = ref('')
 const directions = ref<Row[]>([]), favorites = ref<Row[]>([]), recommendation = ref<Row|null>(null), recommendationRuns = ref<Row[]>([]), recPath = ref(''), feedbackComments = ref<Record<string,string>>({})
 const goals = ref<Row|null>(null), goalVersions = ref<Row[]>([]), primaryDirectionId = ref(''), backupDirectionId = ref(''), goalReason = ref('')
@@ -36,7 +36,7 @@ async function loadAll(){
 }
 async function openQuestionnaire(){
   if(!selectedQuestionnaire.value) return
-  await run('open-questionnaire', async()=>{ questionnaire.value=await api.student.questionnaire(selectedQuestionnaire.value) as Row; return questionnaire.value }, false)
+  await run('open-questionnaire', async()=>{ const [detail,versions]=await Promise.all([api.student.questionnaire(selectedQuestionnaire.value),api.student.questionnaireVersions(selectedQuestionnaire.value)]); questionnaire.value=detail as Row; questionnaireVersions.value=list(versions); return questionnaire.value }, false)
 }
 async function startAssessment(){
   const created=await run('start-assessment', ()=>api.student.createAssessment({questionnaireId:selectedQuestionnaire.value}), false) as Row|undefined
@@ -93,4 +93,5 @@ onMounted(loadAll)
   <Transition name="modal"><BaseModal v-if="detailTitle" @close="detailTitle='';detail=null"><section class="modal-card admin-editor"><p class="eyebrow">{{detailTitle}}</p><h2>{{detailTitle}}</h2><p v-if="!detail">正在读取…</p><pre v-else>{{JSON.stringify(detail,null,2)}}</pre><button class="outline-btn" @click="detailTitle='';detail=null">关闭</button></section></BaseModal></Transition>
   <section v-if="active==='goals'" class="card"><p class="eyebrow">计划历史</p><div class="simple-list"><button v-for="item in plans" :key="item.id" @click="openDetail('plan',item)"><b>{{item.goalSummary||item.id}}</b><span>{{item.status||'—'}} · {{item.createdAt||''}}</span></button><p v-if="!plans.length" class="empty">暂无计划历史。</p></div></section>
   <section v-if="active==='tasks'" class="card"><p class="eyebrow">详情查看</p><div class="simple-list"><button v-for="item in tasks" :key="`task-${item.id}`" @click="openDetail('task',item)"><b>任务：{{item.title||item.id}}</b><span>{{item.status||'—'}}</span></button><button v-for="item in reviews" :key="`review-${item.id}`" @click="openDetail('review',item)"><b>复盘：{{item.cycle||item.id}}</b><span>{{item.status||'—'}}</span></button></div></section>
+  <section v-if="active==='assessment'&&selectedQuestionnaire" class="card"><p class="eyebrow">问卷版本</p><div class="simple-list"><div v-for="item in questionnaireVersions" :key="item.id"><b>{{item.version||item.id}}</b><span>{{item.status||'—'}} · {{item.createdAt||''}}</span></div><p v-if="!questionnaireVersions.length" class="empty">暂无历史版本。</p></div></section>
 </template>
