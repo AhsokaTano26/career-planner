@@ -55,6 +55,16 @@ button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: no
 .base-select-menu, .native-select-menu { z-index: var(--layer-dropdown); }
 .empty, p.empty { color: var(--color-text-muted); background: var(--color-surface-muted); border: 1px dashed var(--color-border-strong); }
 .error-state { color: var(--color-danger); }
+.journey-panel { padding: 30px; border-top: 4px solid var(--color-action-primary); }
+.journey-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 22px; }
+.journey-step { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 12px; border: 1px solid var(--color-border); background: var(--color-surface-muted); }
+.journey-step.done { border-color: #83b2dc; background: #edf6ff; }
+.journey-step small { display: block; margin-top: 3px; color: var(--color-text-muted); }
+.step-dot { display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; border: 1px solid var(--color-border-strong); color: var(--color-text-muted); }
+.journey-step.done .step-dot { border-color: var(--color-action-primary); background: var(--color-action-primary); color: var(--color-action-foreground); }
+.focus-card { border-top: 3px solid var(--color-action-primary); }
+.focus-task { display: flex; align-items: end; justify-content: space-between; gap: var(--space-4); }
+.focus-task p { max-width: 680px; margin: 0; color: var(--color-text-muted); line-height: 1.7; }
 
 @media (max-width: 1024px) {
   .side-nav { width: 82px; padding: 20px 10px; }
@@ -87,6 +97,10 @@ button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: no
   .page-actions > * { flex: 1; }
   .page-title .primary-btn, .page-title .outline-btn { width: 100%; }
   .card { padding: 20px 18px; }
+  .journey-panel { padding: 22px 18px; }
+  .journey-steps { grid-template-columns: 1fr; }
+  .focus-task { align-items: stretch; flex-direction: column; }
+  .focus-task .primary-btn { width: 100%; }
   .modal-card { width: min(100%, 560px); padding: 20px; }
   .topbar .logout-btn { min-height: var(--control-height-sm); }
 }
