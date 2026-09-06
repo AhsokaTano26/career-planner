@@ -13,6 +13,8 @@ import com.rickgao.careercore.modules.portrait.entity.ProfileSnapshot;
 import com.rickgao.careercore.modules.portrait.mapper.ProfileSnapshotMapper;
 import com.rickgao.careercore.modules.student.entity.StudentProfile;
 import com.rickgao.careercore.modules.student.mapper.StudentProfileMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class PortraitService {
+
+    private static final Logger log = LoggerFactory.getLogger(PortraitService.class);
 
     private static final String[] DIMENSIONS = {"interest", "values", "ability", "academic", "tendency", "practice"};
     private static final Map<String, String> DIM_NAMES = Map.of(
@@ -64,7 +68,9 @@ public class PortraitService {
             dims = estimateFromProfile(studentId);
         }
         // 统一画像维度到 0-100（测评原始为 1-5 分制，×20 归一化；档案估算已为 0-100）
-        dims.replaceAll((k, v) -> v != null && v <= 5.0 ? Math.min(100.0, Math.round(v * 20.0 * 10.0) / 10.0) : v);
+        // 稳定性：null 值归一为 0，避免下游 comparingDouble 拆箱 NPE
+        dims.replaceAll((k, v) -> v == null ? 0.0
+                : (v <= 5.0 ? Math.min(100.0, Math.round(v * 20.0 * 10.0) / 10.0) : v));
 
         ProfileSnapshot latest = snapshotMapper.findLatestByStudent(studentId);
         int nextVersion = (latest == null ? 0 : (latest.getVersionNo() == null ? 0 : latest.getVersionNo())) + 1;
@@ -108,20 +114,23 @@ public class PortraitService {
         return snapshotMapper.listByStudent(studentId).stream().map(this::toVO).collect(Collectors.toList());
     }
 
-    public ProfileSnapshotVO getSnapshot(String snapshotId) {
+    public ProfileSnapshotVO getSnapshot(String snapshotId, String studentId) {
         ProfileSnapshot snap = snapshotMapper.findById(snapshotId);
         if (snap == null) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "画像快照不存在");
         }
+        // 安全：快照按 ID 直接寻址，必须校验归属，防止枚举他人画像
+        assertOwnSnapshot(snap, studentId);
         return toVO(snap);
     }
 
     @Transactional
-    public ProfileSnapshotVO addFeedback(String snapshotId, ProfileFeedbackRequest req) {
+    public ProfileSnapshotVO addFeedback(String snapshotId, String studentId, ProfileFeedbackRequest req) {
         ProfileSnapshot snap = snapshotMapper.findById(snapshotId);
         if (snap == null) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "画像快照不存在");
         }
+        assertOwnSnapshot(snap, studentId);
         ProfileSnapshotVO.ProfileFeedback fb = new ProfileSnapshotVO.ProfileFeedback();
         fb.setFeedbackType(req.getFeedbackType());
         fb.setComment(req.getComment());
@@ -131,6 +140,12 @@ public class PortraitService {
     }
 
     // ---------------------------------------------------------------- 内部
+
+    private void assertOwnSnapshot(ProfileSnapshot snap, String studentId) {
+        if (studentId == null || !studentId.equals(snap.getStudentId())) {
+            throw new BizException(ResultCode.FORBIDDEN, "无权访问该画像快照");
+        }
+    }
 
     private ProfileSnapshotVO toVO(ProfileSnapshot snap) {
         ProfileSnapshotVO vo = new ProfileSnapshotVO();
@@ -156,7 +171,9 @@ public class PortraitService {
                     out.put(n.path("dimensionCode").asText(), n.path("score").asDouble());
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            // 稳定性：脏 JSON 不再静默归零，记 warn 便于定位
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
         }
         for (String d : DIMENSIONS) {
             out.putIfAbsent(d, 0.0);
@@ -180,7 +197,9 @@ public class PortraitService {
                     out.add(v);
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            // 稳定性：脏 JSON 不再静默归零，记 warn 便于定位
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
         }
         return out;
     }
@@ -197,7 +216,9 @@ public class PortraitService {
                     out.add(n.asText());
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            // 稳定性：脏 JSON 不再静默归零，记 warn 便于定位
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
         }
         return out;
     }
@@ -212,7 +233,9 @@ public class PortraitService {
             fb.setFeedbackType(n.path("feedbackType").asText());
             fb.setComment(n.path("comment").asText(""));
             return fb;
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            // 稳定性：脏 JSON 不再静默归零，记 warn 便于定位
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
             return null;
         }
     }

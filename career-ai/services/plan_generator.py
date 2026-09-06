@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 
+from services.desensitizer import desensitize
 from services.llm_gateway import generate
 
 _SYSTEM_PROMPT = (
@@ -26,7 +27,7 @@ def generate_plan(direction_id: str, semester: str, goal_summary: str | None = N
 
     输入按 Apifox PlanGenerateRequest：directionId/semester/goalSummary/template(PlanDraft)。
     """
-    user_prompt = (
+    user_prompt = desensitize(
         f"方向编码：{direction_id or '未指定'}\n"
         f"学期：{semester or '未指定'}\n"
         f"目标摘要：{goal_summary or (template or {}).get('goalSummary') or '围绕目标方向打好基础，完成一个小项目'}\n"

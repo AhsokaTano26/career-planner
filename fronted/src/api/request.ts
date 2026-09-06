@@ -29,6 +29,16 @@ export const clearAuthSession = () => {
   setAccessToken('')
   refreshToken = ''
   sessionStorage.removeItem('career.refresh-token')
+  // 稳定性：token 失效即通知各单例清数据（此前只清 storage，旧号数据残留到下次守卫）
+  authInvalidatedHandlers.forEach(handler => {
+    try { handler() } catch { /* 单例清理不得影响请求错误路径 */ }
+  })
+}
+// 会话失效通知（useAuth 注册 resetSession；request.ts 不反向依赖 composable，避免循环）
+type AuthInvalidatedHandler = () => void
+const authInvalidatedHandlers = new Set<AuthInvalidatedHandler>()
+export function onAuthInvalidated(handler: AuthInvalidatedHandler) {
+  authInvalidatedHandlers.add(handler)
 }
 export const getErrorMessage = (error:unknown) => error instanceof Error ? error.message : '请求失败，请稍后重试'
 
@@ -46,7 +56,11 @@ async function renewAccessToken():Promise<boolean> {
       if (!response.ok || !body || body.code !== 'OK') { clearAuthSession(); return false }
       setAuthTokens(body.data)
       return true
-    } catch { return false } finally { refreshInFlight = null }
+    } catch {
+      // 稳定性：网络异常同样清理过期 token（此前只清 HTTP 失败分支，过期 token 常驻导致每次 401 都重试 refresh）
+      clearAuthSession()
+      return false
+    } finally { refreshInFlight = null }
   })()
   return refreshInFlight
 }
@@ -62,10 +76,30 @@ export async function request<T>(path:string, init:RequestInit = {}): Promise<T>
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method) && !headers.has('Idempotency-Key')) {
     headers.set('Idempotency-Key', crypto.randomUUID())
   }
-  const requestInit:RequestInit = { ...init, headers, credentials:'include' }
-  const response = await fetch(`${base}${path}`, requestInit)
+  // 稳定性：默认 60s 超时（AI 类长调用由调用方经 signal 覆盖）；超时错误可被 catch 区分展示
+  const externalSignal = init.signal ?? null
+  const controller = new AbortController()
+  const onExternalAbort = () => controller.abort(externalSignal?.reason)
+  if (externalSignal) {
+    if (externalSignal.aborted) controller.abort(externalSignal.reason)
+    else externalSignal.addEventListener('abort', onExternalAbort, { once: true })
+  }
+  const timer = setTimeout(() => controller.abort(new Error('请求超时，请稍后重试')), 60000)
+  const requestInit:RequestInit = { ...init, headers, credentials:'include', signal: controller.signal }
+  let response: Response
+  try {
+    response = await fetch(`${base}${path}`, requestInit)
+  } catch (e) {
+    if (externalSignal) externalSignal.removeEventListener('abort', onExternalAbort)
+    clearTimeout(timer)
+    throw e instanceof Error ? e : new Error('网络请求失败，请检查网络后重试')
+  }
+  clearTimeout(timer)
+  if (externalSignal) externalSignal.removeEventListener('abort', onExternalAbort)
   const body = await response.json().catch(() => null) as ApiEnvelope<T> | null
-  if (response.status === 401 && path !== '/auth/refresh' && await renewAccessToken()) return request<T>(path, requestInit)
+  // 复审 Batch4：重试传原始 init（此前传已消耗的 requestInit，其 signal 已绑定旧 controller，
+  // 刷新瞬间点的取消/超时会丢失；init 里的 headers 若已有 Idempotency-Key 则保持同一键）。
+  if (response.status === 401 && path !== '/auth/refresh' && await renewAccessToken()) return request<T>(path, init)
   if (!response.ok || !body || body.code !== 'OK') {
     if (response.status === 401) clearAuthSession()
     throw new Error(body?.message || `请求失败（HTTP ${response.status}）`)
@@ -73,14 +107,32 @@ export async function request<T>(path:string, init:RequestInit = {}): Promise<T>
   return body.data
 }
 
-export async function downloadFile(path:string):Promise<{blob:Blob; filename:string}> {
+/** 带超时 + 外部取消的 fetch（复审 Batch4：downloadFile/postRaw 此前零超时可永久 hanging）。 */
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const externalSignal = init.signal ?? null
+  const controller = new AbortController()
+  const onExternalAbort = () => controller.abort(externalSignal?.reason)
+  if (externalSignal) {
+    if (externalSignal.aborted) controller.abort(externalSignal.reason)
+    else externalSignal.addEventListener('abort', onExternalAbort, { once: true })
+  }
+  const timer = setTimeout(() => controller.abort(new Error('请求超时，请稍后重试')), timeoutMs)
+  try {
+    return await fetch(url, { ...init, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+    if (externalSignal) externalSignal.removeEventListener('abort', onExternalAbort)
+  }
+}
+
+export async function downloadFile(path:string, timeoutMs = 120000):Promise<{blob:Blob; filename:string}> {
   const headers = new Headers()
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
   headers.set('X-Request-Id', crypto.randomUUID())
-  let response = await fetch(`${base}${path}`, { headers, credentials:'include' })
+  let response = await fetchWithTimeout(`${base}${path}`, { headers, credentials:'include' }, timeoutMs)
   if (response.status === 401 && await renewAccessToken()) {
     headers.set('Authorization', `Bearer ${accessToken}`)
-    response = await fetch(`${base}${path}`, { headers, credentials:'include' })
+    response = await fetchWithTimeout(`${base}${path}`, { headers, credentials:'include' }, timeoutMs)
   }
   if (!response.ok) {
     if (response.status === 401) clearAuthSession()
@@ -92,11 +144,19 @@ export async function downloadFile(path:string):Promise<{blob:Blob; filename:str
 }
 const get = <T>(path:string) => request<T>(path)
 const post = <T>(path:string, data?:unknown) => request<T>(path, { method:'POST', body:data === undefined ? undefined : JSON.stringify(data) })
-const postRaw = async <T>(path:string, data:unknown):Promise<T> => {
+const postRaw = async <T>(path:string, data:unknown, timeoutMs = 120000):Promise<T> => {
   const headers = new Headers({'Content-Type':'application/json', 'X-Request-Id':crypto.randomUUID()})
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`)
-  const response = await fetch(`${base}${path}`, { method:'POST', headers, credentials:'include', body:JSON.stringify(data) })
-  if (!response.ok) throw new Error(`请求失败（HTTP ${response.status}）`)
+  let response = await fetchWithTimeout(`${base}${path}`, { method:'POST', headers, credentials:'include', body:JSON.stringify(data) }, timeoutMs)
+  // 稳定性：过期 access 自愈一次（此前直接抛 401；响应体为网关原生 JSON，不做信封校验）
+  if (response.status === 401 && await renewAccessToken()) {
+    headers.set('Authorization', `Bearer ${accessToken}`)
+    response = await fetchWithTimeout(`${base}${path}`, { method:'POST', headers, credentials:'include', body:JSON.stringify(data) }, timeoutMs)
+  }
+  if (!response.ok) {
+    if (response.status === 401) clearAuthSession()
+    throw new Error(`请求失败（HTTP ${response.status}）`)
+  }
   return response.json() as Promise<T>
 }
 const patch = <T>(path:string, data:unknown) => request<T>(path, { method:'PATCH', body:JSON.stringify(data) })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { api, downloadFile, getErrorMessage, request } from '../../api/request'
+import { onSessionReset } from '../../composables/useAuth'
 import BaseModal from '../../components/BaseModal.vue'
 
 type Row = Record<string, unknown>
@@ -53,6 +54,13 @@ const filters = ref<Record<string,string>>({}), modal = ref(false), submitting =
 const logTab = ref<'operations'|'ai'>('operations'), curriculumTab = ref<'jobs'|'items'|'versions'>('jobs'), selectedJob = ref<Row|null>(null), jobDetail = ref<Row|null>(null), selectedItems = ref<string[]>([]), batchAction = ref('APPROVE')
 const generatedInitialPasswords = ref<{studentNo:string;initialPassword:string}[]>([])
 const deleteTarget = ref<Row|null>(null)
+// 稳定性：切号/401 时清空工作台数据，避免看到上号内容
+onSessionReset(()=>{
+  rows.value=[]; total.value=0; page.value=1; totalPages.value=1; loading.value=false; error.value=''
+  filters.value={}; modal.value=false; submitting.value=false; form.value={}; editing.value=null; editKind.value=''
+  selectedJob.value=null; jobDetail.value=null; selectedItems.value=[]
+  generatedInitialPasswords.value=[]; deleteTarget.value=null
+})
 let curriculumPollTimer:number|undefined
 const title = computed(() => names[props.module] || '管理工作台')
 const isPage = computed(() => props.module !== 'weights')

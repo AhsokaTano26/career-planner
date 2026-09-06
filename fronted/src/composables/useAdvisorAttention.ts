@@ -6,6 +6,7 @@ import { onSessionReset, useAuth } from './useAuth'
 const items = ref<AdvisorAttention[]>([])
 const loading = ref(false)
 const error = ref('')
+let loadSeq = 0
 
 onSessionReset(() => {
   items.value = []
@@ -18,14 +19,19 @@ export function useAdvisorAttention() {
 
   async function load() {
     if (auth.forcePasswordChange.value) return
+    // 稳定性：序号防卫（与 useAdvisorStudents 同模式）
+    const seq = ++loadSeq
     loading.value = true
     error.value = ''
     try {
-      items.value = await api.advisor.attention() as AdvisorAttention[]
+      const data = await api.advisor.attention() as AdvisorAttention[]
+      if (seq !== loadSeq) return
+      items.value = data
     } catch (e) {
+      if (seq !== loadSeq) return
       error.value = getErrorMessage(e)
     } finally {
-      loading.value = false
+      if (seq === loadSeq) loading.value = false
     }
   }
 

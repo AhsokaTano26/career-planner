@@ -30,4 +30,7 @@ public interface SysUserMapper {
     int updateConsentAgreed(@Param("id") String id, @Param("consentAgreed") boolean consentAgreed);
 
     int updateLastLoginAt(@Param("id") String id, @Param("lastLoginAt") java.time.LocalDateTime lastLoginAt);
+
+    /** 递增令牌版本（改密/重置/停用/改角色时调用，旧 accessToken 即刻失效）。 */
+    int incrementTokenVersion(@Param("id") String id);
 }

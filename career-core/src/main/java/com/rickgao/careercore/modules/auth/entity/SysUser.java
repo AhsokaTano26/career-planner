@@ -28,6 +28,8 @@ public class SysUser {
     private Boolean consentAgreed;
     /** 是否必须先修改初始密码后才能使用业务功能 */
     private Boolean passwordChangeRequired;
+    /** 令牌版本：改密/重置/停用/改角色时递增，旧 accessToken 即刻失效 */
+    private Integer tokenVersion;
     private LocalDateTime lastLoginAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

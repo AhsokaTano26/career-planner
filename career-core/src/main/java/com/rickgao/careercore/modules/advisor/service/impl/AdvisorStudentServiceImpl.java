@@ -206,7 +206,8 @@ public class AdvisorStudentServiceImpl implements AdvisorStudentService {
         double sum = 0;
         int n = 0;
         for (PlanRateRow row : queryMapper.selectCompletionRates(advisorId)) {
-            if (row.getTotalTasks() != null && row.getTotalTasks() > 0) {
+            // 防御：done_tasks 可为 NULL，自动拆箱会 NPE（与 totalTasks 判空同模式）
+            if (row.getTotalTasks() != null && row.getTotalTasks() > 0 && row.getDoneTasks() != null) {
                 sum += row.getDoneTasks() * 100.0 / row.getTotalTasks();
                 n++;
             }
@@ -263,10 +264,14 @@ public class AdvisorStudentServiceImpl implements AdvisorStudentService {
             vo.setClassName(profile.getClassName());
             vo.setCompleteness(profile.getCompleteness());
             vo.setAssessed(isAssessed);
-            vo.setPath(PATH_ENUM.contains(profile.getDevelopmentIntention()) ? profile.getDevelopmentIntention() : null);
+            // 防御：新生档案 developmentIntention 常为 null，Set.of().contains(null) 会抛 NPE
+            // （2026-09-06 实测：带新生的辅导员列表整体 500；与 555 行 hasText 守卫保持同一模式）
+            String intention = profile.getDevelopmentIntention();
+            vo.setPath(intention != null && PATH_ENUM.contains(intention) ? intention : null);
             vo.setDirection(primary == null ? null : primary.getDirectionName());
             vo.setPrimaryGoal(primary == null ? null : primary.getGoalName());
             vo.setPlanRate(rate == null || rate.getTotalTasks() == null || rate.getTotalTasks() == 0
+                    || rate.getDoneTasks() == null
                     ? null
                     : (int) Math.round(rate.getDoneTasks() * 100.0 / rate.getTotalTasks()));
             vo.setLastReview(lastReviewAt == null ? null : lastReviewAt.toLocalDate());

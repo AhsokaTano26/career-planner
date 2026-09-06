@@ -6,22 +6,36 @@
         <id property="id" column="id"/>
         <result property="userId" column="user_id"/>
         <result property="token" column="token"/>
+        <result property="tokenHash" column="token_hash"/>
         <result property="expiresAt" column="expires_at"/>
         <result property="revoked" column="revoked"/>
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.rickgao.careercore.modules.auth.entity.RefreshToken">
-        INSERT INTO refresh_token (id, user_id, token, expires_at, revoked, created_at)
-        VALUES (#{id}, #{userId}, #{token}, #{expiresAt}, 0, NOW())
+        INSERT INTO refresh_token (id, user_id, token, token_hash, expires_at, revoked, created_at)
+        VALUES (#{id}, #{userId}, #{token}, #{tokenHash}, #{expiresAt}, 0, NOW())
     </insert>
 
     <select id="findByToken" resultMap="RefreshTokenMap">
-        SELECT id, user_id, token, expires_at, revoked, created_at
+        SELECT id, user_id, token, token_hash, expires_at, revoked, created_at
         FROM refresh_token
         WHERE token = #{token}
         LIMIT 1
     </select>
+
+    <select id="findByTokenHash" resultMap="RefreshTokenMap">
+        SELECT id, user_id, token, token_hash, expires_at, revoked, created_at
+        FROM refresh_token
+        WHERE token_hash = #{tokenHash}
+        LIMIT 1
+    </select>
+
+    <update id="backfillTokenHash">
+        UPDATE refresh_token
+        SET token_hash = #{tokenHash}
+        WHERE id = #{id} AND (token_hash IS NULL OR token_hash = '')
+    </update>
 
     <update id="revokeByUserId">
         UPDATE refresh_token

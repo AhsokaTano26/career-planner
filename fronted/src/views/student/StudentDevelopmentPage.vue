@@ -2,7 +2,10 @@
 import { computed, onMounted, ref } from 'vue'
 import PageHeader from '../../components/BasePageHeader.vue'
 import BaseSelect from '../../components/BaseSelect.vue'
+import RadarChart from '../../components/RadarChart.vue'
+import type { RadarDimension } from '../../utils/radarOption'
 import { api, getErrorMessage } from '../../api/request'
+import { onSessionReset } from '../../composables/useAuth'
 import { useToast } from '../../composables/useToast'
 
 type Row = Record<string, any>
@@ -24,14 +27,60 @@ const taskTypeOptions = [{value:'LEARNING',label:'学习'},{value:'PRACTICE',lab
 
 function list(data:any):Row[]{ return Array.isArray(data) ? data : (data?.list || data?.items || []) }
 function error(e:unknown){ show(getErrorMessage(e)) }
-async function run(key:string, action:()=>Promise<any>, reload=true){ busy.value=key; try { const result=await action(); show('操作已完成'); if(reload) await loadAll(); return result } catch(e){ error(e) } finally { busy.value='' } }
-async function loadAll(){
-  try {
-    const data:any[] = await Promise.all([api.student.questionnaires(), api.student.assessmentSessions(), api.student.latestPortrait(), api.student.portraitVersions(), api.student.directions(), api.student.favorites(), api.student.recommendationLatest(), api.student.recommendationRuns(), api.student.goals(), api.student.goalVersions(), api.student.latestPlan(), api.student.plans(), api.student.tasks({month:taskMonth.value,status:taskStatus.value}), api.student.reviews(), api.student.reminders(), api.student.unreadReminderCount()])
-    questionnaires.value=list(data[0]); sessions.value=list(data[1]); portrait.value=data[2]||null; portraitVersions.value=list(data[3]); directions.value=list(data[4]); favorites.value=list(data[5]); recommendation.value=data[6]||null; recommendationRuns.value=list(data[7]); goals.value=data[8]||null; goalVersions.value=list(data[9]); plan.value=data[10]||null; plans.value=list(data[11]); tasks.value=list(data[12]); reviews.value=list(data[13]); reminders.value=list(data[14]); unreadCount.value=Number(data[15]?.count || 0)
-    primaryDirectionId.value=goals.value?.primary?.directionId || primaryDirectionId.value; backupDirectionId.value=goals.value?.backup?.directionId || backupDirectionId.value
-  } catch(e){ error(e) }
+// 稳定性：同 key 禁重入（防双击双发）；busy 保留最近 key 供按钮 disabled
+const inflight = new Set<string>()
+async function run(key:string, action:()=>Promise<any>, reload=true){
+  if (inflight.has(key)) return
+  inflight.add(key); busy.value=key
+  try { const result=await action(); show('操作已完成'); if(reload) await loadAll(); return result }
+  catch(e){ error(e) }
+  finally { inflight.delete(key); busy.value=[...inflight].pop() || '' }
 }
+// 稳定性：逐项 allSettled，任一接口失败不影响其余板块渲染（此前 Promise.all 一挂全空）
+async function loadAll(){
+  const jobs:[string,()=>Promise<any>][]=[
+    ['questionnaires',()=>api.student.questionnaires()],['sessions',()=>api.student.assessmentSessions()],
+    ['portrait',()=>api.student.latestPortrait()],['portraitVersions',()=>api.student.portraitVersions()],
+    ['directions',()=>api.student.directions()],['favorites',()=>api.student.favorites()],
+    ['recommendation',()=>api.student.recommendationLatest()],['recommendationRuns',()=>api.student.recommendationRuns()],
+    ['goals',()=>api.student.goals()],['goalVersions',()=>api.student.goalVersions()],
+    ['plan',()=>api.student.latestPlan()],['plans',()=>api.student.plans()],
+    ['tasks',()=>api.student.tasks({month:taskMonth.value,status:taskStatus.value})],
+    ['reviews',()=>api.student.reviews()],['reminders',()=>api.student.reminders()],
+    ['unread',()=>api.student.unreadReminderCount()],
+  ]
+  const results = await Promise.allSettled(jobs.map(([,fn])=>fn()))
+  const failed:string[]=[]
+  const value=(name:string)=>{ const i=jobs.findIndex(([n])=>n===name); const r=results[i];
+    if(r.status==='fulfilled') return r.value; failed.push(name); return undefined }
+  const q=value('questionnaires'); if(q!==undefined) questionnaires.value=list(q)
+  const se=value('sessions'); if(se!==undefined) sessions.value=list(se)
+  const po=value('portrait'); if(po!==undefined) portrait.value=po||null
+  const pv=value('portraitVersions'); if(pv!==undefined) portraitVersions.value=list(pv)
+  const di=value('directions'); if(di!==undefined) directions.value=list(di)
+  const fa=value('favorites'); if(fa!==undefined) favorites.value=list(fa)
+  const re=value('recommendation'); if(re!==undefined) recommendation.value=re||null
+  const rr=value('recommendationRuns'); if(rr!==undefined) recommendationRuns.value=list(rr)
+  const go=value('goals'); if(go!==undefined) goals.value=go||null
+  const gv=value('goalVersions'); if(gv!==undefined) goalVersions.value=list(gv)
+  const pl=value('plan'); if(pl!==undefined) plan.value=pl||null
+  const ps=value('plans'); if(ps!==undefined) plans.value=list(ps)
+  const ta=value('tasks'); if(ta!==undefined) tasks.value=list(ta)
+  const rv=value('reviews'); if(rv!==undefined) reviews.value=list(rv)
+  const rm=value('reminders'); if(rm!==undefined) reminders.value=list(rm)
+  const un=value('unread'); if(un!==undefined) unreadCount.value=Number((un as Row)?.count || 0)
+  if(failed.length) show(`部分数据加载失败（${failed.join('、')}），其余已展示`)
+  if(goals.value){ primaryDirectionId.value=goals.value?.primary?.directionId || primaryDirectionId.value; backupDirectionId.value=goals.value?.backup?.directionId || backupDirectionId.value }
+}
+// 稳定性：切号/401 时清空本页数据，避免短暂看到上号内容
+onSessionReset(()=>{
+  questionnaires.value=[]; sessions.value=[]; questionnaire.value=null; activeSession.value=null; answers.value={}; scores.value=null
+  portrait.value=null; portraitVersions.value=[]; portraitComment.value=''
+  directions.value=[]; favorites.value=[]; recommendation.value=null; recommendationRuns.value=[]; feedbackComments.value={}
+  goals.value=null; goalVersions.value=[]; goalReason.value=''
+  plan.value=null; plans.value=[]; tasks.value=[]; taskEdits.value={}; checkins.value={}
+  reviews.value=[]; reminders.value=[]; unreadCount.value=0; busy.value=''; inflight.clear()
+})
 async function openQuestionnaire(){
   if(!selectedQuestionnaire.value) return
   await run('open-questionnaire', async()=>{ questionnaire.value=await api.student.questionnaire(selectedQuestionnaire.value) as Row; return questionnaire.value }, false)
@@ -45,6 +94,10 @@ async function saveAnswers(finished=false){ if(!activeSession.value) return; awa
 async function submitAssessment(){ if(!activeSession.value) return; const result=await run('submit-assessment', ()=>api.student.submitAssessment(activeSession.value!.id), false); if(result){ scores.value=result as Row; await loadAll() } }
 async function viewSession(session:Row){ activeSession.value=session; selectedQuestionnaire.value=String(session.questionnaireId); await openQuestionnaire(); if(session.status==='SCORED') scores.value=await api.student.assessmentScores(session.id) as Row }
 function flatLines(values:any){ return Array.isArray(values) ? values.filter(Boolean).join('；') : '—' }
+/** 测评六维（0-5）→ 雷达数据。 */
+const scoreDims = computed<RadarDimension[]>(()=>Array.isArray(scores.value?.dimensionScores)?scores.value.dimensionScores.map((item:Row)=>({label:String(item.dimensionName||item.dimensionCode||'—'),value:Number(item.score||0)})):[])
+/** 画像六维（0-100）→ 雷达数据。 */
+const portraitDims = computed<RadarDimension[]>(()=>Array.isArray(portrait.value?.dimensions)?portrait.value.dimensions.map((item:Row)=>({label:String(item.name||item.key||'—'),value:Number(item.score||0)})):[])
 async function refreshPortrait(){ await run('refresh-portrait', api.student.refreshPortrait) }
 async function savePortraitFeedback(){ if(!portrait.value?.id) return; await run('portrait-feedback',()=>api.student.portraitFeedback(portrait.value!.id,{feedbackType:portraitFeedback.value,comment:portraitComment.value})) }
 async function toggleFavorite(direction:Row){ await run(`favorite-${direction.id}`,()=>direction.favorited?api.student.removeFavorite(direction.id):api.student.addFavorite(direction.id)) }
@@ -76,11 +129,11 @@ onMounted(loadAll)
   <section v-if="active==='assessment'" class="development-stack">
     <article class="card"><p class="eyebrow">测评问卷</p><h2>选择问卷并作答</h2><div class="inline-form"><BaseSelect v-model="selectedQuestionnaire" :options="questionnaireOptions" placeholder="请选择测评问卷"/><button class="outline-btn" :disabled="!selectedQuestionnaire||busy==='open-questionnaire'" @click="openQuestionnaire">查看题目</button><button class="primary-btn" :disabled="!selectedQuestionnaire||busy==='start-assessment'" @click="startAssessment">开始测评</button></div><p class="muted">测评过程可反复保存；提交后系统会计算六个维度的得分。</p></article>
     <article v-if="questionnaire&&activeSession" class="card question-card"><div class="section-head"><div><p class="eyebrow">{{questionnaire.questionnaire?.typeName || questionnaire.questionnaire?.name}}</p><h2>正在作答</h2></div><span>{{answerItems().length}} / {{questionnaire.questions?.length||0}} 题已答</span></div><fieldset v-for="(question,index) in questionnaire.questions||[]" :key="question.id"><legend>{{index+1}}. {{question.text}}</legend><div v-if="question.type==='RATING'" class="choice-row"><button v-for="n in 5" :key="n" :class="{selected:answers[question.id]===n}" @click="answers[question.id]=n">{{question.labels?.[n-1] || n}}</button></div><div v-else class="choice-column"><button v-for="(option,index) in question.options||[]" :key="option.id" :class="{selected:answers[question.id]===index}" @click="answers[question.id]=index">{{option.text}}</button></div></fieldset><div class="form-actions"><button class="outline-btn" :disabled="busy==='save-answers'" @click="saveAnswers(false)">保存进度</button><button class="primary-btn" :disabled="answerItems().length!==(questionnaire.questions||[]).length||busy==='submit-assessment'" @click="submitAssessment">提交并评分</button></div></article>
-    <article v-if="scores" class="card"><p class="eyebrow">评分结果</p><h2>六维能力概览</h2><div class="metric-grid"><div v-for="item in scores.dimensionScores||[]" :key="item.dimensionCode"><small>{{item.dimensionName}}</small><b>{{Number(item.score||0).toFixed(1)}}</b></div></div></article>
+    <article v-if="scores" class="card"><p class="eyebrow">评分结果</p><h2>六维能力概览</h2><div class="metric-grid"><div v-for="item in scores.dimensionScores||[]" :key="item.dimensionCode"><small>{{item.dimensionName}}</small><b>{{Number(item.score||0).toFixed(1)}}</b></div></div><div class="card radar-card mt-24"><p class="eyebrow">RADAR / 满分 5 分</p><div class="radar-wrap"><RadarChart :dimensions="scoreDims" :max="5" :height="400"/></div></div></article>
     <article class="card"><p class="eyebrow">历史记录</p><h2>我的测评会话</h2><div class="simple-list"><button v-for="session in sessions" :key="session.id" @click="viewSession(session)"><b>{{session.questionnaireName || '测评问卷'}}</b><span>{{session.answeredQuestions||0}} / {{session.totalQuestions||0}} 题 · {{session.status}}</span></button><p v-if="!sessions.length" class="empty">尚未创建测评会话</p></div></article>
   </section>
 
-  <section v-else-if="active==='portrait'" class="development-stack"><article class="card"><div class="section-head"><div><p class="eyebrow">个人画像</p><h2>生涯发展画像</h2></div><button class="primary-btn" :disabled="busy==='refresh-portrait'" @click="refreshPortrait">更新画像</button></div><template v-if="portrait"><p>{{portrait.summary}}</p><div class="metric-grid"><div v-for="item in portrait.dimensions||[]" :key="item.key"><small>{{item.name}}</small><b>{{Number(item.score||0).toFixed(1)}}</b></div></div><div class="two-column"><div><h3>优势</h3><p>{{flatLines(portrait.strengths)}}</p></div><div><h3>待探索</h3><p>{{flatLines(portrait.explore)}}</p></div></div><div class="inline-form"><BaseSelect v-model="portraitFeedback" :options="[{value:'HELPFUL',label:'有帮助'},{value:'MISMATCH',label:'与我不符'},{value:'NEUTRAL',label:'一般'}]"/><input v-model.trim="portraitComment" placeholder="补充反馈（可选）"><button class="outline-btn" @click="savePortraitFeedback">提交反馈</button></div></template><p v-else class="empty">尚无画像；请先完善档案或完成测评。</p></article><article class="card"><p class="eyebrow">版本记录</p><h2>历史画像</h2><div class="simple-list"><div v-for="item in portraitVersions" :key="item.id"><b>第 {{item.version}} 版</b><span>完整度 {{item.completeness||0}}% · {{item.generatedAt||'—'}}</span></div><p v-if="!portraitVersions.length" class="empty">暂无历史版本</p></div></article></section>
+  <section v-else-if="active==='portrait'" class="development-stack"><article class="card"><div class="section-head"><div><p class="eyebrow">个人画像</p><h2>生涯发展画像</h2></div><button class="primary-btn" :disabled="busy==='refresh-portrait'" @click="refreshPortrait">更新画像</button></div><template v-if="portrait"><p>{{portrait.summary}}</p><div class="metric-grid"><div v-for="item in portrait.dimensions||[]" :key="item.key"><small>{{item.name}}</small><b>{{Number(item.score||0).toFixed(1)}}</b></div></div><div class="card radar-card mt-24"><p class="eyebrow">RADAR / 满分 100 分</p><div class="radar-wrap"><RadarChart :dimensions="portraitDims" :max="100" :height="400"/></div></div><div class="two-column"><div><h3>优势</h3><p>{{flatLines(portrait.strengths)}}</p></div><div><h3>待探索</h3><p>{{flatLines(portrait.explore)}}</p></div></div><div class="inline-form"><BaseSelect v-model="portraitFeedback" :options="[{value:'HELPFUL',label:'有帮助'},{value:'MISMATCH',label:'与我不符'},{value:'NEUTRAL',label:'一般'}]"/><input v-model.trim="portraitComment" placeholder="补充反馈（可选）"><button class="outline-btn" @click="savePortraitFeedback">提交反馈</button></div></template><p v-else class="empty">尚无画像；请先完善档案或完成测评。</p></article><article class="card"><p class="eyebrow">版本记录</p><h2>历史画像</h2><div class="simple-list"><div v-for="item in portraitVersions" :key="item.id"><b>第 {{item.version}} 版</b><span>完整度 {{item.completeness||0}}% · {{item.generatedAt||'—'}}</span></div><p v-if="!portraitVersions.length" class="empty">暂无历史版本</p></div></article></section>
 
   <section v-else-if="active==='recommendation'" class="development-stack"><article class="card"><p class="eyebrow">发展方向</p><h2>浏览与收藏</h2><div class="inline-form"><BaseSelect v-model="recPath" :options="pathOptions"/><button class="outline-btn" @click="filterDirections">筛选方向</button><button class="primary-btn" :disabled="busy==='recommendation'" @click="makeRecommendation">生成推荐</button></div><div class="direction-grid"><article v-for="item in directions" :key="item.id"><h3>{{item.name}}</h3><p>{{item.intro||'暂无简介'}}</p><button class="outline-btn" @click="toggleFavorite(item)">{{item.favorited?'取消收藏':'收藏方向'}}</button></article></div></article><article class="card"><p class="eyebrow">推荐结果</p><h2>{{recommendation?.ruleVersion ? `规则 ${recommendation.ruleVersion}`:'尚未生成推荐'}}</h2><div v-if="recommendation?.results" class="simple-list"><div v-for="result in recommendation.results" :key="result.resultId"><b>第 {{result.rank}} 位 · {{result.directionId}}</b><span>匹配度 {{Number(result.score||0).toFixed(1)}} · {{flatLines(result.reasons)}}</span><div class="inline-form"><input v-model.trim="feedbackComments[result.resultId]" placeholder="反馈说明（可选）"><button class="outline-btn" @click="saveRecFeedback(result,'INTERESTED')">感兴趣</button><button class="outline-btn" @click="saveRecFeedback(result,'NOT_INTERESTED')">不感兴趣</button></div></div></div><p v-else class="empty">请完成画像后生成个性化方向推荐。</p></article><article class="card"><p class="eyebrow">我的收藏</p><div class="chip-row"><span v-for="item in favorites" :key="item.id">{{item.name}}</span><p v-if="!favorites.length" class="empty">暂未收藏方向</p></div></article></section>
 

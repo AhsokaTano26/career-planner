@@ -169,7 +169,8 @@ def _gw_key(monkeypatch):
 
 
 def test_路由_缺密钥401(_gw_key):
-    resp = client.post("/v1/chat/completions", json={
+    # conftest 会自动补鉴权头；传空头模拟“缺失”场景
+    resp = client.post("/v1/chat/completions", headers={"Authorization": ""}, json={
         "messages": [{"role": "user", "content": "hi"}]})
     assert resp.status_code == 401
     resp = client.post("/v1/chat/completions", headers={"Authorization": "Bearer wrong"}, json={

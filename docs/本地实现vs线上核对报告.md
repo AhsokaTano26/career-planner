@@ -138,3 +138,15 @@
    - `POST /goals` 请求体改为 `primaryDirectionId/backupDirectionId/changeReason`。
 
 > 说明：计划模块当前为「可用简化版」实现，若需通过 Apifox 契约测试，建议按本报告第三节逐项补齐。是否要我按线上 Schema 重构计划模块的 DTO 与 Service？
+
+---
+
+## 五、2026-09-05 复核（Linux 容器实测结论，覆盖本报告第三节）
+
+> 复核方式：逐字段对照 `docs/openapi/career-core-apis-live.yaml` 的 `Goal/Plan/Task/Reminder/ProfileSnapshot/RecommendationRun/RecommendationResult` schema + 本地启动冒烟（`python3 tests/smoke_api.py`，10 项 ALL PASS）。
+
+1. **计划模块 DTO 已对齐（本报告第三节结论过期）**：`GoalVO{primary/backup/version/updatedAt}`、`PlanVO{id/version/status/source/goalSummary/semesterGoals/monthlyTasks/notes/confirmedAt/updatedAt}`、`TaskVO{id/month/title/type/estHours/status/deadline/abilityTags/note/checkedInAt/checkin}`、`ReminderVO{id/type/title/content/read/createdAt}`、`GoalRequest{primaryDirectionId/backupDirectionId/changeReason}` 与线上 key 完全一致，**无需重构**。
+2. **画像 null 风险已修**：`ProfileSnapshotVO` 补 `@JsonInclude(NON_NULL)`（与推荐模块 13 个 VO 同一模式）；冒烟断言 `refresh` 响应无 `feedback` key。
+3. **唯一剩余偏差（有意保留）**：`GET /students/me/recommendations` 线上 schema 声明单个 `RecommendationRun`，本地返回 `PageResult<RecRunVO>` 分页。历史接口返回分页是合理语义且前端已适配，**保留实现，记为文档侧简化偏差**。
+4. **阻塞启动的 SQL 方言已修**：`core-domains.sql` 15 处 MariaDB 方言 `ADD COLUMN IF NOT EXISTS` 在标准 MySQL 8.0.46 上启动即报语法错；已移除，列补齐移入 `DatabaseSchemaMigration`（information_schema 检测 + ALTER，沿用其既有模式）。
+5. **种子接入**：`application.yml data-locations` 接入 `seed-directions.sql` + `seed-questionnaires.sql`；空库启动即有 4 方向/2 问卷/9 题，推荐实测产出 4 条百分制结果（含 confidence 枚举）。

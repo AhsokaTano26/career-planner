@@ -12,7 +12,7 @@ spring:
       # 应用启动时执行建表与种子脚本(幂等)
       mode: always
       schema-locations: classpath:db/schema.sql,classpath:db/advisor.sql,classpath:db/advisor-domain.sql,classpath:db/admin-config.sql,classpath:db/admin-curriculum.sql,classpath:db/admin-log.sql,classpath:db/ai-chat.sql,classpath:db/core-domains.sql
-      data-locations: classpath:db/data.sql
+      data-locations: classpath:db/data.sql,classpath:db/seed-directions.sql,classpath:db/seed-questionnaires.sql
       continue-on-error: false
   jackson:
     time-zone: Asia/Shanghai
@@ -34,6 +34,8 @@ ai:
   gateway-api-key: ${AI_GATEWAY_API_KEY:}
   gateway-model: ${AI_GATEWAY_MODEL:default}
   gateway-timeout: ${AI_GATEWAY_TIMEOUT:30}
+  # 按 scene 的 max_tokens 上限（格式 scene:tokens,...；与 career-ai GATEWAY_SCENE_MAX_TOKENS 对齐，网关侧二次钳制）
+  gateway-scene-max-tokens: ${AI_GATEWAY_SCENE_MAX_TOKENS:}
 
 # Deprecated（2026-08-29）：直连大模型配置，仅为兼容保留，代码不再读取
 llm:

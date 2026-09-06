@@ -31,9 +31,13 @@ import com.rickgao.careercore.security.JwtUtil;
 import com.rickgao.careercore.security.LoginAttemptTracker;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -53,6 +57,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final IdGenerator idGenerator;
     private final LoginAttemptTracker loginAttemptTracker;
+    private final com.rickgao.careercore.security.AuthUserCache authUserCache;
+    private final AuthServiceImpl self;
 
     public AuthServiceImpl(SysUserMapper sysUserMapper,
                            StudentWhitelistMapper studentWhitelistMapper,
@@ -63,7 +69,9 @@ public class AuthServiceImpl implements AuthService {
                            PasswordEncoder passwordEncoder,
                            JwtUtil jwtUtil,
                            IdGenerator idGenerator,
-                           LoginAttemptTracker loginAttemptTracker) {
+                           LoginAttemptTracker loginAttemptTracker,
+                           com.rickgao.careercore.security.AuthUserCache authUserCache,
+                           @org.springframework.context.annotation.Lazy AuthServiceImpl self) {
         this.sysUserMapper = sysUserMapper;
         this.studentWhitelistMapper = studentWhitelistMapper;
         this.consentMapper = consentMapper;
@@ -74,6 +82,8 @@ public class AuthServiceImpl implements AuthService {
         this.jwtUtil = jwtUtil;
         this.idGenerator = idGenerator;
         this.loginAttemptTracker = loginAttemptTracker;
+        this.authUserCache = authUserCache;
+        this.self = self;
     }
 
     @Override
@@ -83,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
         if (whitelist == null) {
             throw new BizException(ResultCode.VALIDATION_ERROR, "学号不在白名单,无法注册");
         }
-        if (!whitelist.getInitialPassword().equals(request.getInitialPassword())) {
+        if (!java.util.Objects.equals(whitelist.getInitialPassword(), request.getInitialPassword())) {
             throw new BizException(ResultCode.VALIDATION_ERROR, "初始密码不匹配");
         }
         if (Boolean.TRUE.equals(whitelist.getUsed()) || sysUserMapper.findByUsername(request.getStudentNo()) != null) {
@@ -140,14 +150,41 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public TokenVO refresh(RefreshRequest request, String ip) {
-        RefreshToken stored = refreshTokenMapper.findByToken(request.getRefreshToken());
-        if (stored == null || Boolean.TRUE.equals(stored.getRevoked())
+        String presented = request.getRefreshToken();
+        // 新路径优先：按哈希查；双写兼容一轮：老行无哈希时回退明文并回填（下轮删除该分支）
+        RefreshToken stored = null;
+        if (org.springframework.util.StringUtils.hasText(presented)) {
+            stored = refreshTokenMapper.findByTokenHash(sha256Hex(presented));
+        }
+        if (stored == null && org.springframework.util.StringUtils.hasText(presented)) {
+            RefreshToken legacy = refreshTokenMapper.findByToken(presented);
+            if (legacy != null && !org.springframework.util.StringUtils.hasText(legacy.getTokenHash())) {
+                refreshTokenMapper.backfillTokenHash(legacy.getId(), sha256Hex(presented));
+                legacy.setTokenHash(sha256Hex(presented));
+            }
+            stored = legacy;
+        }
+        if (stored == null
                 || stored.getExpiresAt() == null || stored.getExpiresAt().isBefore(LocalDateTime.now())) {
             throw new BizException(ResultCode.AUTH_REQUIRED, "刷新令牌无效或已过期");
+        }
+        if (Boolean.TRUE.equals(stored.getRevoked())) {
+            // 复用检测（RFC 9700 轮换语义）：已作废的 refresh 再次出现视为疑似盗用，
+            // 作废该用户全部 refresh，强制重登。注意：网络重试导致的“旧 token 重放”
+            // 在正常轮换后同样触发，此为安全优先的取舍（客户端应只保留最新 refresh）。
+            // 必须经 REQUIRES_NEW 独立提交——外层随后抛异常，若同事务会被回滚导致吊销落空。
+            self.revokeAllUserRefreshTokens(stored.getUserId());
+            recordAudit(CommonConstants.AUDIT_LOGOUT, stored.getUserId(), "refresh_token", stored.getId(),
+                    "刷新令牌复用,全部作废", ip);
+            throw new BizException(ResultCode.AUTH_REQUIRED, "刷新令牌已轮换,请重新登录");
         }
         SysUser user = sysUserMapper.findById(stored.getUserId());
         if (user == null || !CommonConstants.USER_STATUS_ACTIVE.equals(user.getStatus())) {
             throw new BizException(ResultCode.AUTH_REQUIRED, "账号不可用");
+        }
+        // 安全：首改密码未完成前不允许经 refresh 续期，防止无限推迟强制改密
+        if (Boolean.TRUE.equals(user.getPasswordChangeRequired())) {
+            throw new BizException(ResultCode.FORBIDDEN, "首次登录请先修改初始密码");
         }
         // 刷新轮换:旧刷新令牌随即作废
         refreshTokenMapper.revoke(stored.getId());
@@ -181,6 +218,9 @@ public class AuthServiceImpl implements AuthService {
         if (user == null) {
             throw new BizException(ResultCode.AUTH_REQUIRED, "用户不存在");
         }
+        if (!StringUtils.hasText(request.getName())) {
+            throw new BizException(ResultCode.VALIDATION_ERROR, "姓名不能为空");
+        }
         String name = request.getName().trim();
         sysUserMapper.updateOwnName(userId, name);
         user.setName(name);
@@ -200,7 +240,9 @@ public class AuthServiceImpl implements AuthService {
         }
         validatePasswordStrength(request.getNewPassword());
         sysUserMapper.updatePassword(userId, passwordEncoder.encode(request.getNewPassword()), false);
-        // 使其他端会话失效
+        // 使其他端会话失效：刷新令牌作废 + 令牌版本递增（旧 accessToken 即刻失效）
+        sysUserMapper.incrementTokenVersion(userId);
+        authUserCache.evict(userId);
         refreshTokenMapper.revokeByUserId(userId);
         recordAudit(CommonConstants.AUDIT_PASSWORD_CHANGE, userId, "sys_user", userId, "修改密码", ip);
     }
@@ -217,6 +259,8 @@ public class AuthServiceImpl implements AuthService {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "未找到该学号的用户");
         }
         sysUserMapper.updatePassword(target.getId(), passwordEncoder.encode(request.getNewPassword()), true);
+        sysUserMapper.incrementTokenVersion(target.getId());
+        authUserCache.evict(target.getId());
         refreshTokenMapper.revokeByUserId(target.getId());
         String reason = StringUtils.hasText(request.getReason()) ? request.getReason() : "";
         recordAudit(CommonConstants.AUDIT_PASSWORD_RESET, operatorId, "sys_user", target.getId(), "重置密码,原因:" + reason, ip);
@@ -263,15 +307,17 @@ public class AuthServiceImpl implements AuthService {
         return document;
     }
 
-    /** 生成访问 + 刷新令牌对,并持久化刷新令牌。 */
+    /** 生成访问 + 刷新令牌对,并持久化刷新令牌（双写兼容：明文 + 哈希并存）。 */
     private TokenVO createTokenPair(SysUser user) {
-        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getUsername(), user.getRole());
+        int tokenVersion = user.getTokenVersion() == null ? 0 : user.getTokenVersion();
+        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getUsername(), user.getRole(), tokenVersion);
         String refreshTokenValue = generateRefreshToken();
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setId(idGenerator.refreshTokenId());
         refreshToken.setUserId(user.getId());
         refreshToken.setToken(refreshTokenValue);
+        refreshToken.setTokenHash(sha256Hex(refreshTokenValue));
         refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(jwtUtil.getRefreshTokenTtlSeconds()));
         refreshToken.setRevoked(false);
         refreshTokenMapper.insert(refreshToken);
@@ -288,6 +334,28 @@ public class AuthServiceImpl implements AuthService {
 
     private String generateRefreshToken() {
         return "rt_" + TraceIdUtil.generate() + UUID.randomUUID().toString().replace("-", "");
+    }
+
+    /** 复用吊销独立事务（见 refresh）：外层抛异常时仍保证提交。 */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void revokeAllUserRefreshTokens(String userId) {
+        refreshTokenMapper.revokeByUserId(userId);
+    }
+
+    /** 刷新令牌 SHA-256（hex 小写）；失败抛内部错（fail-closed，不降级明文比对）。 */
+    static String sha256Hex(String value) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder(hash.length * 2);
+            for (byte b : hash) {
+                sb.append(Character.forDigit((b >> 4) & 0xF, 16));
+                sb.append(Character.forDigit(b & 0xF, 16));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new BizException(ResultCode.INTERNAL_ERROR, "哈希算法不可用");
+        }
     }
 
     private CurrentUserVO toCurrentUserVO(SysUser user) {

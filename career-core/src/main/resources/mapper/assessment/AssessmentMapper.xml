@@ -78,6 +78,15 @@
         LIMIT 1
     </select>
 
+    <select id="listQuestionnairesByIds" resultMap="QuestionnaireMap">
+        SELECT id, type, name, type_name, icon, status, version, minutes, tip, published_at, published_by, created_at, updated_at
+        FROM questionnaire
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="findLatestVersion" resultMap="VersionMap">
         SELECT id, questionnaire_id, version, status, question_count, change_note, published_at, published_by, created_at
         FROM questionnaire_version
@@ -91,6 +100,29 @@
         FROM questionnaire_version
         WHERE id = #{id}
         LIMIT 1
+    </select>
+
+    <select id="listVersionsByIds" resultMap="VersionMap">
+        SELECT id, questionnaire_id, version, status, question_count, change_note, published_at, published_by, created_at
+        FROM questionnaire_version
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="listLatestVersions" resultMap="VersionMap">
+        SELECT id, questionnaire_id, version, status, question_count, change_note, published_at, published_by, created_at
+        FROM questionnaire_version
+        WHERE (questionnaire_id, version) IN (
+            SELECT questionnaire_id, MAX(version)
+            FROM questionnaire_version
+            WHERE questionnaire_id IN
+            <foreach collection="questionnaireIds" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            GROUP BY questionnaire_id
+        )
     </select>
 
     <select id="listVersions" resultMap="VersionMap">

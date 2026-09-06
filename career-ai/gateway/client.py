@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import threading
 import time
 import uuid
 from dataclasses import dataclass
@@ -16,7 +17,9 @@ import litellm
 from litellm import Router
 
 from gateway.config import GatewayConfig, channel_credentials, load_config
+from gateway.budget import DailyTokenBudget
 from gateway.logging_callback import AiCallLogHandler
+from gateway.metrics import metrics
 from gateway.ratelimit import GatewayRateLimited, TokenBucket
 
 
@@ -39,6 +42,7 @@ class GatewayClient:
     def __init__(self, config: GatewayConfig | None = None) -> None:
         self.config = config or load_config()
         self._bucket = TokenBucket(self.config.rpm)
+        self._budget = DailyTokenBudget(self.config.daily_token_budget)
         self._handler = AiCallLogHandler()
         callbacks = list(litellm.callbacks or [])
         if not any(isinstance(c, AiCallLogHandler) for c in callbacks):
@@ -58,10 +62,12 @@ class GatewayClient:
     ) -> GenerateResult:
         """统一生成入口。
 
-        :raises gateway.ratelimit.GatewayRateLimited: 超过 rpm 限流（映射 429）。
+        :raises gateway.ratelimit.GatewayRateLimited: 超过 rpm 限流 / 单日 token 预算（映射 429）。
         :raises GatewayError: 渠道全部失败 / 返回结构异常。
         """
         group = model_group or self._default_group_name()
+        # 生产化：按 scene 钳制 max_tokens（GATEWAY_SCENE_MAX_TOKENS，未配置不限）
+        effective_max_tokens = self._clamp_max_tokens(scene, max_tokens)
         request_id = uuid.uuid4().hex
         input_hash = self._sha256(json.dumps(messages, ensure_ascii=False, sort_keys=True))
         request_hash = self._sha256("%s|%s|%s" % (scene, group, input_hash))
@@ -73,30 +79,52 @@ class GatewayClient:
             "request_hash": request_hash,
             "input_hash": input_hash,
         }
-        self._bucket.acquire()
         started = time.perf_counter()
         try:
+            self._bucket.acquire()
+            # 预算预占（防 check-then-act 并发超限，多退少补见 settle）
+            self._budget.reserve(scene, effective_max_tokens)
             response = self._router.completion(
                 model=group,
                 messages=messages,
                 temperature=temperature,
-                max_tokens=max_tokens,
+                max_tokens=effective_max_tokens,
                 num_retries=self.config.max_retries,
                 timeout=self.config.timeout,
                 metadata=metadata,
             )
         except GatewayRateLimited:
+            metrics.observe(scene, "RATE_LIMITED", time.perf_counter() - started, None)
             raise
         except Exception as exc:  # noqa: BLE001 - 统一转 GatewayError
+            self._budget.settle(scene, effective_max_tokens, 0)
+            metrics.observe(scene, "FAILED", time.perf_counter() - started, None)
             raise GatewayError("调用大模型失败（group=%s）：%s" % (group, exc)) from exc
-        duration_ms = int((time.perf_counter() - started) * 1000)
-        text = self._extract_text(response)
+        duration_s = time.perf_counter() - started
+        duration_ms = int(duration_s * 1000)
+        try:
+            text = self._extract_text(response)
+            model_used = self._model_used(response)
+            total_tokens = self._total_tokens(response)
+        except GatewayError:
+            # 渠道返回 200 但结构异常：同样释放预算预占并记 FAILED（此前完全隐身）
+            self._budget.settle(scene, effective_max_tokens, 0)
+            metrics.observe(scene, "FAILED", duration_s, None)
+            raise
+        status = "SUCCESS"
+        # fallback 实际生效 → 显式记一条 DEGRADED + scene 后缀（回调只记了 SUCCESS，upsert 覆盖为最终态）
+        if self._used_fallback(group, model_used):
+            status = "DEGRADED"
+            self._log_fallback(request_id, scene, user_ref, prompt_version, model_used,
+                               duration_ms, total_tokens, request_hash, input_hash)
+        self._budget.settle(scene, effective_max_tokens, total_tokens)
+        metrics.observe(scene, status, duration_s, total_tokens)
         return GenerateResult(
             text=text,
-            model=self._model_used(response),
+            model=model_used,
             request_id=request_id,
             duration_ms=duration_ms,
-            total_tokens=self._total_tokens(response),
+            total_tokens=total_tokens,
         )
 
     # ---------------------------------------------------------------- Router 构建
@@ -107,13 +135,65 @@ class GatewayClient:
             for m in g.models:
                 model_list.append(self._deployment(g.name, m))
             if g.fallbacks:
+                # LiteLLM Router 语义：{模型组: [备用组]}；备用部署挂在 "<组>-fallback" 名下
                 fallback_name = "%s-fallback" % g.name
                 for m in g.fallbacks:
                     model_list.append(self._deployment(fallback_name, m))
-                fallbacks.append({"default_model": fallback_name})
+                fallbacks.append({g.name: [fallback_name]})
         if not model_list:
             raise GatewayError("网关未配置任何模型渠道（检查 GATEWAY_MODEL_GROUPS）")
         return Router(model_list=model_list, fallbacks=fallbacks or None, num_retries=self.config.max_retries)
+
+    def _clamp_max_tokens(self, scene: str, requested: int) -> int:
+        """按 scene 钳制 max_tokens（GATEWAY_SCENE_MAX_TOKENS，未配置不限）。"""
+        cap = self.config.scene_max_tokens.get(scene)
+        if cap and requested > cap:
+            return cap
+        return requested
+
+    def _used_fallback(self, group: str, model_used: str | None) -> bool:
+        """实际命中的模型是否在该组的 fallback 名单里。
+
+        复审加固（LiteLLM 官方 Router 语义对照）：先看命中是否属于主组部署——
+        属于则必非降级；再看是否属于 fallback 部署——属于则为降级；上游改名导致
+        两边都对不上时宁可漏记不误记（DEGRADED 漏记只影响可观测，不影响正确性）。
+        归一化（小写+去 provider 前缀）兼容 deepseek-chat vs deepseek/deepseek-chat。
+        """
+        if not model_used:
+            return False
+        cfg_group = self.config.group(group)
+        if cfg_group is None or not cfg_group.fallbacks:
+            return False
+        used = self._normalize_model(model_used)
+        if any(used == self._normalize_model(m) for m in cfg_group.models):
+            return False
+        return any(used == self._normalize_model(fb) for fb in cfg_group.fallbacks)
+
+    @staticmethod
+    def _normalize_model(model: str) -> str:
+        name = (model or "").strip().lower()
+        if "/" in name:
+            name = name.split("/", 1)[1]
+        return name
+
+    def _log_fallback(self, request_id: str, scene: str, user_ref: str | None,
+                      prompt_version: str | None, model_used: str | None, duration_ms: int,
+                      total_tokens: int | None, request_hash: str, input_hash: str) -> None:
+        """fallback 生效 → 显式落 DEGRADED + scene 后缀（同 request_id upsert 覆盖回调的 SUCCESS 行）。"""
+        from gateway.db import insert_ai_call_log  # 局部导入：避免模块循环
+
+        insert_ai_call_log(
+            request_id=request_id,
+            scene=("%s:fallback" % scene)[:32],
+            status="DEGRADED",
+            model_name=model_used,
+            user_ref=user_ref,
+            prompt_version=prompt_version,
+            duration_ms=duration_ms,
+            token_estimate=total_tokens,
+            request_hash=request_hash,
+            input_hash=input_hash,
+        )
 
     def _deployment(self, model_name: str, model: str) -> dict:
         api_key, api_base = channel_credentials(model)
@@ -160,13 +240,19 @@ class GatewayClient:
 
 
 _client: GatewayClient | None = None
+_client_lock = threading.Lock()
 
 
 def get_gateway() -> GatewayClient:
-    """进程级单例；首次调用时按环境变量构建（测试可先 reset_gateway()）。"""
+    """进程级单例；首次调用时按环境变量构建（测试可先 reset_gateway()）。
+
+    稳定性：双检锁，并发首次调用不再建出多实例（此前可双 Router + 双 callback 注册）。
+    """
     global _client
     if _client is None:
-        _client = GatewayClient()
+        with _client_lock:
+            if _client is None:
+                _client = GatewayClient()
     return _client
 
 

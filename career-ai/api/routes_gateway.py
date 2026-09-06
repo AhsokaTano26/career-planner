@@ -10,13 +10,14 @@ Demo 精简点 / 后续迭代替换位置：/v1/chat/completions 暂不支持 st
 
 from __future__ import annotations
 
+import hmac
 import os
 import time
 import uuid
 from typing import List, Literal, Optional
 
 from fastapi import APIRouter, Header, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from gateway.client import GatewayError, get_gateway
 from gateway.ratelimit import GatewayRateLimited
@@ -29,23 +30,36 @@ _DISCLAIMER = "智能生成，供探索参考"
 # ---------------------------------------------------------------- 鉴权
 def _require_gateway_key(authorization: Optional[str]) -> None:
     key = os.getenv("GATEWAY_API_KEY", "")
-    if key and authorization != f"Bearer {key}":
+    # 稳定性：compare_digest 防计时侧信道；strip 容忍多余空格
+    provided = (authorization or "").strip()
+    if not key or not provided.startswith("Bearer ") or not hmac.compare_digest(
+        provided[len("Bearer "):], key
+    ):
         raise HTTPException(status_code=401, detail="网关密钥无效或缺失")
 
 
 # ---------------------------------------------------------------- /v1/chat/completions（OpenAI 兼容）
 class GatewayMessage(BaseModel):
-    role: str
-    content: str
+    role: str = Field(max_length=32)
+    # 稳定性：单条内容封顶，超长前置 400（此前透传 provider 后转 502，难区分输入非法与渠道故障）
+    content: str = Field(min_length=1, max_length=30000)
 
 
 class ChatCompletionRequest(BaseModel):
-    model: Optional[str] = None          # 网关模型组名（如 default）；缺省用 default 组
-    messages: List[GatewayMessage] = Field(min_length=1)
-    temperature: float = 0.7
-    max_tokens: int = 500
+    model: Optional[str] = Field(default=None, max_length=64)  # 网关模型组名（如 default）；缺省用 default 组
+    messages: List[GatewayMessage] = Field(min_length=1, max_length=50)
+    temperature: float = Field(default=0.7, ge=0, le=2)
+    max_tokens: int = Field(default=500, ge=1, le=8000)
     stream: bool = False
-    user: Optional[str] = None           # 脱敏用户引用（写入 ai_call_log.user_ref）
+    user: Optional[str] = Field(default=None, max_length=64)  # 脱敏用户引用（写入 ai_call_log.user_ref)
+
+    @model_validator(mode="after")
+    def _check_total_size(self):
+        # 复审加固：单条 30k×50 条≈1.5M 无总上限→总负载封顶 120k 字符（超长前置 400）
+        total = sum(len(m.content or "") for m in self.messages)
+        if total > 120_000:
+            raise ValueError("messages 总长度超限（120000 字符）")
+        return self
 
 
 @router.post("/v1/chat/completions")
@@ -86,13 +100,20 @@ def chat_completions(req: ChatCompletionRequest,
 
 # ---------------------------------------------------------------- /api/v1/gateway/generate（高层）
 class GatewayGenerateRequest(BaseModel):
-    messages: List[GatewayMessage] = Field(min_length=1)
-    scene: str = "gateway_api"
-    modelGroup: Optional[str] = None
-    temperature: float = 0.7
-    maxTokens: int = 500
-    userRef: Optional[str] = None
-    promptVersion: Optional[str] = None
+    messages: List[GatewayMessage] = Field(min_length=1, max_length=50)
+    scene: str = Field(default="gateway_api", max_length=64)
+    modelGroup: Optional[str] = Field(default=None, max_length=64)
+    temperature: float = Field(default=0.7, ge=0, le=2)
+    maxTokens: int = Field(default=500, ge=1, le=8000)
+    userRef: Optional[str] = Field(default=None, max_length=64)
+    promptVersion: Optional[str] = Field(default=None, max_length=64)
+
+    @model_validator(mode="after")
+    def _check_total_size(self):
+        total = sum(len(m.content or "") for m in self.messages)
+        if total > 120_000:
+            raise ValueError("messages 总长度超限（120000 字符）")
+        return self
 
 
 class GatewayGenerateResponse(BaseModel):

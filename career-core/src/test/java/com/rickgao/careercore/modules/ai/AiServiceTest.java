@@ -100,7 +100,7 @@ class AiServiceTest {
     @Test
     void gatewayRejectsMissingInternalTokenBeforeCallingHttpClient() {
         LlmGateway gateway = new LlmGateway(
-                "", "http://career-ai:8000", "default", 30, new ObjectMapper(),
+                "", "http://career-ai:8000", "default", 30, "", new ObjectMapper(),
                 new com.rickgao.careercore.modules.ai.service.AiCallLogWriter(mock(AiCallLogMapper.class)));
 
         BizException error = assertThrows(BizException.class,

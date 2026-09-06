@@ -15,6 +15,7 @@
         <result property="className" column="class_name"/>
         <result property="consentAgreed" column="consent_agreed"/>
         <result property="passwordChangeRequired" column="password_change_required"/>
+        <result property="tokenVersion" column="token_version"/>
         <result property="lastLoginAt" column="last_login_at"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
@@ -23,7 +24,7 @@
 
     <sql id="baseColumns">
         id, student_no, username, name, password_hash, role, status, grade, major_category,
-        class_name, consent_agreed, password_change_required, last_login_at, created_at, updated_at, deleted
+        class_name, consent_agreed, password_change_required, token_version, last_login_at, created_at, updated_at, deleted
     </sql>
 
     <select id="findById" resultMap="SysUserMap">
@@ -83,6 +84,12 @@
     <update id="updateLastLoginAt">
         UPDATE sys_user
         SET last_login_at = #{lastLoginAt}, updated_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <update id="incrementTokenVersion">
+        UPDATE sys_user
+        SET token_version = COALESCE(token_version, 0) + 1, updated_at = NOW()
         WHERE id = #{id}
     </update>
 

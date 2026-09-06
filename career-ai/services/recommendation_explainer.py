@@ -9,12 +9,15 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
 from fastapi import HTTPException
 
+from gateway.cache import explain_cache_enabled, new_explain_cache
 from providers.deepseek import DEFAULT_MODEL, LlmError
+from services.desensitizer import desensitize
 from services.llm_gateway import generate
 
 # 读取系统提示词模板；缺失时使用内置兜底文案，保证服务可独立运行
@@ -113,26 +116,79 @@ _BATCH_SYSTEM_PROMPT = (
 
 
 def explain_batch(profile: dict | None, results: list[dict], *, run_id: str | None = None,
-                  user_ref: str | None = None) -> list[dict]:
+                  user_ref: str | None = None, model_group: str | None = None,
+                  prompt_version: str | None = None,
+                  temperature: float = 0.7) -> list[dict]:
     """为候选方向批量生成推荐解释，返回 explanations 列表。
 
     输入按 Apifox ExplainRequest：profile（六维得分）、results（[{directionId, score, rank}]）。
     输出每项含 directionId/summary/confidenceText/disclaimer。
     大模型失败抛 LlmError；输出不合法抛 ValueError（由路由映射为 503）。
     run_id/user_ref 写入 ai_call_log 用于归因（Demo 精简点：仅记 user_ref，批次号暂不入库）。
+    生产化（2026-09）：identical prompt 命中进程内 LRU 缓存时直接返回，
+    另落一条 model_name='cache'、token=0 的 SUCCESS 行（不耗额度）。
+    复审 P0 修复：user_prompt 先过 desensitize（此前全程未脱敏）；缓存键绑定
+    模型组/promptVersion/temperature（此前只 hash prompt，换模型命中旧答案）；
+    缓存命中每次生成新 request_id（此前复用同一 cache-* id 致跨用户归因污染）。
     """
+    user_prompt = desensitize(_build_batch_prompt(profile, results))
+    cache_key = _cache_key(user_prompt, model_group, prompt_version, temperature)
+    if explain_cache_enabled():
+        hit = _EXPLAIN_CACHE.get(cache_key)
+        if hit is not None:
+            _log_cache_hit(user_ref)
+            # 稳定性：缓存命中同样记 metrics（否则缓存率越高 Grafana 越失真）
+            from gateway.metrics import metrics as _metrics
+
+            _metrics.observe("recommendation_explain", "SUCCESS", 0.0, None)
+            return [dict(item) for item in hit]
     content = generate(
         [
             {"role": "system", "content": _BATCH_SYSTEM_PROMPT},
-            {"role": "user", "content": _build_batch_prompt(profile, results)},
+            {"role": "user", "content": user_prompt},
         ],
-        temperature=0.7,
+        temperature=temperature,
         # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
         max_tokens=2000,
         scene="recommendation_explain",
         user_ref=user_ref,
     )
-    return _parse_batch_json(content)
+    explanations = _parse_batch_json(content)
+    if explain_cache_enabled():
+        _EXPLAIN_CACHE.set(cache_key, [dict(item) for item in explanations])
+    return explanations
+
+
+_EXPLAIN_CACHE = new_explain_cache()
+
+
+def reset_explain_cache() -> None:
+    """测试用：清空推荐解释缓存。"""
+    _EXPLAIN_CACHE.clear()
+
+
+def _cache_key(user_prompt: str, model_group: str | None = None,
+               prompt_version: str | None = None, temperature: float = 0.7) -> str:
+    material = "recommendation_explain|%s|%s|%s|%s" % (
+        model_group or "default", prompt_version or "", temperature, user_prompt)
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()
+
+
+def _log_cache_hit(user_ref: str | None) -> None:
+    """缓存命中落库：每次新 request_id（model_name='cache'），避免跨用户归因污染。"""
+    import uuid
+
+    from gateway.db import insert_ai_call_log  # 局部导入：避免循环
+
+    insert_ai_call_log(
+        request_id="cache-" + uuid.uuid4().hex[:16],
+        scene="recommendation_explain",
+        status="SUCCESS",
+        model_name="cache",
+        user_ref=user_ref,
+        duration_ms=0,
+        token_estimate=0,
+    )
 
 
 def _build_batch_prompt(profile: dict | None, results: list[dict]) -> str:

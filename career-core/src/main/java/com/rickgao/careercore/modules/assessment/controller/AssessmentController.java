@@ -56,7 +56,7 @@ public class AssessmentController {
     @PutMapping("/assessment-sessions/{sessionId}/answers")
     public ApiResponse<Void> saveAnswers(@PathVariable String sessionId,
                                          @Valid @RequestBody SaveAnswersRequest req) {
-        assessmentService.saveAnswers(sessionId, req);
+        assessmentService.saveAnswers(sessionId, SecurityUtils.currentUserId(), req);
         return ApiResponse.ok();
     }
 

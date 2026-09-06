@@ -28,11 +28,16 @@ public class JwtUtil {
     }
 
     public String createAccessToken(String userId, String username, String role) {
+        return createAccessToken(userId, username, role, 0);
+    }
+
+    public String createAccessToken(String userId, String username, String role, int tokenVersion) {
         Date now = new Date();
         return Jwts.builder()
                 .subject(userId)
                 .claim("username", username)
                 .claim("role", role)
+                .claim("tokenVersion", tokenVersion)
                 .id(UUID.randomUUID().toString())
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + accessTokenTtlSeconds * 1000))

@@ -41,12 +41,15 @@ public class LlmGateway {
     private final AiCallLogWriter callLogWriter;
     private final String apiKey;
     private final String model;
+    /** 按 scene 的 max_tokens 上限（与 career-ai 网关 GATEWAY_SCENE_MAX_TOKENS 对齐，网关侧二次钳制）。 */
+    private final java.util.Map<String, Integer> sceneMaxTokens;
 
     public LlmGateway(
             @Value("${ai.gateway-api-key:}") String apiKey,
             @Value("${ai.gateway-base-url:}") String baseUrl,
             @Value("${ai.gateway-model:}") String model,
             @Value("${ai.gateway-timeout:30}") int timeout,
+            @Value("${ai.gateway-scene-max-tokens:}") String sceneMaxTokensSpec,
             ObjectMapper objectMapper,
             AiCallLogWriter callLogWriter) {
         this.apiKey = apiKey;
@@ -54,6 +57,7 @@ public class LlmGateway {
         this.model = (model == null || model.isBlank()) ? DEFAULT_MODEL_GROUP : model;
         this.objectMapper = objectMapper;
         this.callLogWriter = callLogWriter;
+        this.sceneMaxTokens = parseSceneMaxTokens(sceneMaxTokensSpec);
         this.restClient = RestClient.builder()
                 .baseUrl(effectiveBaseUrl.replaceAll("/+$", ""))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -192,6 +196,41 @@ public class LlmGateway {
 
     public String getModel() {
         return model;
+    }
+
+    /**
+     * 按 scene 取 max_tokens 上限（生产化 2026-09：替代调用方写死的 2000/1500）。
+     * 解析 {@code ai.gateway-scene-max-tokens}（格式 {@code scene:tokens,scene:tokens}），
+     * 缺省与 career-ai 网关默认值一致；网关侧会二次钳制。
+     */
+    public int sceneMaxTokens(String scene) {
+        Integer cap = sceneMaxTokens.get(scene);
+        return cap == null ? 2000 : cap;
+    }
+
+    private static java.util.Map<String, Integer> parseSceneMaxTokens(String spec) {
+        java.util.Map<String, Integer> map = new java.util.LinkedHashMap<>();
+        map.put("career_chat", 2000);
+        map.put("recommendation_explain", 2000);
+        map.put("plan_generate", 2000);
+        map.put("review_summarize", 1500);
+        map.put("gateway_api", 500);
+        if (spec != null && !spec.isBlank()) {
+            for (String entry : spec.split(",")) {
+                String[] kv = entry.split(":");
+                if (kv.length == 2) {
+                    try {
+                        int value = Integer.parseInt(kv[1].trim());
+                        if (value > 0) {
+                            map.put(kv[0].trim(), value);
+                        }
+                    } catch (NumberFormatException ignored) {
+                        // 非法条目跳过，保持默认（fail-open）
+                    }
+                }
+            }
+        }
+        return java.util.Collections.unmodifiableMap(map);
     }
 
     // ---------------------------------------------------------------- ai_call_log 写入（委托给独立 bean，REQUIRES_NEW 保证不被外层回滚）

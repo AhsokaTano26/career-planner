@@ -12,6 +12,7 @@ import com.rickgao.careercore.modules.admin.service.AdminUserService;
 import com.rickgao.careercore.modules.admin.vo.AdminUserVO;
 import com.rickgao.careercore.modules.auth.entity.SysUser;
 import com.rickgao.careercore.modules.auth.mapper.SysUserMapper;
+import com.rickgao.careercore.security.AuthUserCache;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,8 @@ class AdminUserServiceImplTest {
     private final SysUserMapper sysUserMapper = mock(SysUserMapper.class);
     private final IdempotencyService idempotencyService = mock(IdempotencyService.class);
     private final AdminUserService service =
-            new AdminUserServiceImpl(adminUserMapper, sysUserMapper, idempotencyService);
+            new AdminUserServiceImpl(adminUserMapper, sysUserMapper, idempotencyService,
+                    mock(AuthUserCache.class));
 
     @BeforeEach
     void setUp() {

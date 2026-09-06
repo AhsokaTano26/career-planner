@@ -22,6 +22,8 @@ import com.rickgao.careercore.modules.assessment.vo.QuestionnaireDetailVO;
 import com.rickgao.careercore.modules.assessment.vo.QuestionnaireVersionVO;
 import com.rickgao.careercore.modules.assessment.vo.QuestionnaireVO;
 import com.rickgao.careercore.modules.assessment.vo.ScoreResultVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +47,8 @@ import java.util.stream.Collectors;
 @Service
 public class AssessmentService {
 
+    private static final Logger log = LoggerFactory.getLogger(AssessmentService.class);
+
     private static final String[] DIMENSIONS = {"interest", "values", "ability", "academic", "tendency", "practice"};
     private static final Map<String, String> DIM_NAMES = Map.of(
             "interest", "兴趣", "values", "价值观", "ability", "能力",
@@ -65,8 +69,13 @@ public class AssessmentService {
 
     // ---------------------------------------------------------------- 问卷
     public List<QuestionnaireVO> listQuestionnaires() {
-        return assessmentMapper.listPublishedQuestionnaires().stream()
-                .map(q -> toQuestionnaireVO(q, questionCount(q.getId())))
+        List<Questionnaire> questionnaires = assessmentMapper.listPublishedQuestionnaires();
+        // 稳定性：最新版本批量一次查出（此前每问卷一查，N+1）
+        Map<String, QuestionnaireVersion> latestByQnr = assessmentMapper
+                .listLatestVersions(questionnaires.stream().map(Questionnaire::getId).collect(Collectors.toList()))
+                .stream().collect(Collectors.toMap(QuestionnaireVersion::getQuestionnaireId, v -> v, (a, b) -> a));
+        return questionnaires.stream()
+                .map(q -> toQuestionnaireVO(q, questionCount(latestByQnr.get(q.getId()))))
                 .collect(Collectors.toList());
     }
 
@@ -82,12 +91,14 @@ public class AssessmentService {
                     .collect(Collectors.groupingBy(QuestionOption::getQuestionId, LinkedHashMap::new, Collectors.toList()));
             for (Question qu : qs) {
                 List<QuestionOption> qOpts = optMap.getOrDefault(qu.getId(), List.of());
+                // 防御：题库 dim 脏 NULL 时 List.of(null) 抛 NPE，整卷 500；未知维度兜底展示
+                String dim = qu.getDim() == null ? "未知维度" : DIM_NAMES.getOrDefault(qu.getDim(), qu.getDim());
                 questions.add(QuestionVO.builder()
                         .id(qu.getId())
                         .text(qu.getText())
                         .type(qu.getType())
                         .dim(qu.getDim())
-                        .labels(List.of(DIM_NAMES.getOrDefault(qu.getDim(), qu.getDim())))
+                        .labels(List.of(dim))
                         .options(qOpts.stream().map(this::toOptionVO).collect(Collectors.toList()))
                         .build());
             }
@@ -131,8 +142,9 @@ public class AssessmentService {
     }
 
     @Transactional
-    public void saveAnswers(String sessionId, SaveAnswersRequest req) {
-        AssessmentSession session = requireOwnSession(sessionId, null);
+    public void saveAnswers(String sessionId, String studentId, SaveAnswersRequest req) {
+        // 安全：保存答案同样必须校验会话归属（此前传 null 跳过检查，他人可覆盖答案）
+        AssessmentSession session = requireOwnSession(sessionId, studentId);
         if ("COMPLETED".equals(session.getStatus()) || "SCORED".equals(session.getStatus())) {
             throw new BizException(ResultCode.STATE_CONFLICT, "会话已提交，无法再保存");
         }
@@ -159,10 +171,22 @@ public class AssessmentService {
 
     public List<AssessmentSessionVO> listMySessions(String studentId) {
         List<AssessmentSession> sessions = assessmentMapper.listSessions(studentId);
+        if (sessions.isEmpty()) {
+            return List.of();
+        }
+        // 稳定性：版本与问卷名批量一次查出（此前每会话 2 查，2N+1）
+        Map<String, QuestionnaireVersion> versionById = assessmentMapper.listVersionsByIds(
+                sessions.stream().map(AssessmentSession::getQuestionnaireVersionId)
+                        .filter(id -> id != null).distinct().collect(Collectors.toList()))
+                .stream().collect(Collectors.toMap(QuestionnaireVersion::getId, v -> v, (a, b) -> a));
+        Map<String, String> nameByQnrId = assessmentMapper.listQuestionnairesByIds(
+                versionById.values().stream().map(QuestionnaireVersion::getQuestionnaireId)
+                        .filter(id -> id != null).distinct().collect(Collectors.toList()))
+                .stream().collect(Collectors.toMap(Questionnaire::getId, Questionnaire::getName, (a, b) -> a));
         return sessions.stream().map(s -> {
             QuestionnaireVersion v = s.getQuestionnaireVersionId() == null ? null
-                    : assessmentMapper.findVersionById(s.getQuestionnaireVersionId());
-            String name = v == null ? "" : questionnaireName(v.getQuestionnaireId());
+                    : versionById.get(s.getQuestionnaireVersionId());
+            String name = v == null ? "" : nameByQnrId.getOrDefault(v.getQuestionnaireId(), "");
             return toSessionVO(s, name, v == null ? null : v.getVersion());
         }).collect(Collectors.toList());
     }
@@ -238,6 +262,10 @@ public class AssessmentService {
 
     private int questionCount(String questionnaireId) {
         QuestionnaireVersion v = assessmentMapper.findLatestVersion(questionnaireId);
+        return questionCount(v);
+    }
+
+    private int questionCount(QuestionnaireVersion v) {
         return v == null ? 0 : (v.getQuestionCount() == null ? 0 : v.getQuestionCount());
     }
 
@@ -296,6 +324,7 @@ public class AssessmentService {
         try {
             return objectMapper.readValue(json, LinkedHashMap.class);
         } catch (Exception exc) {
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
             return new LinkedHashMap<>();
         }
     }
@@ -317,7 +346,9 @@ public class AssessmentService {
                             .build());
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            // 稳定性：脏 JSON 不再静默归零，记 warn 便于定位
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
         }
         return out;
     }

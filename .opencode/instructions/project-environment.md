@@ -155,3 +155,33 @@
 ## 12. 环境依赖有任何的安装和更改都请记得更新该文档
 
 ## 13.有任何问题请问我
+
+## 14. Linux 容器环境补充（2026-09-05，自主搭建）
+
+> 本节记录非 Windows 开发机的第二套环境（当前容器）。与上面 Windows 章节互补，互不覆盖。
+
+- **系统**：Ubuntu 22.04（WSL2 内核 `6.18.33.2-microsoft-standard-wsl2`），用户 `uio8k`，**无 root/sudo**（`sudo -n` 需密码），`apt install` 不可用
+- **JDK 17**：`~/devtools/jdk-17.0.20+8`（Temurin 17.0.20+8，GitHub adoptium 解压即用）
+- **Maven**：走仓库 `career-core/mvnw`（wrapper 自动下载 3.9.16 到 `~/.m2/wrapper`；注意 checkout 后需 `chmod +x mvnw`）
+- **MySQL 8.0.46**：`apt-get download mysql-server-core-8.0 mysql-client-core-8.0 libevent-pthreads-2.1-7 libprotobuf23 libprotobuf-lite23 libaio1` → `dpkg-deb -x` 到 `~/devtools/mysql-pkg/root`，`mysqld --initialize-insecure --datadir=~/mysql-data`，用户态运行（端口 3306，socket `~/mysql-run/mysqld.sock`，`LD_LIBRARY_PATH` 指向解包的 `usr/lib/x86_64-linux-gnu`）。库 `career_core`，账号 `career`/`career123`（见 `~/devtools/env.sh`）
+- **环境一键载入**：`source ~/devtools/env.sh`（`JAVA_HOME`/`PATH`/`LD_LIBRARY_PATH`/`DB_PASSWORD`/`JWT_SECRET`）
+- **后台进程保活坑**：bash 工具超时会连带杀掉 `&` 后台进程（含 `nohup`）。可靠做法：`setsid ... & disown` 启动，且**构建与启动分两次调用**（勿把 `mvnw` 长构建和后台启动写在同一条命令里）
+- **Python**：系统 `python3`（3.10），冒烟脚本仅标准库，无需 pip
+- **career-ai 专用 Python 3.12**：`~/devtools/python`（python-build-standalone 3.12.11 解压即用，自带 pip；系统 3.10 跑不起 litellm 1.98.0）；依赖装在其自带 site-packages（`pip install -r career-ai/requirements.txt`，对齐 Dockerfile python:3.12-slim）
+- **career-ai 本地配置**：`career-ai/.env`（gitignore，不入库；`GATEWAY_API_KEY=career-dev-gateway-key-2026`，无真实 LLM 密钥→走 502/503 降级验证）；启动：`setsid ~/devtools/python/bin/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000`（必须在 `career-ai/` 目录下执行，`api` 包导入依赖当前目录）
+- **core 调网关**：core 启动环境必须带 `AI_GATEWAY_API_KEY`（与 career-ai 的 `GATEWAY_API_KEY` 同值，见 `~/devtools/env.sh`）；为空时 `LlmGateway` 直接抛“内部令牌未配置”
+- **联调冒烟**：`python3 tests/ai_gateway_smoke.py`（直调 15 项：health/鉴权/限流校验/降级码/转人工/history/反馈 + core 端到端 5 项回退；无 LLM key 时 20 项 ALL PASS 为通过标准）
+- **真 LLM 模式**：`CAREER_AI_REAL_LLM=1 python3 tests/ai_gateway_smoke.py`（需 `.env` 配真实 `LLM_API_KEY`，仅放 gitignore 的 `career-ai/.env`，不得入库/进日志；2026-09-06 已用 DeepSeek 验证 20 项 ALL PASS，`ai_call_log` SUCCESS 落库+token 计数正常）
+- **2026-09-06 网关生产化**：fallback 链（`GATEWAY_MODEL_GROUPS[].fallbacks`，Router `{组:[备用组]}` 语义，命中记 `DEGRADED` + scene 后缀）、scene 上限（`GATEWAY_SCENE_MAX_TOKENS`，core 以 `ai.gateway-scene-max-tokens` 对齐）、日预算（`GATEWAY_DAILY_TOKEN_BUDGET`，超限 429→core 模板消化）、解释缓存（`GATEWAY_EXPLAIN_CACHE*`，命中 `model_name='cache'` token 0）、`/metrics`（Prometheus 文本，Grafana 按 job=career-ai 抓）；`litellm==1.98.0` 已对 PyPI sha256 校验一致；冒烟增至 21 项（+`/metrics`），双模式 ALL PASS
+- **2026-09-06 稳定性加固**：`sys_user.token_version`（`DatabaseSchemaMigration` 自动加列；改密/重置/停用即刻失效旧 token，**现存登录态需重登**）；career-ai 的 AI 路由与网关同 Bearer 密钥、`GATEWAY_API_KEY` 为空拒绝启动；冒烟增至 22 项（+AI 无 key 401）；pytest 48 项
+- **2026-09-06 复审第二轮**（`docs/稳定性复审报告.md`）：`refresh_token.token_hash`（双写兼容一轮：新行明文+哈希并存，读优先哈希；**下轮停写明文删回退**）+ `uk_token_hash`；`stage_review.uk_review_student_cycle`（并发草稿幂等）；refresh 复用即吊销全用户 refresh（REQUIRES_NEW，客户端只保留最新）；网关 history 按 studentRef 分区；`/metrics` 需 Bearer；`AuthUserCache` 60s（黑名单仍实时）；冒烟 23 项；pytest 49 项；`mvnw test` 106 项；vitest 27 项
+- **Node**：`~/.nvm` 下 v20.20.2（2026-09-06 由 v18.20.8 升级，与 Docker `node:20-alpine` @v20.20.2 对齐，`nvm alias default 20.20.2`；v18 保留未删）+ v18.20.8；`npm run build`（vue-tsc+vite，481 模块）与 `npm run test`（vitest 5 文件/8 用例）均已在 v20.20.2 下验证通过
+- **前端新增依赖 `echarts@5.6.0`**（2026-09-06，雷达图；按需引入 core+RadarChart+Tooltip+Legend+CanvasRenderer 并动态 `import()` 拆独立 chunk，主包仅 +7KB；无 Docker 对齐问题，`npm ci` 自带）+ **`playwright-core@^1.63` dev**（截图脚本用，浏览器不随包下载）
+- **雷达视觉能力升级**（2026-09-06，P0→P3）：Skill `viz-design`（雷达 7 铁律：同量程/5-8轴/≤2多边形/填充10-20%/基准线必备/数字兜底/条形自检）；主题 Token 单源 `fronted/src/utils/theme-tokens.ts`（跟随 styles.css `:root`，单测逐项回归）；`playwright` MCP（local，`plan` 下关，`PATH` 需指 nvm Node20，否则报 Node18 不兼容）；Chromium headless-shell 1243（`~/.cache/ms-playwright`，缺 `libnspr4/libnss3/libasound2`→`apt-get download` 解到 `~/devtools/chromium-libs`，跑脚本时 `LD_LIBRARY_PATH` 指向它）；命令 `/viz-check` + 脚本 `fronted/scripts/viz-shots.mjs`（李明号三页×三断点，基线 `docs/viz-baseline/`）；雷达最终形态（用户裁决 2026-09：HLTV 广播语言重大蓝版，去绿）：标准蓝 `#004b9d` 3px 辉光描边 + 14% 淡蓝填充 + 深海军蓝方点 + 顶点 HUD 数字小牌 + 浅蓝灰实线网格 + 12px 等宽轴名，居中大图（400px），数字由 `metric-grid` 承担；目标虚线圈/平均线均不入图（后端平均线待办保留）
+- **`application-local.yml`**：已按 `application-local.example.yml` 生成（gitignore，不入库），数据源指向本容器 MySQL
+- **2026-09-05 改动同步**：`core-domains.sql` 移除 15 处 MariaDB 方言 `ADD COLUMN IF NOT EXISTS`（标准 MySQL 8 启动即报语法错），列补齐移入 `DatabaseSchemaMigration`（沿用其 information_schema 检测模式）；`application.yml` 的 `data-locations` 接入 `seed-directions.sql` + `seed-questionnaires.sql`（空库启动即有 4 方向/2 问卷/9 题）；`tests/smoke_api.py` 重写为 JWT 契约（含注册→首改密码→登录→画像/推荐/计划/401 基线，10 项 ALL PASS）
+- **2026-09-06 学生测试账号**（本容器 DB，非种子）：白名单新增 WL004~006（`2026011311`赵磊/`2026011312`陈静/`2026011313`刘洋，验证码 `202611/202612/202613`）；已走真实注册+首改流程开好 4 号：`2026011301`（李明）+ 上述 3 号，密码统一 `Student@2026`，可直接登录；另注意注册接口要求 `initialPassword` 必须等于白名单 `verify_code`，且 5 次错密触发 15 分钟内存锁（重启 core 清除）
+- **2026-09-06 辅导员联调测试数据**（本容器 DB，非种子）：`2026011309` 由白名单 WL002 注册后改 role=ADVISOR（密码 `Advisor@2026`），`POST /admin/relations` 绑定学生 `S1003`；admin 密码保持文档默认值 `Admin@2026`
+- **2026-09-06 OpenCode 提效配置**：新增项目 Skill `backend-verify`/`db-migration`/`api-contract`/`smoke-run`（`.opencode/skills/`），`apifox-cli` 补 Linux 段；新增命令 `/smoke`、`/contract-check`、`/verify-frontend`（`.opencode/commands/`，`subtask:true` 隔离）；`opencode.json` 加 `context7`（remote，官方文档检索）+ `mysql-ro`（local，只读 MCP，包 `@matpb/mysql-mcp-server` 2.0.0，仅 `show_tables/describe_table/execute_query` 三工具+语句消毒）MCP，`plan` agent 默认关 `mysql-ro_*`（build 才开），`compaction{auto,prune,reserved:10000}` + `build.steps:40`；根目录新增精简 `AGENTS.md`；新增插件 `.opencode/plugins/secret-blocker.js`（禁读 `career-ai/.env`/`application-local.yml`/`devtools/env.sh`，禁写 `afxp_/sk-/PRIVATE KEY` 落库）
+- **MySQL 只读账号 `career_ro`**（本容器 DB，供 `mysql-ro` MCP）：`GRANT SELECT, SHOW VIEW ON career_core.*`（无建表/写权限，已验证 `CREATE` 被拒）；密码只存 `~/devtools/env.sh` 的 `MYSQL_RO_PASS`（gitignore 之外、不入库），opencode 侧以 `{env:MYSQL_RO_PASS}` 引用；官方 `@modelcontextprotocol/server-mysql` 已从 npm 下架（404），改用社区 `@matpb/mysql-mcp-server`
+- **Apifox MCP 在 Linux 容器已修好**（2026-09-06：`opencode.json` 的 command 由 Windows 版 `cmd /c npx` 改为 `npx` 直调，`mcp list` 三服务全 connected；Token 按用户要求保持明文暂不改）。Linux 下 Apifox 走 MCP（读）+ CLI（`apifox-cli` Skill）双通道

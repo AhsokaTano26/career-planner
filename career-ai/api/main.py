@@ -18,9 +18,9 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel
 
 # 加载 career-ai/.env（如存在）
@@ -29,7 +29,15 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    """启动时预热网关（Demo 精简点：失败不阻塞启动，调用时报错）。"""
+    """启动时预热网关（Demo 精简点：失败不阻塞启动，调用时报错）。
+
+    稳定性（2026-09）：GATEWAY_API_KEY 为空 = 未配置内部密钥 → fail-closed 拒绝启动，
+    杜绝 AI 路由无鉴权裸奔（此前空 key 自动放行）。
+    """
+    import os
+
+    if not os.getenv("GATEWAY_API_KEY", ""):
+        raise RuntimeError("GATEWAY_API_KEY 未配置：AI 路由要求内部鉴权，拒绝无密钥启动")
     try:
         from gateway.client import get_gateway
 
@@ -97,7 +105,7 @@ async def http_exception_handler(_request: Request, exc: HTTPException):
         content={
             "code": _ERROR_CODE_BY_STATUS.get(exc.status_code, "ERROR"),
             "message": str(exc.detail),
-            "data": [],
+            "data": {},
             "traceId": _uuid.uuid4().hex,
             "timestamp": _now_local(),
         },
@@ -157,13 +165,21 @@ class ExplainResponse(BaseModel):
 
 # ---------------------------------------------------------------- 路由
 @app.post("/v1/recommendation/explain", response_model=ExplainResponse)
-def recommendation_explain(req: ExplainRequest) -> ExplainResponse:
+def recommendation_explain(req: ExplainRequest,
+                           authorization: Optional[str] = Header(default=None)) -> ExplainResponse:
     """根据结构化评分数据生成自然语言推荐解释（调用大模型，失败抛 502 由调用方回退）。"""
+    import os
+
+    from fastapi import HTTPException as _HTTPException
+
+    key = os.getenv("GATEWAY_API_KEY", "")
+    if not key:
+        raise _HTTPException(status_code=503, detail="AI 服务未配置内部密钥，拒绝服务")
+    if authorization != f"Bearer {key}":
+        raise _HTTPException(status_code=401, detail="内部密钥无效或缺失")
     from services.recommendation_explainer import explain
 
     return explain(req)
-
-
 @app.get("/health")
 def health() -> Dict[str, object]:
     """健康检查（含网关概要：模型组 / rpm / 日志落库配置）。"""
@@ -183,3 +199,26 @@ def health() -> Dict[str, object]:
     except Exception as exc:  # noqa: BLE001 - 健康检查不因网关未就绪而失败
         summary["gateway"] = {"status": "unavailable", "reason": str(exc)}
     return summary
+
+
+@app.get("/metrics", response_class=PlainTextResponse)
+def prometheus_metrics(authorization: Optional[str] = Header(default=None)) -> str:
+    """Prometheus 指标（career_ai_requests_total / tokens / duration 直方图）。
+
+    Grafana 抓取示例：job=career-ai, targets=['127.0.0.1:8000'], metrics_path=/metrics；
+    p95 = histogram_quantile(0.95, sum(rate(career_ai_duration_seconds_bucket[5m])) by (le, scene))。
+    Demo 精简点：进程内累计（多 worker 各自累计，抓取端 sum 聚合）。
+    复审加固：/metrics 同网关 Bearer 鉴权（此前无鉴权暴露请求量/token 量）。
+    """
+    import hmac
+    import os
+
+    key = os.getenv("GATEWAY_API_KEY", "")
+    provided = (authorization or "").strip()
+    if not key or not provided.startswith("Bearer ") or not hmac.compare_digest(
+        provided[len("Bearer "):], key
+    ):
+        raise HTTPException(status_code=401, detail="指标接口需内部密钥")
+    from gateway.metrics import metrics
+
+    return metrics.render()

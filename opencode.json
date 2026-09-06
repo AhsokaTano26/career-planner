@@ -6,12 +6,55 @@
     ".opencode/instructions/workflow.md",
     ".opencode/instructions/pitfalls.md"
   ],
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 10000
+  },
+  "permission": {
+    "skill": {
+      "*": "allow"
+    }
+  },
+  "agent": {
+    "build": {
+      "steps": 40
+    },
+    "plan": {
+      "tools": {
+        "mysql-ro_*": false,
+        "playwright_*": false
+      }
+    }
+  },
   "mcp": {
     "生涯规划 API 文档": {
       "type": "local",
-      "command": ["cmd", "/c", "npx", "-y", "apifox-mcp-server@latest", "--project-id=8662286"],
+      "command": ["npx", "-y", "apifox-mcp-server@latest", "--project-id=8662286"],
       "environment": {
         "APIFOX_ACCESS_TOKEN": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo"
+      }
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "mysql-ro": {
+      "type": "local",
+      "command": ["npx", "-y", "@matpb/mysql-mcp-server"],
+      "environment": {
+        "MYSQL_HOST": "127.0.0.1",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "career_ro",
+        "MYSQL_PASSWORD": "{env:MYSQL_RO_PASS}",
+        "MYSQL_DATABASE": "career_core"
+      }
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp@latest"],
+      "environment": {
+        "PATH": "/home/uio8k/.nvm/versions/node/v20.20.2/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       }
     }
   }

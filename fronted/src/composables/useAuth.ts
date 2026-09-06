@@ -1,7 +1,7 @@
 import { ref } from 'vue'
-import { api, clearAuthSession, getErrorMessage, hasAccessToken, hasRefreshToken, setAuthTokens } from '../api/request'
+import { api, clearAuthSession, getErrorMessage, hasAccessToken, hasRefreshToken, onAuthInvalidated, setAuthTokens } from '../api/request'
 import type { Role, User } from '../types/domain'
-import { useToast } from './useToast'
+import { resetToast, useToast } from './useToast'
 
 export type AuthPayload = {
   mode: 'login' | 'register' | 'reset'
@@ -37,6 +37,23 @@ export function onSessionReset(handler: SessionResetHandler) {
 export function runSessionResets() {
   sessionResetHandlers.forEach(handler => handler())
 }
+
+/** 模块级会话清理（401/登出统一入口；request.ts 经 onAuthInvalidated 反向调用）。 */
+function resetSessionState() {
+  currentUser.value = null
+  role.value = 'STUDENT'
+  loggedIn.value = false
+  forcePasswordChange.value = false
+  error.value = ''
+  saving.value = false
+  forcedPasswordSaving.value = false
+  resetToast()
+  runSessionResets()
+  restoring = null
+}
+
+// 401 即清单例（含 request.ts 路径），不再等下次守卫
+onAuthInvalidated(resetSessionState)
 
 export function useAuth() {
   const { show: notice } = useToast()
@@ -96,12 +113,7 @@ export function useAuth() {
 
   /** Drop the local session without relying on the server (used by 401 invalidation too). */
   function resetSession() {
-    currentUser.value = null
-    role.value = 'STUDENT'
-    loggedIn.value = false
-    forcePasswordChange.value = false
-    runSessionResets()
-    restoring = null
+    resetSessionState()
   }
 
   async function logout() {

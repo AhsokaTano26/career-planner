@@ -45,12 +45,12 @@ public class PortraitController {
 
     @GetMapping("/profile-snapshots/{snapshotId}")
     public ApiResponse<ProfileSnapshotVO> getSnapshot(@PathVariable String snapshotId) {
-        return ApiResponse.ok(portraitService.getSnapshot(snapshotId));
+        return ApiResponse.ok(portraitService.getSnapshot(snapshotId, SecurityUtils.currentUserId()));
     }
 
     @PostMapping("/profile-snapshots/{snapshotId}/feedback")
     public ApiResponse<ProfileSnapshotVO> addFeedback(@PathVariable String snapshotId,
                                                       @Valid @RequestBody ProfileFeedbackRequest req) {
-        return ApiResponse.ok(portraitService.addFeedback(snapshotId, req));
+        return ApiResponse.ok(portraitService.addFeedback(snapshotId, SecurityUtils.currentUserId(), req));
     }
 }

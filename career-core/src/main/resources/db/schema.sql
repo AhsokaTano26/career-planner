@@ -80,12 +80,14 @@ CREATE TABLE IF NOT EXISTS consent_record (
 CREATE TABLE IF NOT EXISTS refresh_token (
     id         VARCHAR(32) NOT NULL,
     user_id    VARCHAR(32) NOT NULL,
-    token      VARCHAR(128) NOT NULL COMMENT '刷新令牌(随机串)',
+    token      VARCHAR(128) NOT NULL COMMENT '刷新令牌(随机串，双写兼容期；切读后停写)',
+    token_hash VARCHAR(64) DEFAULT NULL COMMENT '刷新令牌SHA-256(切读后唯一凭证)',
     expires_at DATETIME NOT NULL COMMENT '过期时间',
     revoked    TINYINT(1)  NOT NULL DEFAULT 0 COMMENT '是否已作废(登出/刷新轮换)',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uk_token (token),
+    UNIQUE KEY uk_token_hash (token_hash),
     KEY idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='刷新令牌';
 

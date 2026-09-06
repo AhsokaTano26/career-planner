@@ -9,6 +9,7 @@ import com.rickgao.careercore.modules.ai.dto.AiChatContext;
 import com.rickgao.careercore.modules.ai.dto.AiChatFeedbackRequest;
 import com.rickgao.careercore.modules.ai.dto.AiChatRequest;
 import com.rickgao.careercore.modules.ai.dto.AiExplainBatchRequest;
+import com.rickgao.careercore.modules.ai.dto.AiExplainResultItem;
 import com.rickgao.careercore.modules.ai.dto.AiPdfParseRequest;
 import com.rickgao.careercore.modules.ai.dto.AiPlanGenerateRequest;
 import com.rickgao.careercore.modules.ai.dto.AiReviewSummarizeRequest;
@@ -48,7 +49,8 @@ import java.util.Map;
  * <p>Demo 精简点 / 后续迭代替换位置：
  *  - chat 历史与反馈已落库（取代原 ConcurrentHashMap / CopyOnWriteArrayList）；
  *  - 转人工检测用关键词匹配；
- *  - 大模型失败时抛 BizException(INTERNAL_ERROR)，由调用方决定降级。
+ *  - 大模型不可用（未配置/超时/502/输出非法）时本类直接返回确定性模板内容
+ *    （FALLBACK，主业务流程不失败；ai_call_log 仍由 LlmGateway 记录 FAILED）。
  */
 @Service
 public class AiService {
@@ -83,7 +85,8 @@ public class AiService {
 
     // ---------------------------------------------------------------- chat
 
-    @Transactional
+    // 注意：此处刻意不用 @Transactional——先调远程 LLM（数十秒），再单语句落库；
+    // 若包事务会长期占用 DB 连接导致池耗尽（2026-09 稳定性）。insertBatch 单语句原子性足够。
     public AiChatVO chat(AiChatRequest req) {
         String userId = resolveUserId(req.getStudentRef());
         String messageGroup = java.util.UUID.randomUUID().toString().replace("-", "");
@@ -94,8 +97,15 @@ public class AiService {
         if (needsHuman) {
             answer = "该问题可能涉及心理健康、医疗或法律等专业领域，建议联系辅导员或专业机构获取帮助。";
         } else {
-            answer = llm.generate(buildChatMessages(sanitizedQuestion, req.getContext()), 0.7, 2000,
-                    "career_chat", userId, null, messageGroup);
+            try {
+                answer = llm.generate(buildChatMessages(sanitizedQuestion, req.getContext()), 0.7,
+                        llm.sceneMaxTokens("career_chat"),
+                        "career_chat", userId, null, messageGroup);
+            } catch (BizException exc) {
+                // Demo 精简点：网关不可用时回退确定性答复（主流程不失败）
+                log.warn("生涯咨询大模型不可用，回退模板答复: {}", exc.getMessage());
+                answer = "AI 服务暂时不可用，你可以先对照推荐方向完成一门基础课与一个小项目，稍后再来提问（" + DISCLAIMER + "）。";
+            }
         }
         String supportReason = needsHuman ? "涉及心理健康/医疗/法律等话题，建议转人工或专业机构" : "";
 
@@ -178,23 +188,55 @@ public class AiService {
         List<Map<String, String>> messages = List.of(
                 mapOf("role", "system", "content", EXPLAIN_SYSTEM_PROMPT),
                 mapOf("role", "user", "content", desensitizer.maskFreeText(buildExplainPrompt(req))));
-        String content = llm.generate(messages, 0.7, 2000, "recommendation_explain", runId, null, runId);
-        List<Map<String, String>> items = parseExplainJson(content);
         List<AiExplanationItemVO> vos = new ArrayList<>();
-        for (Map<String, String> item : items) {
-            vos.add(AiExplanationItemVO.builder()
-                    .directionId(item.get("directionId"))
-                    .summary(item.get("summary"))
-                    .confidenceText(item.getOrDefault("confidenceText", "数据基本完整，供参考"))
-                    .disclaimer(item.getOrDefault("disclaimer", DISCLAIMER))
-                    .build());
+        try {
+            String content = llm.generate(messages, 0.7, llm.sceneMaxTokens("recommendation_explain"),
+                    "recommendation_explain", runId, null, runId);
+            List<Map<String, String>> items = parseExplainJson(content);
+            for (Map<String, String> item : items) {
+                vos.add(AiExplanationItemVO.builder()
+                        .directionId(item.get("directionId"))
+                        .summary(item.get("summary"))
+                        .confidenceText(item.getOrDefault("confidenceText", "数据基本完整，供参考"))
+                        .disclaimer(item.getOrDefault("disclaimer", DISCLAIMER))
+                        .build());
+            }
+        } catch (BizException exc) {
+            // Demo 精简点：网关不可用/输出非法时按规则分回退模板解释
+            log.warn("推荐解释大模型不可用，回退规则模板: {}", exc.getMessage());
+            vos = fallbackExplanations(req);
         }
         return AiExplainBatchVO.builder().runId(runId).explanations(vos).build();
     }
 
+    /**
+     * 推荐解释回退：按规则评分生成确定性解释（只引用候选项，不下结论）。
+     * Demo 精简点 / 后续迭代替换位置：话术固定，后续可按画像维度细化。
+     */
+    private List<AiExplanationItemVO> fallbackExplanations(AiExplainBatchRequest req) {
+        List<AiExplanationItemVO> out = new ArrayList<>();
+        if (req.getResults() == null) {
+            return out;
+        }
+        for (AiExplainResultItem r : req.getResults()) {
+            double score = r.getScore() == null ? 0 : r.getScore();
+            String level = score >= 75 ? "匹配度较高" : score >= 55 ? "匹配度中等" : "匹配度一般";
+            out.add(AiExplanationItemVO.builder()
+                    .directionId(r.getDirectionId())
+                    .summary("方向" + r.getDirectionId() + "规则评分"
+                            + Math.round(score) + "分（排名第" + r.getRank() + "），" + level
+                            + "，建议结合兴趣与已修课程进一步探索（模板生成，" + DISCLAIMER + "）。")
+                    .confidenceText(score >= 75 ? "数据较完整，供参考"
+                            : score >= 55 ? "数据基本完整，供参考" : "数据较少，仅供初步参考")
+                    .disclaimer(DISCLAIMER)
+                    .build());
+        }
+        return out;
+    }
+
     // ---------------------------------------------------------------- 计划生成
 
-    @Transactional
+    // 注意：同 chat，不包事务（本方法无写库，仅组装 LLM 输入输出）。
     public AiPlanResultVO generatePlan(AiPlanGenerateRequest req) {
         String userId = resolveUserId(req.getStudentRef());
         String goal = (req.getGoalSummary() != null && !req.getGoalSummary().isBlank())
@@ -208,42 +250,108 @@ public class AiService {
                 + "\n参考模板：" + templateJson
                 + "\n请生成计划草案 JSON。";
         String reqId = "plan-" + java.util.UUID.randomUUID().toString().substring(0, 8);
-        String content = llm.generate(List.of(
-                mapOf("role", "system", "content", PLAN_SYSTEM_PROMPT),
-                mapOf("role", "user", "content", desensitizer.maskFreeText(userPrompt))), 0.7, 2000,
-                "plan_generate", req.getDirectionId(), null, reqId);
-        JsonNode node = parseJson(content);
-        AiPlanResultVO result = AiPlanResultVO.builder()
-                .goalSummary(textOr(node, "goalSummary", "围绕目标方向完成一学期学习与一个小项目"))
-                .semesterGoals(parseSemesterGoals(node.path("semesterGoals")))
-                .monthlyTasks(parseMonthlyTasks(node.path("monthlyTasks")))
-                .notes(textList(node.path("notes")))
-                .build();
+        AiPlanResultVO result;
+        try {
+            String content = llm.generate(List.of(
+                    mapOf("role", "system", "content", PLAN_SYSTEM_PROMPT),
+                    mapOf("role", "user", "content", desensitizer.maskFreeText(userPrompt))), 0.7,
+                    llm.sceneMaxTokens("plan_generate"),
+                    "plan_generate", req.getDirectionId(), null, reqId);
+            JsonNode node = parseJson(content);
+            result = AiPlanResultVO.builder()
+                    .goalSummary(textOr(node, "goalSummary", "围绕目标方向完成一学期学习与一个小项目"))
+                    .semesterGoals(parseSemesterGoals(node.path("semesterGoals")))
+                    .monthlyTasks(parseMonthlyTasks(node.path("monthlyTasks")))
+                    .notes(textList(node.path("notes")))
+                    .build();
+        } catch (BizException exc) {
+            // Demo 精简点：网关不可用/输出非法时回退模板计划（有模板用模板，否则默认）
+            log.warn("计划生成大模型不可用，回退模板计划: {}", exc.getMessage());
+            result = fallbackPlanResult(req, goal);
+        }
 
         return result;
     }
 
+    /**
+     * 计划生成回退：优先采用请求自带模板，否则返回默认四段式学期计划。
+     * Demo 精简点 / 后续迭代替换位置：默认任务固定，后续可按方向任务模板库生成。
+     */
+    private AiPlanResultVO fallbackPlanResult(AiPlanGenerateRequest req, String goal) {
+        if (req.getTemplate() != null) {
+            List<AiSemesterGoalVO> goals = new ArrayList<>();
+            if (req.getTemplate().getSemesterGoals() != null) {
+                for (var g : req.getTemplate().getSemesterGoals()) {
+                    goals.add(AiSemesterGoalVO.builder()
+                            .title(g.getTitle()).abilityTag(g.getAbilityTag()).build());
+                }
+            }
+            List<AiMonthlyTaskVO> tasks = new ArrayList<>();
+            if (req.getTemplate().getMonthlyTasks() != null) {
+                for (var t : req.getTemplate().getMonthlyTasks()) {
+                    tasks.add(AiMonthlyTaskVO.builder()
+                            .month(t.getMonth()).title(t.getTitle())
+                            .taskType(t.getTaskType()).estimatedHours(t.getEstimatedHours()).build());
+                }
+            }
+            return AiPlanResultVO.builder()
+                    .goalSummary(req.getTemplate().getGoalSummary() != null
+                            ? req.getTemplate().getGoalSummary() : goal)
+                    .semesterGoals(goals)
+                    .monthlyTasks(tasks)
+                    .notes(List.of("模板生成，" + DISCLAIMER))
+                    .build();
+        }
+        String[] titles = {"完成基础课程学习", "参与一个项目实践", "参加行业讲座", "整理学习心得与复盘"};
+        String[] types = {"LEARNING", "PRACTICE", "CAREER", "REVIEW"};
+        java.time.LocalDate base = java.time.LocalDate.now().withDayOfMonth(1);
+        List<AiMonthlyTaskVO> tasks = new ArrayList<>();
+        for (int i = 0; i < titles.length; i++) {
+            tasks.add(AiMonthlyTaskVO.builder()
+                    .month(base.plusMonths(i).toString().substring(0, 7))
+                    .title(titles[i]).taskType(types[i]).estimatedHours(20.0).build());
+        }
+        return AiPlanResultVO.builder()
+                .goalSummary(goal)
+                .semesterGoals(List.of(AiSemesterGoalVO.builder().title("打好方向基础").build()))
+                .monthlyTasks(tasks)
+                .notes(List.of("模板生成，" + DISCLAIMER))
+                .build();
+    }
+
     // ---------------------------------------------------------------- 复盘总结
 
-    @Transactional
+    // 注意：同 chat，不包事务（本方法无写库）。
     public AiReviewSummaryVO reviewSummarize(AiReviewSummarizeRequest req) {
         String userId = resolveUserId(req.getStudentRef());
         String cycle = req.getCycle();
         String userPrompt = desensitizer.maskFreeText(buildReviewPrompt(req));
         String reqId = "review-" + java.util.UUID.randomUUID().toString().substring(0, 8);
-        String content = llm.generate(List.of(
-                mapOf("role", "system", "content", REVIEW_SYSTEM_PROMPT),
-                mapOf("role", "user", "content", userPrompt)), 0.5, 1500,
-                "review_summarize", cycle, null, reqId);
         AiReviewSummaryVO result;
         try {
-            JsonNode node = parseJson(content);
-            String summary = textOr(node, "summary", content);
-            List<String> suggestions = textList(node.path("suggestions"));
-            result = AiReviewSummaryVO.builder().summary(summary).suggestions(suggestions).build();
+            String content = llm.generate(List.of(
+                    mapOf("role", "system", "content", REVIEW_SYSTEM_PROMPT),
+                    mapOf("role", "user", "content", userPrompt)), 0.5,
+                    llm.sceneMaxTokens("review_summarize"),
+                    "review_summarize", cycle, null, reqId);
+            try {
+                JsonNode node = parseJson(content);
+                String summary = textOr(node, "summary", content);
+                List<String> suggestions = textList(node.path("suggestions"));
+                result = AiReviewSummaryVO.builder().summary(summary).suggestions(suggestions).build();
+            } catch (BizException exc) {
+                // Demo 精简点：复盘总结输出非 JSON 时回退为原文本（对齐 career-ai summarize）
+                result = AiReviewSummaryVO.builder().summary(content).suggestions(List.of()).build();
+            }
         } catch (BizException exc) {
-            // Demo 精简点：复盘总结输出非 JSON 时回退为原文本（对齐 career-ai summarize）
-            result = AiReviewSummaryVO.builder().summary(content).suggestions(List.of()).build();
+            // Demo 精简点：网关不可用时回退固定总结（主流程不失败）
+            log.warn("复盘总结大模型不可用，回退固定总结: {}", exc.getMessage());
+            String done = req.getReviewContent() != null && req.getReviewContent().getDone() != null
+                    ? req.getReviewContent().getDone() : "按计划推进中";
+            result = AiReviewSummaryVO.builder()
+                    .summary("本期已完成：" + done + "。AI 服务暂时不可用，以下建议为模板生成（" + DISCLAIMER + "）。")
+                    .suggestions(List.of("对照计划检查未完成任务并更新状态", "下期聚焦一个可验证的小目标", "带着问题去请教辅导员或学长"))
+                    .build();
         }
 
         return result;
@@ -407,15 +515,49 @@ public class AiService {
     }
 
     private byte[] fetch(String url) {
+        // 安全：仅 http/https，禁止内网/回环地址（SSRF 防护；行为与 career-ai pdf_parser 对齐）
+        if (!isFetchUrlAllowed(url)) {
+            log.warn("文件拉取拒绝（地址不合法，已脱敏）");
+            return null;
+        }
         try {
             var factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
             factory.setConnectTimeout(10000);
             factory.setReadTimeout(10000);
             var client = org.springframework.web.client.RestClient.builder()
                     .requestFactory(factory).build();
-            return client.get().uri(URI.create(url)).retrieve().body(byte[].class);
+            byte[] data = client.get().uri(URI.create(url)).retrieve().body(byte[].class);
+            if (data != null && data.length > 20 * 1024 * 1024) {
+                log.warn("文件拉取拒绝（超 20MB）");
+                return null;
+            }
+            return data;
         } catch (Exception exc) {
+            log.warn("文件拉取失败：{}", exc.getMessage());
             return null;
+        }
+    }
+
+    private boolean isFetchUrlAllowed(String url) {
+        try {
+            URI uri = URI.create(url);
+            String scheme = uri.getScheme();
+            if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+                return false;
+            }
+            String host = uri.getHost();
+            if (host == null || host.isBlank()) {
+                return false;
+            }
+            for (java.net.InetAddress addr : java.net.InetAddress.getAllByName(host)) {
+                if (addr.isSiteLocalAddress() || addr.isLoopbackAddress() || addr.isLinkLocalAddress()
+                        || addr.isMulticastAddress() || addr.isAnyLocalAddress()) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception exc) {
+            return false;
         }
     }
 

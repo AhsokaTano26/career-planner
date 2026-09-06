@@ -4,6 +4,7 @@ import { MotionConfig } from 'motion-v'
 import { useRouter } from 'vue-router'
 import PasswordChangeDialog from './components/PasswordChangeDialog.vue'
 import AdvisorStudentDialog from './components/AdvisorStudentDialog.vue'
+import type { GuidanceFormPayload } from './components/AdvisorGuidanceForm.vue'
 import { getErrorMessage } from './api/request'
 import { useAuth } from './composables/useAuth'
 import { useAdvisorDetail } from './composables/useAdvisorDetail'
@@ -31,6 +32,11 @@ async function handleForcedPasswordChange(oldPassword: string, newPassword: stri
     notice(getErrorMessage(e))
   }
 }
+
+// G4：等发送结果，成功才关窗；失败留窗内（useAdvisorDetail 内已 toast）。
+async function handleGuidanceSubmit(payload: GuidanceFormPayload) {
+  if (await sendGuidance(payload)) closeAdvisorDetail()
+}
 </script>
 
 <template>
@@ -52,7 +58,7 @@ async function handleForcedPasswordChange(oldPassword: string, newPassword: stri
         :student="advisorDetail"
         :saving="guidanceSaving"
         @close="closeAdvisorDetail"
-        @submit="sendGuidance"
+        @submit="handleGuidanceSubmit"
       />
     </Transition>
     <Transition name="toast">
