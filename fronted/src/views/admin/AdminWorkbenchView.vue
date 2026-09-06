@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { api, downloadFile, getErrorMessage } from '../../api/request'
 import BaseModal from '../../components/BaseModal.vue'
+import { adminStatusPresentation } from './adminStatus'
 
 type Row = Record<string, unknown>
 type Field = { key:string; label:string; type?:'text'|'select'|'textarea'|'number'; options?:string[]; required?:boolean; placeholder?:string }
@@ -124,7 +125,7 @@ function exportTypeLabel(input:unknown){ return ({STUDENT_DATA:'学生数据',WH
 const weightLabels:Record<string,string>={interest:'兴趣',values:'价值观',ability:'能力',academic:'学业',tendency:'发展倾向',practice:'实践'}
 function percent(input:unknown){ const number=Number(input); return Number.isFinite(number) ? `${(number*100).toFixed(number*100%1===0?0:1)}%` : '—' }
 function confidence(input:unknown){ const number=Number(input); return !Number.isFinite(number)||number===0 ? '不设下限' : percent(number) }
-function statusText(input:unknown){ return ({DRAFT:'草稿',PUBLISHED:'已发布',DISABLED:'已停用',COMPLETED:'已完成',PENDING:'待处理',PROCESSING:'处理中',FAILED:'失败',APPROVED:'已通过',REJECTED:'已驳回',MERGED:'已合并',SUCCESS:'成功',ERROR:'失败',ACTIVE:'已启用',UPLOADED:'已上传',PARSING:'解析中'} as Record<string,string>)[String(input)] || value(input) }
+function statusText(input:unknown){ return adminStatusPresentation(input).label }
 function weightValue(row:Row, key:string){ const weights=row.weights; return weights && typeof weights==='object' ? Number((weights as Row)[key] || 0) : 0 }
 function barWidth(row:Row, key:string){ return `${Math.max(0,Math.min(100,weightValue(row,key)*100))}%` }
 function summary(row:Row){ return Object.entries(row).filter(([key,v])=>!['id','userId','relationId','tagId','directionId','templateId','status','name','username','studentNo','verifyCode','initialPassword','generatedInitialPassword','password','passwordHash'].includes(key)&&v!==null&&v!==undefined&&v!=='').slice(0,4) }
@@ -153,10 +154,8 @@ function rowTitle(row:Row){
 }
 function rowStatus(row:Row){ if(props.module==='whitelist') return row.used?'已使用':'未使用'; if(props.module==='relations') return '已关联'; if(props.module==='logs'&&logTab.value==='operations') return value(row.level)||'记录'; return statusText(row.status) }
 function rowStatusClass(row:Row){
-  const status=String(props.module==='whitelist' ? (row.used?'USED':'ACTIVE') : props.module==='relations' ? 'ACTIVE' : props.module==='logs'&&logTab.value==='operations' ? row.level||'' : row.status||'').toUpperCase()
-  if(/ACTIVE|PUBLISHED|SUCCESS|COMPLETED|APPROVED|USED|INFO/.test(status)) return 'success'
-  if(/FAILED|DISABLED|REJECTED|ERROR|WARN/.test(status)) return 'danger'
-  return 'neutral'
+  const status=props.module==='whitelist' ? (row.used?'USED':'ACTIVE') : props.module==='relations' ? 'ACTIVE' : props.module==='logs'&&logTab.value==='operations' ? row.level||'' : row.status||''
+  return adminStatusPresentation(status).tone
 }
 function columnLabels(){ if(props.module==='users') return ['用户编号','账户信息','状态与操作']; if(props.module==='whitelist') return ['白名单编号','学生信息','状态与操作']; if(props.module==='relations') return ['关系编号','师生关系','状态与操作']; if(props.module==='admin-directions') return ['方向编码','方向信息','状态与操作']; if(props.module==='abilities') return ['标签编码','能力标签','状态与操作']; if(props.module==='templates') return ['模板编码','任务模板','状态与操作']; if(props.module==='exports') return ['任务编号','导出内容','状态与操作']; if(props.module==='logs') return ['日志编号','记录内容','处理状态']; if(props.module==='curricula') return curriculumTab.value==='items'?['选择与条目编号','课程信息','审核与操作']:curriculumTab.value==='versions'?['版本编号','方案信息','发布状态']:['任务编号','导入信息','处理状态']; return ['编号','内容','状态与操作'] }
 function rowId(row:Row){ return String(row.id || row.userId || row.relationId || row.tagId || row.directionId || row.templateId || '') }

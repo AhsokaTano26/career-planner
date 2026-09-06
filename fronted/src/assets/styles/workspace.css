@@ -46,6 +46,7 @@ button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: no
 .list-summary, .advisor-filters, .guidance-hint, .advisor-guidance-form { background: var(--color-surface-muted); }
 .enhanced-list article:hover { background: var(--color-surface-muted); }
 .enhanced-list em.success { background: var(--color-status-success); }
+.enhanced-list em.warning { background: var(--color-status-warning); color: #755000; border-color: #e0bd70; }
 .enhanced-list em.danger { background: var(--color-status-danger); color: var(--color-danger); }
 .enhanced-list em.neutral { background: var(--color-surface-muted); color: var(--color-text-muted); }
 .modal-mask { z-index: var(--layer-modal); background: rgba(0, 59, 123, .6); }
