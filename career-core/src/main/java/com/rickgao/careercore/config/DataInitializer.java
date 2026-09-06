@@ -80,6 +80,8 @@ public class DataInitializer implements CommandLineRunner {
             advisor.setPasswordHash(passwordEncoder.encode(ADVISOR_PASSWORD));
             advisor.setStatus(CommonConstants.USER_STATUS_ACTIVE);
             advisor.setConsentAgreed(true);
+            // 合并修复：password_change_required 非空约束，种子账号直接可用（与文档默认口令一致）
+            advisor.setPasswordChangeRequired(false);
             sysUserMapper.insert(advisor);
             log.info("初始化辅导员账号: {}", ADVISOR_USERNAME);
         }
