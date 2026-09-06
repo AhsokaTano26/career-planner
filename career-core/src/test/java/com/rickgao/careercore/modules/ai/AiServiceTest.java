@@ -3,7 +3,6 @@ package com.rickgao.careercore.modules.ai;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rickgao.careercore.common.exception.BizException;
 import com.rickgao.careercore.common.response.ResultCode;
-import com.rickgao.careercore.config.DatabaseSchemaMigration;
 import com.rickgao.careercore.config.DataInitializer;
 import com.rickgao.careercore.modules.ai.dto.AiChatFeedbackRequest;
 import com.rickgao.careercore.modules.ai.dto.AiChatRequest;
@@ -52,9 +51,6 @@ class AiServiceTest {
 
     @MockBean
     private LlmGateway llmGateway;
-
-    @MockBean
-    private DatabaseSchemaMigration databaseSchemaMigration;
 
     @MockBean
     private DataInitializer dataInitializer;

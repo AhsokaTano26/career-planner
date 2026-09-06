@@ -1,6 +1,5 @@
 package com.rickgao.careercore;
 
-import com.rickgao.careercore.config.DatabaseSchemaMigration;
 import com.rickgao.careercore.config.DataInitializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,6 @@ class CareerCoreApplicationTests {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    @MockBean
-    private DatabaseSchemaMigration databaseSchemaMigration;
 
     @MockBean
     private DataInitializer dataInitializer;
