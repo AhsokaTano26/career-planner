@@ -23,6 +23,11 @@ const content = ref('')
 const suggestedTask = ref('')
 const retestReason = ref('')
 const adviceLabel = (value: Guidance['adviceType']) => ({ COMMENT: '指导意见', SUGGEST_TASK: '建议任务', SUGGEST_RETEST: '建议重新测评' } as Record<Guidance['adviceType'], string>)[value]
+const guidanceSummary = computed(() => ({
+  COMMENT: '请填写学生当前最需要推进的行动。',
+  SUGGEST_TASK: '请把建议任务写成可执行的事项。',
+  SUGGEST_RETEST: '请说明重新测评能解决的具体问题。',
+} as Record<Guidance['adviceType'], string>)[type.value])
 function submit() {
   emit('submit', { content: content.value.trim(), adviceType: type.value, suggestedTask: suggestedTask.value.trim() || undefined, retestReason: retestReason.value.trim() || undefined })
   emit('close')
@@ -40,7 +45,7 @@ function submit() {
         <section class="advisor-detail-section"><h3>计划任务</h3><div class="detail-timeline"><article v-for="(task,index) in tasks" :key="String(task.id)" :style="{ '--i': index }"><div><b>{{ String(task.title || '未命名任务') }}</b><small>{{ String(task.month || '未排期') }} · {{ String(task.type || task.taskType || '学习任务') }} · {{ statusLabel(String(task.status || '')) }}</small></div><span>{{ task.deadline ? formatDateTime(String(task.deadline)) : '无截止日期' }}</span></article><p v-if="!tasks.length">暂无计划任务。</p></div></section>
         <section class="advisor-detail-section"><h3>阶段复盘</h3><div class="detail-timeline"><article v-for="(review,index) in reviews" :key="String(review.id)" :style="{ '--i': index }"><div><b>{{ String(review.cycle || '阶段复盘') }}</b><small>{{ statusLabel(String(review.status || '')) }} · {{ review.submittedAt ? formatDateTime(String(review.submittedAt)) : '未提交' }}</small></div><span>{{ review.advisorRequested ? '已请求指导' : '未申请指导' }}</span></article><p v-if="!reviews.length">暂无阶段复盘。</p></div></section>
         <section class="advisor-detail-section"><h3>历史指导记录</h3><div class="guidance-history"><article v-for="(item,index) in student.guidance" :key="item.id" :style="{ '--i': index }"><div><em>{{ adviceLabel(item.adviceType) }}</em><time>{{ formatDateTime(item.createdAt) }}</time></div><b>{{ item.content }}</b><p v-if="item.suggestedTask">建议任务：{{ item.suggestedTask }}</p><p v-if="item.retestReason">重新测评原因：{{ item.retestReason }}</p></article><p v-if="!student.guidance.length">暂无历史指导记录。</p></div></section>
-        <form class="advisor-guidance-form" @submit.prevent="submit"><p class="eyebrow">填写指导意见</p><h3>发送新的指导</h3><label>类型<select v-model="type"><option value="COMMENT">指导意见</option><option value="SUGGEST_TASK">建议任务</option><option value="SUGGEST_RETEST">建议重新测评</option></select></label><label>指导内容<textarea v-model.trim="content" required maxlength="2000" placeholder="清晰说明观察、建议与下一步行动"></textarea></label><label v-if="type === 'SUGGEST_TASK'">建议任务<input v-model.trim="suggestedTask" required maxlength="500"></label><label v-if="type === 'SUGGEST_RETEST'">重新测评原因<input v-model.trim="retestReason" required maxlength="500"></label><div><button type="button" class="outline-btn" @click="emit('close')">取消</button><button class="primary-btn" :disabled="saving || !content">{{ saving ? '正在发送…' : '发送指导 →' }}</button></div></form>
+        <form class="advisor-guidance-form" @submit.prevent="submit"><p class="eyebrow">填写指导意见</p><h3>发送新的指导</h3><p class="advisor-guidance-summary" data-testid="advisor-guidance-summary" aria-live="polite">{{ guidanceSummary }}</p><label>类型<select v-model="type"><option value="COMMENT">指导意见</option><option value="SUGGEST_TASK">建议任务</option><option value="SUGGEST_RETEST">建议重新测评</option></select></label><label>指导内容<textarea v-model.trim="content" required maxlength="2000" placeholder="清晰说明观察、建议与下一步行动"></textarea></label><label v-if="type === 'SUGGEST_TASK'">建议任务<input v-model.trim="suggestedTask" required maxlength="500" placeholder="例如：本周完成岗位调研并提交一页总结"></label><label v-if="type === 'SUGGEST_RETEST'">重新测评原因<input v-model.trim="retestReason" required maxlength="500" placeholder="例如：当前测评结果与近期发展意向差异较大"></label><div><button type="button" class="outline-btn" @click="emit('close')">取消</button><button class="primary-btn" :disabled="saving || !content">{{ saving ? '正在发送…' : '发送指导 →' }}</button></div></form>
       </div>
     </section>
   </BaseModal>
