@@ -1,0 +1,31 @@
+/* CQU 生涯发展工作台：语义令牌。组件只能消费语义角色，不直接绑定品牌色值。 */
+:root {
+  --color-canvas: #f5f8fc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #edf4fa;
+  --color-surface-strong: #d9e7f4;
+  --color-text: #172b45;
+  --color-text-muted: #607189;
+  --color-border: #c9d8e8;
+  --color-border-strong: #7ca9d0;
+  --color-action-primary: #003b7b;
+  --color-action-primary-hover: #004b9d;
+  --color-action-foreground: #ffffff;
+  --color-status-info: #d9e7f4;
+  --color-status-success: #e2f6ca;
+  --color-status-warning: #fff2cf;
+  --color-status-danger: #ffe1da;
+  --color-danger: #a22d1a;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --control-height-sm: 34px;
+  --control-height-md: 40px;
+  --control-height-lg: 46px;
+  --focus-ring: 0 0 0 3px rgba(0, 75, 157, .28);
+  --layer-dropdown: 30;
+  --layer-modal: 100;
+}
