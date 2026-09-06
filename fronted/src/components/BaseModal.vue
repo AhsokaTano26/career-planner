@@ -47,6 +47,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div ref="mask" class="modal-mask" role="dialog" aria-modal="true" @mousedown.self="dismiss">
+    <button v-if="closeable" type="button" class="modal-close" data-testid="dialog-close" aria-label="关闭对话框" @click="dismiss">×</button>
     <slot />
   </div>
 </template>

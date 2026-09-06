@@ -27,6 +27,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .page { max-width: 1440px; padding: 42px 40px 76px; }
 .page-title { margin-bottom: 28px; padding-bottom: 24px; }
 .page-title > div { min-width: 0; }
+.page-actions { display: flex; flex: 0 0 auto; align-items: center; gap: var(--space-2); }
 .page-title h1 { color: var(--color-text); }
 .page-title > div > p:last-child { max-width: 760px; color: var(--color-text-muted); }
 .eyebrow { color: var(--color-action-primary-hover); }
@@ -49,6 +50,8 @@ button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: no
 .enhanced-list em.neutral { background: var(--color-surface-muted); color: var(--color-text-muted); }
 .modal-mask { z-index: var(--layer-modal); background: rgba(0, 59, 123, .6); }
 .modal-card { box-shadow: 8px 8px 0 var(--color-surface-strong); }
+.modal-close { position: fixed; z-index: 1; top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); width: 36px; height: 36px; border: 1px solid var(--color-action-primary); background: var(--color-surface); color: var(--color-action-primary); font: 500 26px/1 var(--mono); }
+.modal-close:hover { background: var(--color-surface-strong); }
 .base-select-menu, .native-select-menu { z-index: var(--layer-dropdown); }
 .empty, p.empty { color: var(--color-text-muted); background: var(--color-surface-muted); border: 1px dashed var(--color-border-strong); }
 .error-state { color: var(--color-danger); }
@@ -81,6 +84,7 @@ button:disabled, input:disabled, select:disabled, textarea:disabled { cursor: no
   .page-title h1 { font-size: clamp(32px, 10vw, 42px); }
   .page-title > div > p:last-child { margin-top: 12px; }
   .page-title > [data-testid="page-actions"], .page-title > .page-actions { width: 100%; }
+  .page-actions > * { flex: 1; }
   .page-title .primary-btn, .page-title .outline-btn { width: 100%; }
   .card { padding: 20px 18px; }
   .modal-card { width: min(100%, 560px); padding: 20px; }
