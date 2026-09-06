@@ -40,3 +40,50 @@ docs/openapi/_*.yaml
 docs/openapi/_*.json
 !docs/openapi/career-core-apis-live.yaml
 !docs/openapi/career-core-apis-live-summary.md
+
+# ==================== preview 精简：以下文件不入库 ====================
+# AI / opencode 配置
+.opencode/
+.agents/
+opencode.json
+AGENTS.md
+
+# Apifox 配置与测试报告
+.apifox/
+apifox-reports/
+apifox-reports-*.html
+
+# Playwright 截图日志
+.playwright-mcp/
+
+# 项目文档（非运行必需）
+docs/
+career-core/docs/
+IMPLEMENTATION_PROGRESS.md
+
+# 测试产物（Apifox 报告、反馈、临时脚本）
+tests/apifox-reports/
+tests/feedback.json
+tests/smoke_api.py
+tests/ai_gateway_smoke.py
+tests/seed_*.py
+tests/test_*.py
+
+# 临时文件与目录
+career-ai(8000)
+data/
+scripts/
+career-ai/ai.log
+temp_login.json
+temp_update.json
+debug-script.txt
+debug-task-script.txt
+.vscode/
+
+# 顶层中文 HTML 参考页
+*.html
+
+# 顶层 GBK 乱码/参考文件（历史遗留，非运行必需）
+/前端
+/前锟斤拷
+/生涯规划系统.openapi.json

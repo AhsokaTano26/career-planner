@@ -33,7 +33,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -66,7 +66,8 @@ class AiServiceTest {
 
     @Test
     void authenticatedUserCannotReadOrFeedbackAnotherUsersChat() {
-        when(llmGateway.generate(any(), anyDouble(), anyInt(), anyString(), anyString(), isNull(), anyString()))
+        // 2026-09 回答质量迭代：chat 透传提示词版本 chat.v2（原 null）
+        when(llmGateway.generate(any(), anyDouble(), anyInt(), anyString(), anyString(), eq("chat.v2"), anyString()))
                 .thenReturn("仅属于用户 B 的回答");
 
         authenticate("student-b");
