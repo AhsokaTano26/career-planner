@@ -17,6 +17,7 @@
 | AI 网关生产化 | 已完成 | fallback 链（DEGRADED+后缀可观测）/scene 上限/core 对齐/日预算/解释缓存（cache 行 token 0）//metrics/哈希核验；pytest 46 项全过（2026-09-06） | Redis 化（多 worker 限流/预算/缓存）后续迭代 |
 | 稳定性加固 | 已完成 | A：越权×3/adviceType NPE/白名单改名 NPE/tokenVersion（改密停用即刻失效）/refresh 首改门禁/SSRF 双侧/AI 路由鉴权+空 key 拒启/复盘 503 语义；B：IdGenerator 代理/长事务拆分/审计 fail-open/判空补齐/静默 JSON 记日志/N+1 批量/连接池/预算预占/fallback 归一化/缓存 metrics/输入边界/脱敏扩展/内存上限/字段截断/前端超时会话竞态；pytest 48、冒烟 10/22/22 全过（2026-09-06） | 多 worker Redis 化、E2E、C 类长尾后续迭代 |
 | 复审第二轮 | 已完成 | P0：网关 history 按户隔离/explain 脱敏/缓存键绑定模型+新 request_id/SSRF（fileUrl 校验+重定向逐跳复验）/refresh 哈希轮换复用吊销（双写兼容）/metrics 鉴权+基数上限；P1：复盘 UK+条件写/计划行锁/提醒去重/任务打卡幂等/409 映射/预算跨零点/回退判定/输入总上限/迁移守卫/JWT 短缓存/路由改密拦截/401 重试 signal/工作台降级/分页钳制/雷达降级；详见 `docs/稳定性复审报告.md`；后端 106、pytest 49、冒烟 10/23、vitest 27 全过（2026-09-06） | refresh 第二轮切读、Redis 化、Flyway、E2E |
+| 合并 AI_and_DATA | 已完成 | 本地合并 `origin/AI_and_DATA`（仅本地，未 push）：差异与线上对齐——`desensitizer`/`plan_generator` 取分支 richer 版（类型化掩码/mask_free_text/truncate，`review_summarizer` 保留本地 JSON 加固）、其余以本地稳定性改动为准；修合并后 `DataInitializer` 辅导员种子空字段启动失败；后端 117、pytest 75、冒烟 10/23、vitest 27 全过（2026-09-06） | push 线上待确认 |
 
 ## 约定
 
