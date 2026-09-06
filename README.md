@@ -15,9 +15,8 @@
 
 ## 三、其他文档
 
-- 详细文档：`docs/使用手册.md`（完整安装/排坑）、`docs/接口设计.md`、`docs/openapi/career-core-apis.yaml`
+- 详细文档：`docs/guides/使用手册.md`（完整安装/排坑）、`docs/openapi/career-core-apis-live.yaml`（接口定义，以 Apifox 线上为准）、`docs/openapi/career-core-apis-live-summary.md`（接口清单摘要）
 - `deploy/docker-compose.yml` 为 Docker 部署**最小骨架**（尚未提供 Dockerfile，暂不可用）；当前按本手册本机部署
-- 其实，由于AI生成了一些无用文档，因此文档可以不用看
 
 ## 四、Apifox使用
 

@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/ai/chat/history",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":{\"messageId\":\"\",\"answer\":\"\",\"references\":[],\"needsHumanSupport\":false,\"supportReason\":\"\",\"disclaimer\":\"智能生成，供探索参考\"},\"traceId\":\"0e3de6f60442d6799049a210d8412e9a\",\"timestamp\":\"2026-08-29T11:54:27.8290943+08:00\"}"
+}

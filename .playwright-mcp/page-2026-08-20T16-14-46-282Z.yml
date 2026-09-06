@@ -1,0 +1,121 @@
+- generic [ref=e329]:
+  - complementary [ref=e330]:
+    - generic [ref=e331]:
+      - generic [ref=e332]: C
+      - generic [ref=e333]: CAREER / ARCHIVE
+    - generic [ref=e334]:
+      - generic [ref=e335]: 李
+      - generic [ref=e336]:
+        - generic [ref=e337]: 李明
+        - generic [ref=e338]: 学生工作台 · 在线
+    - navigation [ref=e339]:
+      - paragraph [ref=e340]: 我的生涯
+      - button "◼ 生涯总览" [ref=e341] [cursor=pointer]:
+        - generic [ref=e342]: ◼
+        - text: 生涯总览
+      - button "◼ 个人资料" [active] [ref=e343] [cursor=pointer]:
+        - generic [ref=e344]: ◼
+        - text: 个人资料
+      - button "◼ 经历管理" [ref=e345] [cursor=pointer]:
+        - generic [ref=e346]: ◼
+        - text: 经历管理
+      - button "◼ 生涯测评" [ref=e347] [cursor=pointer]:
+        - generic [ref=e348]: ◼
+        - text: 生涯测评
+      - button "◼ 能力画像" [ref=e349] [cursor=pointer]:
+        - generic [ref=e350]: ◼
+        - text: 能力画像
+    - navigation [ref=e351]:
+      - paragraph [ref=e352]: 探索与行动
+      - button "◼ 路径探索" [ref=e353] [cursor=pointer]:
+        - generic [ref=e354]: ◼
+        - text: 路径探索
+      - button "◼ 方向推荐" [ref=e355] [cursor=pointer]:
+        - generic [ref=e356]: ◼
+        - text: 方向推荐
+      - button "◼ 方向对比" [ref=e357] [cursor=pointer]:
+        - generic [ref=e358]: ◼
+        - text: 方向对比
+      - button "◼ 我的收藏" [ref=e359] [cursor=pointer]:
+        - generic [ref=e360]: ◼
+        - text: 我的收藏
+      - button "◼ 目标管理" [ref=e361] [cursor=pointer]:
+        - generic [ref=e362]: ◼
+        - text: 目标管理
+      - button "◼ 学期计划" [ref=e363] [cursor=pointer]:
+        - generic [ref=e364]: ◼
+        - text: 学期计划
+      - button "◼ 任务看板" [ref=e365] [cursor=pointer]:
+        - generic [ref=e366]: ◼
+        - text: 任务看板
+      - button "◼ 阶段复盘" [ref=e367] [cursor=pointer]:
+        - generic [ref=e368]: ◼
+        - text: 阶段复盘
+    - navigation [ref=e369]:
+      - paragraph [ref=e370]: 支持与设置
+      - button "◼ 任务提醒" [ref=e371] [cursor=pointer]:
+        - generic [ref=e372]: ◼
+        - text: 任务提醒
+      - button "◼ AI 咨询" [ref=e373] [cursor=pointer]:
+        - generic [ref=e374]: ◼
+        - text: AI 咨询
+      - button "◼ 隐私与账户" [ref=e375] [cursor=pointer]:
+        - generic [ref=e376]: ◼
+        - text: 隐私与账户
+    - generic [ref=e377]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=e378]:
+    - generic [ref=e379]:
+      - generic [ref=e380]: 学生工作台 / 2026-2027 · FIRST TERM
+      - generic [ref=e381]:
+        - button "↙ 退出登录" [ref=e382] [cursor=pointer]
+        - button "+ 新建" [ref=e383] [cursor=pointer]
+        - button "●" [ref=e384] [cursor=pointer]
+    - generic [ref=e385]:
+      - generic [ref=e387]:
+        - paragraph [ref=e388]: MODULE / PROFILE
+        - heading "个人资料" [level=1] [ref=e408]
+        - paragraph
+      - generic [ref=e409]:
+        - generic [ref=e410]:
+          - generic [ref=e411]:
+            - paragraph [ref=e412]: PROFILE / LIVE DATA
+            - heading "个人资料" [level=2] [ref=e413]
+          - button "编辑资料 →" [ref=e414] [cursor=pointer]:
+            - text: 编辑资料
+            - generic [ref=e415]: →
+        - generic [ref=e416]:
+          - article [ref=e417]:
+            - generic [ref=e418]: PROFILE
+            - generic [ref=e419]:
+              - generic [ref=e420]: 姓名
+              - generic [ref=e421]: 尚未填写
+          - article [ref=e422]:
+            - generic [ref=e423]: PROFILE
+            - generic [ref=e424]:
+              - generic [ref=e425]: 学号
+              - generic [ref=e426]: "2026011301"
+          - article [ref=e427]:
+            - generic [ref=e428]: PROFILE
+            - generic [ref=e429]:
+              - generic [ref=e430]: 班级
+              - generic [ref=e431]: 尚未填写
+          - article [ref=e432]:
+            - generic [ref=e433]: PROFILE
+            - generic [ref=e434]:
+              - generic [ref=e435]: 年级
+              - generic [ref=e436]: 尚未填写
+          - article [ref=e437]:
+            - generic [ref=e438]: PROFILE
+            - generic [ref=e439]:
+              - generic [ref=e440]: 专业大类
+              - generic [ref=e441]: 尚未填写
+          - article [ref=e442]:
+            - generic [ref=e443]: PROFILE
+            - generic [ref=e444]:
+              - generic [ref=e445]: 兴趣偏好
+              - generic [ref=e446]: 尚未填写
+          - article [ref=e447]:
+            - generic [ref=e448]: PROFILE
+            - generic [ref=e449]:
+              - generic [ref=e450]: 发展意向
+              - generic [ref=e451]: 尚未填写

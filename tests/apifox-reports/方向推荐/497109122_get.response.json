@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/directions/PS-102",
+  "status": 404,
+  "body": "{\"code\":\"RESOURCE_NOT_FOUND\",\"message\":\"资源不存在\",\"data\":null,\"traceId\":\"1b3c666e4a42277dcdd016ff3e0aa281\",\"timestamp\":\"2026-08-29T11:49:22.7223646+08:00\"}"
+}

@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/tasks",
+  "status": 404,
+  "body": "{\"code\":\"RESOURCE_NOT_FOUND\",\"message\":\"资源不存在\",\"data\":null,\"traceId\":\"39455169a7ddac258ffa4d2b31fdcf84\",\"timestamp\":\"2026-08-29T11:51:57.5655576+08:00\"}"
+}

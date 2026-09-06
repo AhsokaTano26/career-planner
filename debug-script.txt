@@ -1,0 +1,38 @@
+// ==================== 调试辅助脚本 ====================
+// 使用方法：粘贴到后置操作 -> 自定义脚本
+
+// 打印请求信息
+console.log("========== 请求信息 ==========");
+console.log("Method:", pm.request.method);
+console.log("URL:", pm.request.url);
+console.log("Headers:", JSON.stringify(pm.request.headers.members.reduce((acc, h) => { acc[h.key] = h.value; return acc; }, {}), null, 2));
+
+// 打印响应信息
+console.log("\n========== 响应信息 ==========");
+console.log("Status:", pm.response.status);
+console.log("Status Text:", pm.response.statusText);
+
+// 打印响应头
+console.log("Response Headers:", JSON.stringify(pm.response.headers.members.reduce((acc, h) => { acc[h.key] = h.value; return acc; }, {}), null, 2));
+
+// 打印响应体
+try {
+    const json = pm.response.json();
+    console.log("\n========== 响应 Body ==========");
+    console.log(JSON.stringify(json, null, 2));
+
+    // 如果是错误，打印更详细信息
+    if (json.code !== "OK") {
+        console.log("\n⚠️ 响应异常:");
+        console.log("  - code:", json.code);
+        console.log("  - message:", json.message);
+        console.log("  - traceId:", json.traceId);
+    }
+} catch (e) {
+    console.log("响应体不是 JSON:", pm.response.text());
+}
+
+// 打印当前环境信息
+console.log("\n========== 环境信息 ==========");
+console.log("Base URL:", pm.request.getBaseUrl());
+console.log("Environment:", pm.environment.name);

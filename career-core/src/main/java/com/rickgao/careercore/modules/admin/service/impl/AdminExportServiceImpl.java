@@ -32,7 +32,7 @@ public class AdminExportServiceImpl implements AdminExportService {
     private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_SIZE = 20;
     private static final int MAX_SIZE = 100;
-    private static final long EXPIRE_MINUTES = 10;
+    private static final long EXPIRE_MINUTES = 30;
     private static final Set<String> TYPE_ENUM =
             Set.of("STUDENT_DATA", "WHITELIST", "OPERATION_LOG", "AI_LOG", "DIRECTION_LIB");
 
@@ -74,6 +74,24 @@ public class AdminExportServiceImpl implements AdminExportService {
     }
 
     @Override
+    public ExportJobVO getJob(String jobId) {
+        ExportJob job = exportMapper.findExportJobById(jobId);
+        if (job == null) {
+            throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "导出任务不存在");
+        }
+        SysUser operator = sysUserMapper.findById(job.getOperatorId());
+        ExportJobVO vo = new ExportJobVO();
+        vo.setId(job.getId());
+        vo.setType(job.getType());
+        vo.setScope(job.getScope());
+        vo.setStatus(job.getStatus());
+        vo.setDownloadUrl(job.getDownloadUrl());
+        vo.setCreatedAt(job.getCreatedAt());
+        vo.setOperator(operator == null ? job.getOperatorId() : operator.getName());
+        return vo;
+    }
+
+    @Override
     public DownloadFile download(String jobId) {
         ExportJob job = exportMapper.findExportJobById(jobId);
         if (job == null) {
@@ -82,9 +100,9 @@ public class AdminExportServiceImpl implements AdminExportService {
         if (!"DONE".equals(job.getStatus()) || !StringUtils.hasText(job.getFilePath())) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "导出尚未完成或已失败");
         }
-        if (job.getCreatedAt() != null
-                && job.getCreatedAt().plusMinutes(EXPIRE_MINUTES).isBefore(LocalDateTime.now())) {
-            throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "导出文件已过期(10 分钟有效)");
+        if (job.getUpdatedAt() != null
+                && job.getUpdatedAt().plusMinutes(EXPIRE_MINUTES).isBefore(LocalDateTime.now())) {
+            throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "导出文件已过期(30 分钟有效)");
         }
         if (!Files.exists(Paths.get(job.getFilePath()))) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "导出文件不存在");

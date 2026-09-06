@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/ai/recommendation/explain",
+  "status": 500,
+  "body": "{\"code\":\"INTERNAL_ERROR\",\"message\":\"AI 网关调用失败（model=default）：401 Unauthorized: [no body]\",\"data\":null,\"traceId\":\"e726156db303173d9080dce38138ddfd\",\"timestamp\":\"2026-08-29T11:53:52.7177635+08:00\"}"
+}

@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8000/v1/chat/completions",
+  "status": 400,
+  "body": "{\"code\":\"VALIDATION_ERROR\",\"message\":\"请求参数校验失败\",\"data\":[{\"field\":\"messages\",\"message\":\"Field required\"}],\"traceId\":\"07a7ac565bcf4fc9a69a590268d182f4\",\"timestamp\":\"2026-08-29T11:54:47+08:00\"}"
+}

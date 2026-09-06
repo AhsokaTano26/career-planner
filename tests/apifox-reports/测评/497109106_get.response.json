@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/questionnaires",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":[{\"id\":\"Q-001\",\"type\":\"ability\",\"typeName\":\"能力自评\",\"icon\":\"ability\",\"version\":1,\"status\":\"PUBLISHED\",\"questionCount\":6,\"minutes\":3,\"tip\":\"评估你的基础能力维度\",\"publishedAt\":null},{\"id\":\"Q-002\",\"type\":\"holland\",\"typeName\":\"霍兰德兴趣\",\"icon\":\"holland\",\"version\":1,\"status\":\"PUBLISHED\",\"questionCount\":3,\"minutes\":2,\"tip\":\"了解你的兴趣倾向\",\"publishedAt\":null}],\"traceId\":\"f84e593f5b5df05ef4426c90c94160b2\",\"timestamp\":\"2026-08-29T11:47:13.0824398+08:00\"}"
+}

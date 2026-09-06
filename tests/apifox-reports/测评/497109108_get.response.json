@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/questionnaires/Q-001/versions",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":[{\"id\":\"QV-001\",\"version\":1,\"status\":\"PUBLISHED\",\"publishedAt\":null,\"publishedBy\":null,\"questionCount\":6,\"changeNote\":null}],\"traceId\":\"57659ba5cffb7effa087ace99a8382d9\",\"timestamp\":\"2026-08-29T11:47:28.7772616+08:00\"}"
+}

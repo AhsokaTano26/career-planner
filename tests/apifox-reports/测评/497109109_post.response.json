@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/assessment-sessions",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":{\"id\":\"AS-106\",\"questionnaireId\":\"QV-001\",\"questionnaireName\":\"能力自评\",\"questionnaireVersion\":1,\"status\":\"IN_PROGRESS\",\"totalQuestions\":6,\"answeredQuestions\":0,\"startedAt\":\"2026-08-29T11:47:36.7177751\",\"updatedAt\":null,\"finishedAt\":null},\"traceId\":\"6a5ef824f13049b1d8ef96ad419f77ce\",\"timestamp\":\"2026-08-29T11:47:36.7274164+08:00\"}"
+}

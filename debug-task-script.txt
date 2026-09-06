@@ -1,0 +1,38 @@
+// ==================== 调试辅助脚本 ====================
+// 使用方法：粘贴到后置操作 -> 自定义脚本
+
+const json = pm.response.json();
+
+// 打印响应基本信息
+console.log("========== 响应信息 ==========");
+console.log("code:", json.code);
+console.log("message:", json.message);
+
+// 打印环境变量 taskId
+const taskId = pm.environment.get("taskId");
+console.log("\n========== 环境变量 ==========");
+console.log("taskId:", taskId);
+
+// 打印所有任务 ID
+if (json.data && json.data.list) {
+    console.log("\n========== 任务列表 ==========");
+    console.log("共", json.data.list.length, "个任务");
+    json.data.list.forEach((t, i) => {
+        console.log(`[${i+1}] id=${t.id}, month=${t.month}, title=${t.title}, status=${t.status}`);
+    });
+    
+    // 检查 taskId 是否在列表中
+    if (taskId) {
+        const found = json.data.list.some(t => t.id === taskId);
+        console.log("\n========== 查找结果 ==========");
+        console.log("taskId", taskId, "是否在列表中:", found);
+    }
+}
+
+// 如果是错误，打印详细信息
+if (json.code !== "OK") {
+    console.log("\n⚠️ 响应异常:");
+    console.log("  - code:", json.code);
+    console.log("  - message:", json.message);
+    console.log("  - traceId:", json.traceId);
+}

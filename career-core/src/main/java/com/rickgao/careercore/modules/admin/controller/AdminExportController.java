@@ -44,6 +44,11 @@ public class AdminExportController {
         return ApiResponse.ok(adminExportService.listExports(page, size, sort));
     }
 
+    @GetMapping("/{jobId}")
+    public ApiResponse<ExportJobVO> getJob(@PathVariable String jobId) {
+        return ApiResponse.ok(adminExportService.getJob(jobId));
+    }
+
     @PostMapping
     public ApiResponse<ExportJobVO> createExport(
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,

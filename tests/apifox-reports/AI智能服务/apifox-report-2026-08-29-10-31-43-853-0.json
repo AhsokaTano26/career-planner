@@ -1,0 +1,1019 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 51,
+      "responseAverage": 51,
+      "responseMin": 51,
+      "responseMax": 51,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970704505,
+      "completed": 1787970704701
+    },
+    "transfers": {
+      "responseTotal": 213
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "08ab93d4-e7b8-4ff9-9e8b-bbbf8e247fe6",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 51,
+      "responseAverage": 51,
+      "responseMin": 51,
+      "responseMax": 51,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970704505,
+      "completed": 1787970704701
+    },
+    "transfers": {
+      "responseTotal": 213
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "08ab93d4-e7b8-4ff9-9e8b-bbbf8e247fe6",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408813106
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\AI智能服务",
+    "outFile": "apifox-report-2026-08-29-10-31-43-853-0",
+    "originalOutFile": "apifox-report-2026-08-29-10-31-43-853-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "5ccb997d-086d-46ed-bf19-4ef656c0cfad",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "b94698f0-2255-4d3b-86ae-05f8533ae419",
+            "name": "生成学期计划草案(POST /api/v1/ai/plan/generate)",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "ai",
+                  "plan",
+                  "generate"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"studentRef\": \"student_ref_8f3a\", \"directionId\": \"employment_backend\", \"semester\": \"2026-1\", \"template\": {\"goalSummary\": \"本学期完成后端技术基础入门\", \"semesterGoals\": [{\"title\": \"掌握 Java 基础\", \"abilityTag\": \"programming_basic\"}], \"monthlyTasks\": [{\"month\": \"2026-09\", \"title\": \"完成 Java 语法学习\", \"taskType\": \"LEARNING\", \"estimatedHours\": 12}], \"notes\": []}}",
+                "type": "application/json"
+              },
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "dc9f56c8-0892-4d50-b534-bee3dea16e4a",
+              "id": "dc9f56c8-0892-4d50-b534-bee3dea16e4a",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109156,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109156,
+              "httpApiCaseId": 408813106,
+              "httpApiName": "生成学期计划草案",
+              "httpApiPath": "/api/v1/ai/plan/generate",
+              "httpApiMethod": "post",
+              "httpApiCaseName": "POST /api/v1/ai/plan/generate",
+              "moduleId": 8309868,
+              "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {
+                "$ref": "#/definitions/301352915"
+              },
+              "examples": [
+                {
+                  "value": "{\n    \"studentRef\": \"student_ref_8f3a\",\n    \"directionId\": \"employment_backend\",\n    \"semester\": \"2026-1\",\n    \"template\": {\n        \"goalSummary\": \"本学期完成后端技术基础入门\",\n        \"semesterGoals\": [\n            {\n                \"title\": \"掌握 Java 基础\",\n                \"abilityTag\": \"programming_basic\"\n            }\n        ],\n        \"monthlyTasks\": [\n            {\n                \"month\": \"2026-09\",\n                \"title\": \"完成 Java 语法学习\",\n                \"taskType\": \"LEARNING\",\n                \"estimatedHours\": 12\n            }\n        ],\n        \"notes\": []\n    }\n}",
+                  "mediaType": "application/json",
+                  "description": ""
+                }
+              ]
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "生成学期计划草案"
+      }
+    ],
+    "info": {
+      "name": "生成学期计划草案"
+    },
+    "dataSchemas": {
+      "301352861": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "学期目标标题",
+            "examples": [
+              "掌握 Java 基础与面向对象编程"
+            ]
+          },
+          "abilityTag": {
+            "type": "string",
+            "description": "关联能力标签",
+            "examples": [
+              "programming_basic"
+            ]
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "学期目标",
+        "x-apifox-orders": [
+          "title",
+          "abilityTag"
+        ],
+        "name": "SemesterGoal"
+      },
+      "301352862": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "description": "月份（YYYY-MM）",
+            "examples": [
+              "2026-09"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "任务标题",
+            "examples": [
+              "完成 Java 语法与面向对象章节学习"
+            ]
+          },
+          "taskType": {
+            "type": "string",
+            "description": "任务类型",
+            "enum": [
+              "LEARNING",
+              "PRACTICE",
+              "CAREER",
+              "REVIEW"
+            ]
+          },
+          "estimatedHours": {
+            "type": "number",
+            "description": "预计投入（小时）",
+            "examples": [
+              12
+            ]
+          }
+        },
+        "required": [
+          "month",
+          "title"
+        ],
+        "title": "月度任务模板项",
+        "x-apifox-orders": [
+          "month",
+          "title",
+          "taskType",
+          "estimatedHours"
+        ],
+        "name": "MonthlyTask"
+      },
+      "301352863": {
+        "type": "object",
+        "properties": {
+          "goalSummary": {
+            "type": "string",
+            "description": "目标摘要",
+            "examples": [
+              "本学期完成后端技术基础入门：掌握 Java 语法与数据结构基础，完成 1 个可运行的小项目。"
+            ]
+          },
+          "semesterGoals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/301352861"
+            }
+          },
+          "monthlyTasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/301352862"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "examples": [
+                "任务可随课程安排与兴趣变化调整。"
+              ]
+            }
+          }
+        },
+        "required": [
+          "goalSummary",
+          "semesterGoals",
+          "monthlyTasks"
+        ],
+        "title": "计划草案",
+        "x-apifox-orders": [
+          "goalSummary",
+          "semesterGoals",
+          "monthlyTasks",
+          "notes"
+        ],
+        "name": "PlanDraft"
+      },
+      "301352915": {
+        "type": "object",
+        "properties": {
+          "studentRef": {
+            "type": "string",
+            "description": "脱敏学生引用",
+            "examples": [
+              "student_ref_8f3a"
+            ]
+          },
+          "directionId": {
+            "type": "string",
+            "description": "方向编码",
+            "examples": [
+              "employment_backend"
+            ]
+          },
+          "semester": {
+            "type": "string",
+            "description": "学期（YYYY-S）",
+            "examples": [
+              "2026-1"
+            ]
+          },
+          "goalSummary": {
+            "type": "string",
+            "description": "目标摘要（可选）"
+          },
+          "template": {
+            "$ref": "#/definitions/301352863"
+          }
+        },
+        "required": [
+          "studentRef",
+          "directionId",
+          "semester"
+        ],
+        "title": "计划生成请求",
+        "x-apifox-orders": [
+          "studentRef",
+          "directionId",
+          "semester",
+          "goalSummary",
+          "template"
+        ],
+        "name": "PlanGenerateRequest"
+      }
+    },
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8000",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8000",
+      "variable": {
+        "id": "9bfb1c70-75b3-4ef0-a418-f71340ba8d57",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8000",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "e12b27bf-ec33-4bcc-9397-2b4a9d082e73",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "7abf4beb-b1cd-44a7-acc4-bb51b24ed87f",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "b94698f0-2255-4d3b-86ae-05f8533ae419",
+              "name": "生成学期计划草案(POST /api/v1/ai/plan/generate)",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "ai",
+                    "plan",
+                    "generate"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"studentRef\": \"student_ref_8f3a\", \"directionId\": \"employment_backend\", \"semester\": \"2026-1\", \"template\": {\"goalSummary\": \"本学期完成后端技术基础入门\", \"semesterGoals\": [{\"title\": \"掌握 Java 基础\", \"abilityTag\": \"programming_basic\"}], \"monthlyTasks\": [{\"month\": \"2026-09\", \"title\": \"完成 Java 语法学习\", \"taskType\": \"LEARNING\", \"estimatedHours\": 12}], \"notes\": []}}",
+                  "type": "application/json"
+                },
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "dc9f56c8-0892-4d50-b534-bee3dea16e4a",
+                "id": "dc9f56c8-0892-4d50-b534-bee3dea16e4a",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109156,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109156,
+                "httpApiCaseId": 408813106,
+                "httpApiName": "生成学期计划草案",
+                "httpApiPath": "/api/v1/ai/plan/generate",
+                "httpApiMethod": "post",
+                "httpApiCaseName": "POST /api/v1/ai/plan/generate",
+                "moduleId": 8309868,
+                "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {
+                  "$ref": "#/definitions/301352915"
+                },
+                "examples": [
+                  {
+                    "value": "{\n    \"studentRef\": \"student_ref_8f3a\",\n    \"directionId\": \"employment_backend\",\n    \"semester\": \"2026-1\",\n    \"template\": {\n        \"goalSummary\": \"本学期完成后端技术基础入门\",\n        \"semesterGoals\": [\n            {\n                \"title\": \"掌握 Java 基础\",\n                \"abilityTag\": \"programming_basic\"\n            }\n        ],\n        \"monthlyTasks\": [\n            {\n                \"month\": \"2026-09\",\n                \"title\": \"完成 Java 语法学习\",\n                \"taskType\": \"LEARNING\",\n                \"estimatedHours\": 12\n            }\n        ],\n        \"notes\": []\n    }\n}",
+                    "mediaType": "application/json",
+                    "description": ""
+                  }
+                ]
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "生成学期计划草案"
+        }
+      ],
+      "info": {
+        "name": "生成学期计划草案"
+      },
+      "dataSchemas": {
+        "301352861": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "学期目标标题",
+              "examples": [
+                "掌握 Java 基础与面向对象编程"
+              ]
+            },
+            "abilityTag": {
+              "type": "string",
+              "description": "关联能力标签",
+              "examples": [
+                "programming_basic"
+              ]
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "title": "学期目标",
+          "x-apifox-orders": [
+            "title",
+            "abilityTag"
+          ],
+          "name": "SemesterGoal"
+        },
+        "301352862": {
+          "type": "object",
+          "properties": {
+            "month": {
+              "type": "string",
+              "description": "月份（YYYY-MM）",
+              "examples": [
+                "2026-09"
+              ]
+            },
+            "title": {
+              "type": "string",
+              "description": "任务标题",
+              "examples": [
+                "完成 Java 语法与面向对象章节学习"
+              ]
+            },
+            "taskType": {
+              "type": "string",
+              "description": "任务类型",
+              "enum": [
+                "LEARNING",
+                "PRACTICE",
+                "CAREER",
+                "REVIEW"
+              ]
+            },
+            "estimatedHours": {
+              "type": "number",
+              "description": "预计投入（小时）",
+              "examples": [
+                12
+              ]
+            }
+          },
+          "required": [
+            "month",
+            "title"
+          ],
+          "title": "月度任务模板项",
+          "x-apifox-orders": [
+            "month",
+            "title",
+            "taskType",
+            "estimatedHours"
+          ],
+          "name": "MonthlyTask"
+        },
+        "301352863": {
+          "type": "object",
+          "properties": {
+            "goalSummary": {
+              "type": "string",
+              "description": "目标摘要",
+              "examples": [
+                "本学期完成后端技术基础入门：掌握 Java 语法与数据结构基础，完成 1 个可运行的小项目。"
+              ]
+            },
+            "semesterGoals": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/301352861"
+              }
+            },
+            "monthlyTasks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/301352862"
+              }
+            },
+            "notes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "examples": [
+                  "任务可随课程安排与兴趣变化调整。"
+                ]
+              }
+            }
+          },
+          "required": [
+            "goalSummary",
+            "semesterGoals",
+            "monthlyTasks"
+          ],
+          "title": "计划草案",
+          "x-apifox-orders": [
+            "goalSummary",
+            "semesterGoals",
+            "monthlyTasks",
+            "notes"
+          ],
+          "name": "PlanDraft"
+        },
+        "301352915": {
+          "type": "object",
+          "properties": {
+            "studentRef": {
+              "type": "string",
+              "description": "脱敏学生引用",
+              "examples": [
+                "student_ref_8f3a"
+              ]
+            },
+            "directionId": {
+              "type": "string",
+              "description": "方向编码",
+              "examples": [
+                "employment_backend"
+              ]
+            },
+            "semester": {
+              "type": "string",
+              "description": "学期（YYYY-S）",
+              "examples": [
+                "2026-1"
+              ]
+            },
+            "goalSummary": {
+              "type": "string",
+              "description": "目标摘要（可选）"
+            },
+            "template": {
+              "$ref": "#/definitions/301352863"
+            }
+          },
+          "required": [
+            "studentRef",
+            "directionId",
+            "semester"
+          ],
+          "title": "计划生成请求",
+          "x-apifox-orders": [
+            "studentRef",
+            "directionId",
+            "semester",
+            "goalSummary",
+            "template"
+          ],
+          "name": "PlanGenerateRequest"
+        }
+      },
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8000",
+        "variable": {
+          "id": "9bfb1c70-75b3-4ef0-a418-f71340ba8d57",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8000",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8000",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "e12b27bf-ec33-4bcc-9397-2b4a9d082e73",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "7abf4beb-b1cd-44a7-acc4-bb51b24ed87f",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109156,
+        "name": "生成学期计划草案",
+        "path": "/api/v1/ai/plan/generate",
+        "method": "post"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408813106,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "ff7d9887-1940-4a79-8df0-298a6ebccc9c",
+    "name": "生成学期计划草案"
+  }
+}

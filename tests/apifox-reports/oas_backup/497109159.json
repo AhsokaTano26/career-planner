@@ -1,0 +1,191 @@
+{
+ "id": 497109159,
+ "name": "会话历史",
+ "type": "http",
+ "serverId": "",
+ "preProcessors": [],
+ "postProcessors": [],
+ "inheritPreProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "inheritPostProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "description": "返回当前学生 AI 咨询会话历史（默认保留近期记录）。",
+ "operationId": "aiChatHistory",
+ "sourceUrl": "",
+ "method": "get",
+ "path": "/api/v1/ai/chat/history",
+ "tags": [
+  "AI 生涯咨询"
+ ],
+ "status": "released",
+ "requestBody": {
+  "type": "none",
+  "parameters": [],
+  "required": false,
+  "additionalContentTypes": [],
+  "oasExtensions": ""
+ },
+ "parameters": {
+  "path": [],
+  "query": [
+   {
+    "id": "OApERI3DRs",
+    "name": "page",
+    "required": false,
+    "enable": true,
+    "description": "页码，从 1 开始",
+    "example": "",
+    "type": "integer",
+    "schema": {
+     "type": "integer",
+     "minimum": 1,
+     "default": 1
+    },
+    "omitGeneratedExample": false
+   },
+   {
+    "id": "A2KPaiopUh",
+    "name": "size",
+    "required": false,
+    "enable": true,
+    "description": "每页条数（最大 100）",
+    "example": "",
+    "type": "integer",
+    "schema": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 100,
+     "default": 20
+    },
+    "omitGeneratedExample": false
+   },
+   {
+    "id": "h9fiWmCEGB",
+    "name": "sort",
+    "required": false,
+    "enable": true,
+    "description": "排序，如 `-createdAt`（desc）或 `createdAt`（asc）",
+    "example": "",
+    "type": "string",
+    "schema": {
+     "type": "string",
+     "examples": [
+      "-createdAt"
+     ]
+    },
+    "omitGeneratedExample": false
+   }
+  ],
+  "cookie": [],
+  "header": []
+ },
+ "commonParameters": {},
+ "auth": {
+  "type": "securityscheme"
+ },
+ "responses": [
+  {
+   "id": "137548324",
+   "name": "",
+   "code": "200",
+   "contentType": "json",
+   "jsonSchema": {
+    "$ref": "#/definitions/304998565"
+   },
+   "itemSchema": {},
+   "description": "操作成功",
+   "mediaType": "application/json",
+   "headers": [],
+   "oasExtensions": ""
+  },
+  {
+   "id": "342336243",
+   "code": 401,
+   "referencedResponseId": 342336243
+  },
+  {
+   "id": "123002404",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  },
+  {
+   "id": "104529428",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  }
+ ],
+ "responseExamples": [],
+ "codeSamples": [],
+ "projectId": 8662286,
+ "moduleId": 8309868,
+ "folderId": 92650094,
+ "ordering": 6,
+ "responsibleId": 0,
+ "commonResponseStatus": {
+  "342336243": true
+ },
+ "advancedSettings": {
+  "disabledSystemHeaders": {}
+ },
+ "customApiFields": {},
+ "oasExtensions": "",
+ "mockScript": {},
+ "createdAt": "2026-08-04T14:42:57.000Z",
+ "updatedAt": "2026-08-29T04:52:13.000Z",
+ "creatorId": 3510276,
+ "editorId": 1000960460,
+ "creatorUserId": 3510276,
+ "editorUserId": 3779705,
+ "visibility": "INHERITED",
+ "securityScheme": {
+  "schemeGroups": [
+   {
+    "id": "R2QR73hnXhStwy5FRZyE0",
+    "schemeIds": [
+     1687020
+    ]
+   }
+  ],
+  "required": true,
+  "use": {
+   "id": "R2QR73hnXhStwy5FRZyE0",
+   "configs": {
+    "1687020": {
+     "authConfigs": {
+      "x-apifox": {
+       "token": "{{bearerToken}}"
+      }
+     }
+    }
+   }
+  },
+  "scopes": {
+   "R2QR73hnXhStwy5FRZyE0": {
+    "1687020": []
+   }
+  }
+ },
+ "callbacks": ""
+}

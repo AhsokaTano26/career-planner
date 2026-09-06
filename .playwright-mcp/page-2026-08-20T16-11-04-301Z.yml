@@ -1,0 +1,113 @@
+- generic [ref=e31]:
+  - complementary [ref=e32]:
+    - generic [ref=e33]:
+      - generic [ref=e34]: C
+      - generic [ref=e35]: CAREER / ARCHIVE
+    - generic [ref=e36]:
+      - generic [ref=e37]: 系
+      - generic [ref=e38]:
+        - generic [ref=e39]: 系统管理员
+        - generic [ref=e40]: 系统管理台 · 在线
+    - navigation [ref=e41]:
+      - paragraph [ref=e42]: 平台配置
+      - button "◼ 运行总览" [ref=e43] [cursor=pointer]:
+        - generic [ref=e44]: ◼
+        - text: 运行总览
+      - button "◼ 用户管理" [ref=e45] [cursor=pointer]:
+        - generic [ref=e46]: ◼
+        - text: 用户管理
+      - button "◼ 白名单" [ref=e47] [cursor=pointer]:
+        - generic [ref=e48]: ◼
+        - text: 白名单
+      - button "◼ 师生关系" [ref=e49] [cursor=pointer]:
+        - generic [ref=e50]: ◼
+        - text: 师生关系
+      - button "◼ 问卷管理" [ref=e51] [cursor=pointer]:
+        - generic [ref=e52]: ◼
+        - text: 问卷管理
+      - button "◼ 方向库" [ref=e53] [cursor=pointer]:
+        - generic [ref=e54]: ◼
+        - text: 方向库
+      - button "◼ 能力标签" [ref=e55] [cursor=pointer]:
+        - generic [ref=e56]: ◼
+        - text: 能力标签
+      - button "◼ 任务模板" [ref=e57] [cursor=pointer]:
+        - generic [ref=e58]: ◼
+        - text: 任务模板
+    - navigation [ref=e59]:
+      - paragraph [ref=e60]: 内容与治理
+      - button "◼ 培养方案" [ref=e61] [cursor=pointer]:
+        - generic [ref=e62]: ◼
+        - text: 培养方案
+      - button "◼ 推荐权重" [ref=e63] [cursor=pointer]:
+        - generic [ref=e64]: ◼
+        - text: 推荐权重
+      - button "◼ 模型与提示词" [ref=e65] [cursor=pointer]:
+        - generic [ref=e66]: ◼
+        - text: 模型与提示词
+      - button "◼ 导出任务" [ref=e67] [cursor=pointer]:
+        - generic [ref=e68]: ◼
+        - text: 导出任务
+      - button "◼ 审计日志" [active] [ref=e69] [cursor=pointer]:
+        - generic [ref=e70]: ◼
+        - text: 审计日志
+    - generic [ref=e71]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=e72]:
+    - generic [ref=e73]:
+      - generic [ref=e74]: 系统管理台 / 2026-2027 · FIRST TERM
+      - generic [ref=e75]:
+        - button "↙ 退出登录" [ref=e76] [cursor=pointer]
+        - button "+ 新建" [ref=e77] [cursor=pointer]
+        - button "●" [ref=e78] [cursor=pointer]
+    - generic [ref=e79]:
+      - generic [ref=e81]:
+        - paragraph [ref=e82]: MODULE / LOGS
+        - heading "审计日志" [level=1] [ref=e254]
+        - paragraph
+      - generic [ref=e234]:
+        - generic [ref=e235]:
+          - generic [ref=e236]:
+            - paragraph [ref=e237]: ADMIN / LIVE DATA
+            - heading "审计日志" [level=2] [ref=e255]
+          - button "刷新" [ref=e242] [cursor=pointer]
+        - generic [ref=e243]:
+          - generic [ref=e244]: 共 5 条记录
+          - generic [ref=e245]:
+            - generic [ref=e246]: 搜索
+            - textbox "搜索" [ref=e247]:
+              - /placeholder: 搜索名称、编号或状态
+        - generic [ref=e256]:
+          - generic [ref=e257]:
+            - generic [ref=e258]: 编号
+            - generic [ref=e259]: 内容
+            - generic [ref=e260]: 状态
+          - article [ref=e261]:
+            - generic [ref=e262]: AL0006
+            - generic [ref=e263]:
+              - generic [ref=e264]: 记录 AL0006
+              - generic [ref=e265]: "time: 2026-08-21T00:07:55+08:00 · operator: 系统管理员 · 操作: LOGIN"
+            - emphasis [ref=e266]: —
+          - article [ref=e267]:
+            - generic [ref=e268]: AL0005
+            - generic [ref=e269]:
+              - generic [ref=e270]: 记录 AL0005
+              - generic [ref=e271]: "time: 2026-08-20T23:44:49+08:00 · operator: 系统管理员 · 操作: LOGIN"
+            - emphasis [ref=e272]: —
+          - article [ref=e273]:
+            - generic [ref=e274]: AL0004
+            - generic [ref=e275]:
+              - generic [ref=e276]: 记录 AL0004
+              - generic [ref=e277]: "time: 2026-08-20T22:45:18+08:00 · operator: 系统管理员 · 操作: LOGIN"
+            - emphasis [ref=e278]: —
+          - article [ref=e279]:
+            - generic [ref=e280]: AL0003
+            - generic [ref=e281]:
+              - generic [ref=e282]: 记录 AL0003
+              - generic [ref=e283]: "time: 2026-08-20T16:53:37+08:00 · operator: 系统管理员 · 操作: LOGIN"
+            - emphasis [ref=e284]: —
+          - article [ref=e285]:
+            - generic [ref=e286]: AL0002
+            - generic [ref=e287]:
+              - generic [ref=e288]: 记录 AL0002
+              - generic [ref=e289]: "time: 2026-08-20T16:52:11+08:00 · operator: 系统管理员 · 操作: LOGIN"
+            - emphasis [ref=e290]: —

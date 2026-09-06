@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/reviews",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":[{\"id\":\"RV-101\",\"cycle\":\"2026-09\",\"status\":\"SUBMITTED\",\"content\":null,\"aiSummary\":\"本阶段已完成复盘，建议持续跟踪目标进展。\",\"aiSuggest\":[],\"advisorRequested\":true,\"advisorReply\":null,\"submittedAt\":\"2026-08-29T10:30:51+08:00\"}],\"traceId\":\"ac124cf7c767ba0cfca2b82464119113\",\"timestamp\":\"2026-08-29T11:52:39.024302+08:00\"}"
+}

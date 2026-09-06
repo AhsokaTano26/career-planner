@@ -1,0 +1,191 @@
+{
+ "id": 497109110,
+ "name": "我的测评会话",
+ "type": "http",
+ "serverId": "",
+ "preProcessors": [],
+ "postProcessors": [],
+ "inheritPreProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "inheritPostProcessors": {
+  "enable": {},
+  "defaultEnable": {}
+ },
+ "description": "列出当前学生的测评会话与进度（用于续答入口）。",
+ "operationId": "assessmentListSessions",
+ "sourceUrl": "",
+ "method": "get",
+ "path": "/api/v1/assessment-sessions",
+ "tags": [
+  "测评"
+ ],
+ "status": "released",
+ "requestBody": {
+  "type": "none",
+  "parameters": [],
+  "required": false,
+  "additionalContentTypes": [],
+  "oasExtensions": ""
+ },
+ "parameters": {
+  "path": [],
+  "query": [
+   {
+    "id": "rPtqJx3AtJ",
+    "name": "page",
+    "required": false,
+    "enable": true,
+    "description": "页码，从 1 开始",
+    "example": "",
+    "type": "integer",
+    "schema": {
+     "type": "integer",
+     "minimum": 1,
+     "default": 1
+    },
+    "omitGeneratedExample": false
+   },
+   {
+    "id": "ANIxenmQeG",
+    "name": "size",
+    "required": false,
+    "enable": true,
+    "description": "每页条数（最大 100）",
+    "example": "",
+    "type": "integer",
+    "schema": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 100,
+     "default": 20
+    },
+    "omitGeneratedExample": false
+   },
+   {
+    "id": "cztXxA7Yoz",
+    "name": "sort",
+    "required": false,
+    "enable": true,
+    "description": "排序，如 `-createdAt`（desc）或 `createdAt`（asc）",
+    "example": "",
+    "type": "string",
+    "schema": {
+     "type": "string",
+     "examples": [
+      "-createdAt"
+     ]
+    },
+    "omitGeneratedExample": false
+   }
+  ],
+  "cookie": [],
+  "header": []
+ },
+ "commonParameters": {},
+ "auth": {
+  "type": "securityscheme"
+ },
+ "responses": [
+  {
+   "id": "109962361",
+   "name": "",
+   "code": "200",
+   "contentType": "json",
+   "jsonSchema": {
+    "$ref": "#/definitions/301352840"
+   },
+   "itemSchema": {},
+   "description": "操作成功",
+   "mediaType": "application/json",
+   "headers": [],
+   "oasExtensions": ""
+  },
+  {
+   "id": "342336243",
+   "code": 401,
+   "referencedResponseId": 342336243
+  },
+  {
+   "id": "182019380",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  },
+  {
+   "id": "187499890",
+   "name": "",
+   "code": 0,
+   "contentType": "json",
+   "jsonSchema": {
+    "type": "object",
+    "properties": {}
+   },
+   "itemSchema": {},
+   "description": "OK",
+   "mediaType": "",
+   "headers": []
+  }
+ ],
+ "responseExamples": [],
+ "codeSamples": [],
+ "projectId": 8662286,
+ "moduleId": 8309868,
+ "folderId": 92650087,
+ "ordering": 30,
+ "responsibleId": 0,
+ "commonResponseStatus": {
+  "342336243": true
+ },
+ "advancedSettings": {
+  "disabledSystemHeaders": {}
+ },
+ "customApiFields": {},
+ "oasExtensions": "",
+ "mockScript": {},
+ "createdAt": "2026-08-04T14:42:57.000Z",
+ "updatedAt": "2026-08-29T04:48:45.000Z",
+ "creatorId": 3510276,
+ "editorId": 1000960460,
+ "creatorUserId": 3510276,
+ "editorUserId": 3779705,
+ "visibility": "INHERITED",
+ "securityScheme": {
+  "schemeGroups": [
+   {
+    "id": "QEMJuMVfTq20cxLiSkAIX",
+    "schemeIds": [
+     1687020
+    ]
+   }
+  ],
+  "required": true,
+  "use": {
+   "id": "QEMJuMVfTq20cxLiSkAIX",
+   "configs": {
+    "1687020": {
+     "authConfigs": {
+      "x-apifox": {
+       "token": "{{bearerToken}}"
+      }
+     }
+    }
+   }
+  },
+  "scopes": {
+   "QEMJuMVfTq20cxLiSkAIX": {
+    "1687020": []
+   }
+  }
+ },
+ "callbacks": ""
+}

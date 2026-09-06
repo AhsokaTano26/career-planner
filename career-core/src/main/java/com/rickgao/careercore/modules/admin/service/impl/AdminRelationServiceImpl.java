@@ -59,9 +59,11 @@ public class AdminRelationServiceImpl implements AdminRelationService {
         int currentPage = page == null || page < 1 ? DEFAULT_PAGE : page;
         int currentSize = size == null || size < 1 ? DEFAULT_SIZE : Math.min(size, MAX_SIZE);
         boolean desc = !StringUtils.hasText(sort) || sort.startsWith("-");
-        long total = adminRelationMapper.countRelations(advisorId);
+        // Demo 增强点:空字符串查询参数统一归一化为 null,避免 Mapper 的 advisorId='' 等值过滤导致列表查空
+        String filterAdvisorId = StringUtils.hasText(advisorId) ? advisorId.trim() : null;
+        long total = adminRelationMapper.countRelations(filterAdvisorId);
         List<AdvisorRelationVO> list = adminRelationMapper.selectRelationPage(
-                advisorId, "created_at", desc ? "DESC" : "ASC",
+                filterAdvisorId, "created_at", desc ? "DESC" : "ASC",
                 (currentPage - 1) * currentSize, currentSize);
         return PageResult.of(list, total, currentPage, currentSize);
     }

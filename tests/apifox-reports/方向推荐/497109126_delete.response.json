@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/students/me/favorites/PS-102",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":{},\"traceId\":\"bd4c3c8b33fc04a89b4821f6e8cb7be2\",\"timestamp\":\"2026-08-29T11:49:54.3870322+08:00\"}"
+}

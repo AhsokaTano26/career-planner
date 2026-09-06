@@ -1,0 +1,941 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 43,
+      "responseAverage": 43,
+      "responseMin": 43,
+      "responseMax": 43,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970695424,
+      "completed": 1787970695606
+    },
+    "transfers": {
+      "responseTotal": 213
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "13e8d7f3-cae3-4590-8939-506c1be39913",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 43,
+      "responseAverage": 43,
+      "responseMin": 43,
+      "responseMax": 43,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787970695424,
+      "completed": 1787970695606
+    },
+    "transfers": {
+      "responseTotal": 213
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "13e8d7f3-cae3-4590-8939-506c1be39913",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408813101
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\AI智能服务",
+    "outFile": "apifox-report-2026-08-29-10-31-34-762-0",
+    "originalOutFile": "apifox-report-2026-08-29-10-31-34-762-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "0757d2dc-9695-452c-8c79-10c1ac169824",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "47025ce1-c060-4d7b-913e-ae644a3822d1",
+            "name": "生成推荐解释(POST /api/v1/ai/recommendation/explain)",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "ai",
+                  "recommendation",
+                  "explain"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"studentRef\": \"student_ref_8f3a\", \"ruleVersion\": \"R1.0\", \"profileVersion\": 2, \"profile\": {\"interest\": 0.78, \"values\": 0.7, \"ability\": 0.62, \"academic\": 0.58, \"tendency\": 0.8, \"practice\": 0.45}, \"results\": [{\"directionId\": \"employment_backend\", \"score\": 82.4, \"rank\": 1}, {\"directionId\": \"data_analysis\", \"score\": 76.8, \"rank\": 2}]}",
+                "type": "application/json"
+              },
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "fb6fabb0-e5d6-4ad7-8389-c34b97431613",
+              "id": "fb6fabb0-e5d6-4ad7-8389-c34b97431613",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109155,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109155,
+              "httpApiCaseId": 408813101,
+              "httpApiName": "生成推荐解释",
+              "httpApiPath": "/api/v1/ai/recommendation/explain",
+              "httpApiMethod": "post",
+              "httpApiCaseName": "POST /api/v1/ai/recommendation/explain",
+              "moduleId": 8309868,
+              "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {
+                "$ref": "#/definitions/301352913"
+              },
+              "examples": [
+                {
+                  "value": "{\n    \"studentRef\": \"student_ref_8f3a\",\n    \"ruleVersion\": \"R1.0\",\n    \"profileVersion\": 2,\n    \"profile\": {\n        \"interest\": 0.78,\n        \"values\": 0.7,\n        \"ability\": 0.62,\n        \"academic\": 0.58,\n        \"tendency\": 0.8,\n        \"practice\": 0.45\n    },\n    \"results\": [\n        {\n            \"directionId\": \"employment_backend\",\n            \"score\": 82.4,\n            \"rank\": 1\n        },\n        {\n            \"directionId\": \"data_analysis\",\n            \"score\": 76.8,\n            \"rank\": 2\n        }\n    ]\n}",
+                  "mediaType": "application/json",
+                  "description": ""
+                }
+              ]
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "生成推荐解释"
+      }
+    ],
+    "info": {
+      "name": "生成推荐解释"
+    },
+    "dataSchemas": {
+      "301352913": {
+        "type": "object",
+        "properties": {
+          "studentRef": {
+            "type": "string",
+            "description": "脱敏学生引用（禁止直接标识）",
+            "examples": [
+              "student_ref_8f3a"
+            ]
+          },
+          "ruleVersion": {
+            "type": "string",
+            "description": "规则版本",
+            "examples": [
+              "R1.0"
+            ]
+          },
+          "profileVersion": {
+            "type": "integer",
+            "description": "画像版本",
+            "examples": [
+              2
+            ]
+          },
+          "profile": {
+            "type": "object",
+            "properties": {
+              "interest": {
+                "type": "number",
+                "description": "兴趣标准化得分",
+                "examples": [
+                  0.78
+                ]
+              },
+              "values": {
+                "type": "number",
+                "description": "职业价值观标准化得分",
+                "examples": [
+                  0.78
+                ]
+              },
+              "ability": {
+                "type": "number",
+                "description": "能力基础标准化得分",
+                "examples": [
+                  0.78
+                ]
+              },
+              "academic": {
+                "type": "number",
+                "description": "学业基础标准化得分",
+                "examples": [
+                  0.78
+                ]
+              },
+              "tendency": {
+                "type": "number",
+                "description": "发展倾向标准化得分",
+                "examples": [
+                  0.78
+                ]
+              },
+              "practice": {
+                "type": "number",
+                "description": "实践经历标准化得分",
+                "examples": [
+                  0.78
+                ]
+              }
+            },
+            "x-apifox-orders": [
+              "interest",
+              "values",
+              "ability",
+              "academic",
+              "tendency",
+              "practice"
+            ]
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "directionId": {
+                  "type": "string",
+                  "description": "方向编码",
+                  "examples": [
+                    "employment_backend"
+                  ]
+                },
+                "score": {
+                  "type": "number",
+                  "description": "匹配得分",
+                  "examples": [
+                    82.4
+                  ]
+                },
+                "rank": {
+                  "type": "integer",
+                  "examples": [
+                    1
+                  ]
+                }
+              },
+              "x-apifox-orders": [
+                "directionId",
+                "score",
+                "rank"
+              ]
+            },
+            "description": "候选方向与得分"
+          }
+        },
+        "required": [
+          "studentRef",
+          "ruleVersion",
+          "profileVersion",
+          "results"
+        ],
+        "title": "推荐解释请求",
+        "x-apifox-orders": [
+          "studentRef",
+          "ruleVersion",
+          "profileVersion",
+          "profile",
+          "results"
+        ],
+        "name": "ExplainRequest"
+      }
+    },
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8000",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8000",
+      "variable": {
+        "id": "7d33750d-4c27-481e-b604-97b0898d8fbd",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8000",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "2b5c04d8-e50e-43cb-aee4-75baf34f0a62",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "32300499-99c8-42d4-8275-a4b9052dba03",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "47025ce1-c060-4d7b-913e-ae644a3822d1",
+              "name": "生成推荐解释(POST /api/v1/ai/recommendation/explain)",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "ai",
+                    "recommendation",
+                    "explain"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"studentRef\": \"student_ref_8f3a\", \"ruleVersion\": \"R1.0\", \"profileVersion\": 2, \"profile\": {\"interest\": 0.78, \"values\": 0.7, \"ability\": 0.62, \"academic\": 0.58, \"tendency\": 0.8, \"practice\": 0.45}, \"results\": [{\"directionId\": \"employment_backend\", \"score\": 82.4, \"rank\": 1}, {\"directionId\": \"data_analysis\", \"score\": 76.8, \"rank\": 2}]}",
+                  "type": "application/json"
+                },
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "fb6fabb0-e5d6-4ad7-8389-c34b97431613",
+                "id": "fb6fabb0-e5d6-4ad7-8389-c34b97431613",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109155,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109155,
+                "httpApiCaseId": 408813101,
+                "httpApiName": "生成推荐解释",
+                "httpApiPath": "/api/v1/ai/recommendation/explain",
+                "httpApiMethod": "post",
+                "httpApiCaseName": "POST /api/v1/ai/recommendation/explain",
+                "moduleId": 8309868,
+                "serverId": "bc3ac089-4fe2-441b-9a61-e921625e4e2d"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {
+                  "$ref": "#/definitions/301352913"
+                },
+                "examples": [
+                  {
+                    "value": "{\n    \"studentRef\": \"student_ref_8f3a\",\n    \"ruleVersion\": \"R1.0\",\n    \"profileVersion\": 2,\n    \"profile\": {\n        \"interest\": 0.78,\n        \"values\": 0.7,\n        \"ability\": 0.62,\n        \"academic\": 0.58,\n        \"tendency\": 0.8,\n        \"practice\": 0.45\n    },\n    \"results\": [\n        {\n            \"directionId\": \"employment_backend\",\n            \"score\": 82.4,\n            \"rank\": 1\n        },\n        {\n            \"directionId\": \"data_analysis\",\n            \"score\": 76.8,\n            \"rank\": 2\n        }\n    ]\n}",
+                    "mediaType": "application/json",
+                    "description": ""
+                  }
+                ]
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "生成推荐解释"
+        }
+      ],
+      "info": {
+        "name": "生成推荐解释"
+      },
+      "dataSchemas": {
+        "301352913": {
+          "type": "object",
+          "properties": {
+            "studentRef": {
+              "type": "string",
+              "description": "脱敏学生引用（禁止直接标识）",
+              "examples": [
+                "student_ref_8f3a"
+              ]
+            },
+            "ruleVersion": {
+              "type": "string",
+              "description": "规则版本",
+              "examples": [
+                "R1.0"
+              ]
+            },
+            "profileVersion": {
+              "type": "integer",
+              "description": "画像版本",
+              "examples": [
+                2
+              ]
+            },
+            "profile": {
+              "type": "object",
+              "properties": {
+                "interest": {
+                  "type": "number",
+                  "description": "兴趣标准化得分",
+                  "examples": [
+                    0.78
+                  ]
+                },
+                "values": {
+                  "type": "number",
+                  "description": "职业价值观标准化得分",
+                  "examples": [
+                    0.78
+                  ]
+                },
+                "ability": {
+                  "type": "number",
+                  "description": "能力基础标准化得分",
+                  "examples": [
+                    0.78
+                  ]
+                },
+                "academic": {
+                  "type": "number",
+                  "description": "学业基础标准化得分",
+                  "examples": [
+                    0.78
+                  ]
+                },
+                "tendency": {
+                  "type": "number",
+                  "description": "发展倾向标准化得分",
+                  "examples": [
+                    0.78
+                  ]
+                },
+                "practice": {
+                  "type": "number",
+                  "description": "实践经历标准化得分",
+                  "examples": [
+                    0.78
+                  ]
+                }
+              },
+              "x-apifox-orders": [
+                "interest",
+                "values",
+                "ability",
+                "academic",
+                "tendency",
+                "practice"
+              ]
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "directionId": {
+                    "type": "string",
+                    "description": "方向编码",
+                    "examples": [
+                      "employment_backend"
+                    ]
+                  },
+                  "score": {
+                    "type": "number",
+                    "description": "匹配得分",
+                    "examples": [
+                      82.4
+                    ]
+                  },
+                  "rank": {
+                    "type": "integer",
+                    "examples": [
+                      1
+                    ]
+                  }
+                },
+                "x-apifox-orders": [
+                  "directionId",
+                  "score",
+                  "rank"
+                ]
+              },
+              "description": "候选方向与得分"
+            }
+          },
+          "required": [
+            "studentRef",
+            "ruleVersion",
+            "profileVersion",
+            "results"
+          ],
+          "title": "推荐解释请求",
+          "x-apifox-orders": [
+            "studentRef",
+            "ruleVersion",
+            "profileVersion",
+            "profile",
+            "results"
+          ],
+          "name": "ExplainRequest"
+        }
+      },
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8000",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8000",
+        "variable": {
+          "id": "7d33750d-4c27-481e-b604-97b0898d8fbd",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8000",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8000",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8080"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "2b5c04d8-e50e-43cb-aee4-75baf34f0a62",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "32300499-99c8-42d4-8275-a4b9052dba03",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109155,
+        "name": "生成推荐解释",
+        "path": "/api/v1/ai/recommendation/explain",
+        "method": "post"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408813101,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "a252bc6d-15e4-460a-9b07-650958b31c32",
+    "name": "生成推荐解释"
+  }
+}

@@ -1,0 +1,831 @@
+{
+  "result": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 54,
+      "responseAverage": 54,
+      "responseMin": 54,
+      "responseMax": 54,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787975278164,
+      "completed": 1787975278273
+    },
+    "transfers": {
+      "responseTotal": 138
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "b529f487-d5d7-471d-aba6-6a55d25e03d1",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "isTestFlowControl": true,
+  "run": {
+    "stats": {
+      "steps": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0
+      },
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {},
+      "scripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "socketRequests": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseTime": 54,
+      "responseAverage": 54,
+      "responseMin": 54,
+      "responseMax": 54,
+      "responseSd": 0,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1787975278164,
+      "completed": 1787975278273
+    },
+    "transfers": {
+      "responseTotal": 138
+    },
+    "failures": [],
+    "stepTree": [
+      {
+        "ref": "b529f487-d5d7-471d-aba6-6a55d25e03d1",
+        "type": "http"
+      }
+    ],
+    "error": null
+  },
+  "options": {
+    "accessToken": "afxp_4df3b9NOr4oqUdB1weDJR2NHFJ6l504PiVlo",
+    "apiBaseUrl": "https://api.apifox.com",
+    "project": 8662286,
+    "testCase": [
+      408828293
+    ],
+    "environment": 47907998,
+    "reporters": [
+      "cli",
+      "json"
+    ],
+    "outDir": "D:\\Zht20241287\\career-planner\\tests\\apifox-reports\\测评",
+    "outFile": "apifox-report-2026-08-29-11-47-57-424-0",
+    "originalOutFile": "apifox-report-2026-08-29-11-47-57-424-0",
+    "envVar": [],
+    "globalVar": [],
+    "color": "auto",
+    "delayRequest": 0,
+    "timeoutRequest": 0,
+    "timeoutScript": 0,
+    "enableBigInt": false,
+    "disableRejectUnauthorized": false,
+    "allowSecuritySensitiveActions": true,
+    "reporterOptions": {
+      "name": "测试用例",
+      "runnerId": "3c790865-8e3b-44cf-9368-2f3a6e627f8e",
+      "testCaseGroupId": 8662286,
+      "executionCount": 1
+    },
+    "isUploadReportSummary": false,
+    "apifoxVersion": "2.2.9",
+    "globals": {},
+    "teamGlobals": {}
+  },
+  "collection": {
+    "apifoxCli": "1.2.21",
+    "item": [
+      {
+        "item": [
+          {
+            "id": "40791b12-6bbe-415b-bd04-e4c265d1e95b",
+            "name": "保存 / 自动保存答案(PUT /api/v1/assessment-sessions/{sessionId}/answers)",
+            "request": {
+              "url": {
+                "protocol": "http",
+                "port": "8080",
+                "path": [
+                  "api",
+                  "v1",
+                  "assessment-sessions",
+                  "AS-106",
+                  "answers"
+                ],
+                "host": [
+                  "127",
+                  "0",
+                  "0",
+                  "1"
+                ],
+                "query": [],
+                "variable": [
+                  {
+                    "disabled": false,
+                    "type": "string",
+                    "value": "AS-106",
+                    "key": "sessionId"
+                  }
+                ]
+              },
+              "header": [
+                {
+                  "disabled": false,
+                  "key": "Authorization",
+                  "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                },
+                {
+                  "key": "User-Agent",
+                  "value": "app/1.0.0"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "PUT",
+              "baseUrl": "http://127.0.0.1:8080",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"requestId\": \"req-20260901-001\", \"answers\": [{\"questionId\": \"q-holland-1\", \"optionIndex\": 0}, {\"questionId\": \"q-ability-1\", \"ratingValue\": 4}], \"finished\": false}",
+                "type": "application/json"
+              },
+              "auth": {
+                "type": "noauth",
+                "noauth": []
+              },
+              "type": "http"
+            },
+            "response": [],
+            "event": [],
+            "type": "http",
+            "metaInfo": {
+              "blockId": "6b749adb-5871-4c0a-932b-bb71ae9d1718",
+              "id": "6b749adb-5871-4c0a-932b-bb71ae9d1718",
+              "type": "http",
+              "projectId": 8662286,
+              "relatedId": 497109112,
+              "environmentId": 47907998,
+              "blockNumber": 1,
+              "tags": [],
+              "httpApiId": 497109112,
+              "httpApiCaseId": 408828293,
+              "httpApiName": "保存 / 自动保存答案",
+              "httpApiPath": "/api/v1/assessment-sessions/{sessionId}/answers",
+              "httpApiMethod": "put",
+              "httpApiCaseName": "PUT /api/v1/assessment-sessions/{sessionId}/answers",
+              "moduleId": 8309868,
+              "serverId": "default"
+            },
+            "protocolProfileBehavior": {
+              "useWhatWGUrlParser": false,
+              "disableUrlEncoding": false,
+              "disabledSystemHeaders": {},
+              "disableCookies": false
+            },
+            "responseDefinition": {
+              "validateDeletedResponse": false
+            },
+            "requestDefinition": {
+              "jsonSchema": {
+                "$ref": "#/definitions/301352843"
+              },
+              "examples": [
+                {
+                  "value": "{\n    \"requestId\": \"req-20260901-001\",\n    \"answers\": [\n        {\n            \"questionId\": \"q-holland-1\",\n            \"optionIndex\": 0\n        },\n        {\n            \"questionId\": \"q-ability-1\",\n            \"ratingValue\": 4\n        }\n    ],\n    \"finished\": false\n}",
+                  "mediaType": "application/json",
+                  "description": ""
+                }
+              ]
+            },
+            "overrideRequesterOptions": {
+              "strictSSL": false
+            }
+          }
+        ],
+        "name": "保存 / 自动保存答案"
+      }
+    ],
+    "info": {
+      "name": "保存 / 自动保存答案"
+    },
+    "dataSchemas": {
+      "301352842": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "description": "题目 ID",
+            "examples": [
+              "q-holland-1"
+            ]
+          },
+          "optionIndex": {
+            "type": "integer",
+            "description": "CHOICE 题：所选选项下标",
+            "examples": [
+              0
+            ]
+          },
+          "ratingValue": {
+            "type": "integer",
+            "description": "RATING 题：1–5 评分",
+            "examples": [
+              4
+            ]
+          }
+        },
+        "title": "单题答案",
+        "x-apifox-orders": [
+          "questionId",
+          "optionIndex",
+          "ratingValue"
+        ],
+        "name": "AnswerItem"
+      },
+      "301352843": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "description": "业务请求 ID（幂等，防止重复点击）",
+            "examples": [
+              "req-20260901-001"
+            ]
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/301352842"
+            }
+          },
+          "finished": {
+            "type": "boolean",
+            "description": "是否为最后一页/最后一题（true 则按提交处理）",
+            "examples": [
+              false
+            ]
+          }
+        },
+        "required": [
+          "answers"
+        ],
+        "title": "保存/自动保存答案",
+        "x-apifox-orders": [
+          "requestId",
+          "answers",
+          "finished"
+        ],
+        "name": "SaveAnswersRequest"
+      }
+    },
+    "mockRules": {
+      "rules": [],
+      "enableSystemRule": true
+    },
+    "environment": {
+      "id": 47907998,
+      "name": "开发环境",
+      "type": "normal",
+      "baseUrls": {
+        "default": "http://127.0.0.1:8080",
+        "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+      },
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "http://127.0.0.1:8080",
+      "variable": {
+        "id": "2672d52a-4f93-45d2-bab7-1ba44b2e2f76",
+        "name": "开发环境",
+        "baseUrl": "http://127.0.0.1:8080",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8080",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+        },
+        "values": [
+          {
+            "type": "any",
+            "value": "",
+            "key": "baseUrl",
+            "isBindInitial": false,
+            "initialValue": "",
+            "securityType": "default"
+          }
+        ]
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      },
+      "advancedSettings": {}
+    },
+    "globals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "c349bd8e-5b01-4b07-898d-0083134925f8",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "teamGlobals": {
+      "baseUrls": {},
+      "websocketBaseUrls": {},
+      "socketioBaseUrls": {},
+      "baseUrl": "",
+      "variable": {
+        "id": "a84a7673-d93a-4494-ad79-d0cc702bf91a",
+        "baseUrl": "",
+        "baseUrls": {},
+        "values": []
+      },
+      "parameter": {
+        "header": [],
+        "query": [],
+        "body": [],
+        "cookie": []
+      }
+    },
+    "moduleVariablesMap": {
+      "8309868": []
+    },
+    "isServerBuild": true,
+    "isTestFlowControl": true,
+    "collectionDefinition": {
+      "apifoxCli": "1.2.21",
+      "item": [
+        {
+          "item": [
+            {
+              "id": "40791b12-6bbe-415b-bd04-e4c265d1e95b",
+              "name": "保存 / 自动保存答案(PUT /api/v1/assessment-sessions/{sessionId}/answers)",
+              "request": {
+                "url": {
+                  "protocol": "http",
+                  "port": "8080",
+                  "path": [
+                    "api",
+                    "v1",
+                    "assessment-sessions",
+                    "AS-106",
+                    "answers"
+                  ],
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "string",
+                      "value": "AS-106",
+                      "key": "sessionId"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "disabled": false,
+                    "key": "Authorization",
+                    "value": "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJTMTAwMyIsInVzZXJuYW1lIjoiMjAyNjAxMTMwMSIsInJvbGUiOiJTVFVERU5UIiwianRpIjoiMjNkYjc2YmUtNjNlNi00OTE3LTg5M2QtN2IwOTY4OTkwYjkzIiwiaWF0IjoxNzg3OTY5MTEyLCJleHAiOjE3ODc5NzYzMTJ9.TUTSjCKKl-uoOEI629La91Q4UAH5bWipGqrRAwqD35REXQs2lX-O1p_TKgzmThHi"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "app/1.0.0"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PUT",
+                "baseUrl": "http://127.0.0.1:8080",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"requestId\": \"req-20260901-001\", \"answers\": [{\"questionId\": \"q-holland-1\", \"optionIndex\": 0}, {\"questionId\": \"q-ability-1\", \"ratingValue\": 4}], \"finished\": false}",
+                  "type": "application/json"
+                },
+                "auth": {
+                  "type": "noauth",
+                  "noauth": []
+                },
+                "type": "http"
+              },
+              "response": [],
+              "event": [],
+              "type": "http",
+              "metaInfo": {
+                "blockId": "6b749adb-5871-4c0a-932b-bb71ae9d1718",
+                "id": "6b749adb-5871-4c0a-932b-bb71ae9d1718",
+                "type": "http",
+                "projectId": 8662286,
+                "relatedId": 497109112,
+                "environmentId": 47907998,
+                "blockNumber": 1,
+                "tags": [],
+                "httpApiId": 497109112,
+                "httpApiCaseId": 408828293,
+                "httpApiName": "保存 / 自动保存答案",
+                "httpApiPath": "/api/v1/assessment-sessions/{sessionId}/answers",
+                "httpApiMethod": "put",
+                "httpApiCaseName": "PUT /api/v1/assessment-sessions/{sessionId}/answers",
+                "moduleId": 8309868,
+                "serverId": "default"
+              },
+              "protocolProfileBehavior": {
+                "useWhatWGUrlParser": false,
+                "disableUrlEncoding": false,
+                "disabledSystemHeaders": {},
+                "disableCookies": false
+              },
+              "responseDefinition": {
+                "validateDeletedResponse": false
+              },
+              "requestDefinition": {
+                "jsonSchema": {
+                  "$ref": "#/definitions/301352843"
+                },
+                "examples": [
+                  {
+                    "value": "{\n    \"requestId\": \"req-20260901-001\",\n    \"answers\": [\n        {\n            \"questionId\": \"q-holland-1\",\n            \"optionIndex\": 0\n        },\n        {\n            \"questionId\": \"q-ability-1\",\n            \"ratingValue\": 4\n        }\n    ],\n    \"finished\": false\n}",
+                    "mediaType": "application/json",
+                    "description": ""
+                  }
+                ]
+              },
+              "overrideRequesterOptions": {
+                "strictSSL": false
+              }
+            }
+          ],
+          "name": "保存 / 自动保存答案"
+        }
+      ],
+      "info": {
+        "name": "保存 / 自动保存答案"
+      },
+      "dataSchemas": {
+        "301352842": {
+          "type": "object",
+          "properties": {
+            "questionId": {
+              "type": "string",
+              "description": "题目 ID",
+              "examples": [
+                "q-holland-1"
+              ]
+            },
+            "optionIndex": {
+              "type": "integer",
+              "description": "CHOICE 题：所选选项下标",
+              "examples": [
+                0
+              ]
+            },
+            "ratingValue": {
+              "type": "integer",
+              "description": "RATING 题：1–5 评分",
+              "examples": [
+                4
+              ]
+            }
+          },
+          "title": "单题答案",
+          "x-apifox-orders": [
+            "questionId",
+            "optionIndex",
+            "ratingValue"
+          ],
+          "name": "AnswerItem"
+        },
+        "301352843": {
+          "type": "object",
+          "properties": {
+            "requestId": {
+              "type": "string",
+              "description": "业务请求 ID（幂等，防止重复点击）",
+              "examples": [
+                "req-20260901-001"
+              ]
+            },
+            "answers": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/301352842"
+              }
+            },
+            "finished": {
+              "type": "boolean",
+              "description": "是否为最后一页/最后一题（true 则按提交处理）",
+              "examples": [
+                false
+              ]
+            }
+          },
+          "required": [
+            "answers"
+          ],
+          "title": "保存/自动保存答案",
+          "x-apifox-orders": [
+            "requestId",
+            "answers",
+            "finished"
+          ],
+          "name": "SaveAnswersRequest"
+        }
+      },
+      "mockRules": {
+        "rules": [],
+        "enableSystemRule": true
+      },
+      "environment": {
+        "id": 47907998,
+        "name": "开发环境",
+        "type": "normal",
+        "baseUrls": {
+          "default": "http://127.0.0.1:8080",
+          "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+        },
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "http://127.0.0.1:8080",
+        "variable": {
+          "id": "2672d52a-4f93-45d2-bab7-1ba44b2e2f76",
+          "name": "开发环境",
+          "baseUrl": "http://127.0.0.1:8080",
+          "baseUrls": {
+            "default": "http://127.0.0.1:8080",
+            "bc3ac089-4fe2-441b-9a61-e921625e4e2d": "http://127.0.0.1:8000"
+          },
+          "values": [
+            {
+              "type": "any",
+              "value": "",
+              "key": "baseUrl",
+              "isBindInitial": false,
+              "initialValue": "",
+              "securityType": "default"
+            }
+          ]
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        },
+        "advancedSettings": {}
+      },
+      "globals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "c349bd8e-5b01-4b07-898d-0083134925f8",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "teamGlobals": {
+        "baseUrls": {},
+        "websocketBaseUrls": {},
+        "socketioBaseUrls": {},
+        "baseUrl": "",
+        "variable": {
+          "id": "a84a7673-d93a-4494-ad79-d0cc702bf91a",
+          "baseUrl": "",
+          "baseUrls": {},
+          "values": []
+        },
+        "parameter": {
+          "header": [],
+          "query": [],
+          "body": [],
+          "cookie": []
+        }
+      },
+      "moduleVariablesMap": {
+        "8309868": []
+      },
+      "defaultModuleId": 8309868,
+      "isServerBuild": true,
+      "isTestFlowControl": true,
+      "projectAssociationMap": {},
+      "testDataMap": {},
+      "databaseConnectionMap": {}
+    },
+    "runOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectOptions": {
+      "allowAutomationWriteAutomationCreatedSprintBranch": true,
+      "enableJsonc": false,
+      "enableBigint": false,
+      "responseValidate": true,
+      "enableTestScenarioSetting": false,
+      "enableYAPICompatScript": false,
+      "isDefaultUrlEncoding": 2,
+      "publishedDocUrlRules": {
+        "defaultRule": "RESOURCE_KEY_ONLY",
+        "resourceKeyStandard": "NEW"
+      },
+      "folderShareExpandModeSettings": {
+        "expandId": [],
+        "mode": "AUTO"
+      },
+      "allowAutomationWriteMainBranch": true,
+      "allowAutomationWriteSprintBranch": true,
+      "allowAutomationWriteVersionBranch": true,
+      "mockSettings": {},
+      "language": "zh-CN"
+    },
+    "ciRunningOptions": {
+      "environmentId": 47907998,
+      "useDataSetId": -1,
+      "threadCount": 1,
+      "iterationCount": 1,
+      "delayItem": 0,
+      "saveVariables": true,
+      "saveReportDetail": "all",
+      "readGlobalCookie": false,
+      "saveGlobalCookie": false,
+      "onError": "ignore",
+      "runnerId": 0
+    },
+    "projectId": 8662286,
+    "databaseConnectionMap": {},
+    "testDataMap": {},
+    "reportUrlTemplate": "https://app.apifox.com/link/project/{{projectId}}/api-test/test-report/{{id}}",
+    "reportExtra": {
+      "runOptions": {
+        "environmentId": 47907998,
+        "useDataSetId": -1,
+        "threadCount": 1,
+        "iterationCount": 1,
+        "delayItem": 0,
+        "saveVariables": true,
+        "saveReportDetail": "all",
+        "readGlobalCookie": false,
+        "saveGlobalCookie": false,
+        "onError": "ignore",
+        "runnerId": 0
+      },
+      "endpoint": {
+        "id": 497109112,
+        "name": "保存 / 自动保存答案",
+        "path": "/api/v1/assessment-sessions/{sessionId}/answers",
+        "method": "put"
+      },
+      "testCaseRunSource": {
+        "type": "case",
+        "caseId": 408828293,
+        "requestedEnvironmentId": 47907998,
+        "resolvedEnvironmentId": 47907998,
+        "resolvedEnvironmentName": "开发环境",
+        "isDefaultEnvironment": false
+      }
+    },
+    "runnerId": "38d0318b-4d33-45a6-a380-2ef41a2a2284",
+    "name": "保存 / 自动保存答案"
+  }
+}

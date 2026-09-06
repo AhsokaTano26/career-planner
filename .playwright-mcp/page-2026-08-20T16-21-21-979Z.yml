@@ -1,0 +1,35 @@
+- main [ref=e510]:
+  - generic [ref=e511]:
+    - generic [ref=e512]: CAREER ARCHIVE / 01
+    - generic [ref=e513]: 生涯规划系统
+  - generic [ref=e514]:
+    - generic [ref=e515]:
+      - paragraph [ref=e516]: CAREER PLANNING SYSTEM
+      - heading "把每一次探索， 留下证据。" [level=1] [ref=e517]:
+        - generic [ref=e518]: 把每一次探索，
+        - emphasis [ref=e519]: 留下证据。
+      - paragraph [ref=e520]: 账号所属角色由系统自动识别并进入对应工作台。
+      - generic [ref=e521]:
+        - generic [ref=e522]: PROFILE
+        - generic [ref=e523]: ASSESSMENT
+        - generic [ref=e524]: PLAN
+        - generic [ref=e525]: REVIEW
+    - generic [ref=e526]:
+      - paragraph [ref=e527]: LOGIN / ACCESS
+      - heading "进入工作台" [level=2] [ref=e528]
+      - generic [ref=e529]:
+        - text: 账号
+        - textbox "账号" [ref=e530]:
+          - /placeholder: 账号或学号
+          - text: admin
+      - generic [ref=e531]:
+        - text: 密码
+        - textbox "密码" [ref=e532]:
+          - /placeholder: 输入密码
+          - text: Admin@2026
+      - paragraph [ref=e533]: 未预期系统错误
+      - button "登录系统 →" [ref=e534] [cursor=pointer]
+      - generic [ref=e535]:
+        - button "登录" [ref=e536] [cursor=pointer]
+        - button "注册" [ref=e537] [cursor=pointer]
+        - button "忘记密码" [ref=e538] [cursor=pointer]

@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/directions/compare",
+  "status": 404,
+  "body": "{\"code\":\"RESOURCE_NOT_FOUND\",\"message\":\"资源不存在\",\"data\":null,\"traceId\":\"372219bf2eb69764fb9c920ef80f584b\",\"timestamp\":\"2026-08-29T11:49:30.692412+08:00\"}"
+}

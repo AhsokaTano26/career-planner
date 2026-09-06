@@ -1,0 +1,5 @@
+{
+  "url": "http://127.0.0.1:8080/api/v1/students/me/recommendations",
+  "status": 200,
+  "body": "{\"code\":\"OK\",\"message\":\"success\",\"data\":{\"list\":[{\"runId\":\"RR-104\",\"profileVersion\":4,\"ruleVersion\":\"R1.0\",\"generatedAt\":\"2026-08-29T11:50:04\",\"status\":\"SUCCESS\",\"results\":[]},{\"runId\":\"RR-103\",\"profileVersion\":4,\"ruleVersion\":\"R1.0\",\"generatedAt\":\"2026-08-29T11:50:02\",\"status\":\"SUCCESS\",\"results\":[]},{\"runId\":\"RR-102\",\"profileVersion\":2,\"ruleVersion\":\"R1.0\",\"generatedAt\":\"2026-08-29T10:27:17\",\"status\":\"SUCCESS\",\"results\":[]},{\"runId\":\"RR-101\",\"profileVersion\":2,\"ruleVersion\":\"R1.0\",\"generatedAt\":\"2026-08-29T10:27:15\",\"status\":\"SUCCESS\",\"results\":[]}],\"page\":1,\"size\":20,\"total\":4,\"totalPages\":1},\"traceId\":\"6876891e065984c97efe08e4d0c68dd5\",\"timestamp\":\"2026-08-29T11:50:19.7164536+08:00\"}"
+}

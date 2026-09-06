@@ -1,0 +1,84 @@
+- generic [ref=e329]:
+  - complementary [ref=e330]:
+    - generic [ref=e331]:
+      - generic [ref=e332]: C
+      - generic [ref=e333]: CAREER / ARCHIVE
+    - generic [ref=e334]:
+      - generic [ref=e335]: 李
+      - generic [ref=e336]:
+        - generic [ref=e337]: 李明
+        - generic [ref=e338]: 学生工作台 · 在线
+    - navigation [ref=e339]:
+      - paragraph [ref=e340]: 我的生涯
+      - button "◼ 生涯总览" [ref=e341] [cursor=pointer]:
+        - generic [ref=e342]: ◼
+        - text: 生涯总览
+      - button "◼ 个人资料" [ref=e343] [cursor=pointer]:
+        - generic [ref=e344]: ◼
+        - text: 个人资料
+      - button "◼ 经历管理" [ref=e345] [cursor=pointer]:
+        - generic [ref=e346]: ◼
+        - text: 经历管理
+      - button "◼ 生涯测评" [ref=e347] [cursor=pointer]:
+        - generic [ref=e348]: ◼
+        - text: 生涯测评
+      - button "◼ 能力画像" [ref=e349] [cursor=pointer]:
+        - generic [ref=e350]: ◼
+        - text: 能力画像
+    - navigation [ref=e351]:
+      - paragraph [ref=e352]: 探索与行动
+      - button "◼ 路径探索" [ref=e353] [cursor=pointer]:
+        - generic [ref=e354]: ◼
+        - text: 路径探索
+      - button "◼ 方向推荐" [ref=e355] [cursor=pointer]:
+        - generic [ref=e356]: ◼
+        - text: 方向推荐
+      - button "◼ 方向对比" [ref=e357] [cursor=pointer]:
+        - generic [ref=e358]: ◼
+        - text: 方向对比
+      - button "◼ 我的收藏" [ref=e359] [cursor=pointer]:
+        - generic [ref=e360]: ◼
+        - text: 我的收藏
+      - button "◼ 目标管理" [ref=e361] [cursor=pointer]:
+        - generic [ref=e362]: ◼
+        - text: 目标管理
+      - button "◼ 学期计划" [active] [ref=e363] [cursor=pointer]:
+        - generic [ref=e364]: ◼
+        - text: 学期计划
+      - button "◼ 任务看板" [ref=e365] [cursor=pointer]:
+        - generic [ref=e366]: ◼
+        - text: 任务看板
+      - button "◼ 阶段复盘" [ref=e367] [cursor=pointer]:
+        - generic [ref=e368]: ◼
+        - text: 阶段复盘
+    - navigation [ref=e369]:
+      - paragraph [ref=e370]: 支持与设置
+      - button "◼ 任务提醒" [ref=e371] [cursor=pointer]:
+        - generic [ref=e372]: ◼
+        - text: 任务提醒
+      - button "◼ AI 咨询" [ref=e373] [cursor=pointer]:
+        - generic [ref=e374]: ◼
+        - text: AI 咨询
+      - button "◼ 隐私与账户" [ref=e375] [cursor=pointer]:
+        - generic [ref=e376]: ◼
+        - text: 隐私与账户
+    - generic [ref=e377]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=e378]:
+    - generic [ref=e379]:
+      - generic [ref=e380]: 学生工作台 / 2026-2027 · FIRST TERM
+      - generic [ref=e381]:
+        - button "↙ 退出登录" [ref=e382] [cursor=pointer]
+        - button "+ 新建" [ref=e383] [cursor=pointer]
+        - button "●" [ref=e384] [cursor=pointer]
+    - generic [ref=e385]:
+      - generic [ref=e387]:
+        - paragraph [ref=e388]: MODULE / PLANS
+        - heading "学期计划" [level=1] [ref=e476]
+        - paragraph
+      - generic [ref=e464]:
+        - paragraph [ref=e465]: SERVICE / PENDING
+        - heading "此功能尚未接入当前后端" [level=2] [ref=e466]
+        - paragraph [ref=e467]:
+          - text: 已核对全部远程分支：认证、学生档案、经历和辅导员/管理模块分别存在于后端分支；画像、推荐、计划与 AI 服务尚未与带 JWT 的业务后端合并。前端不会绕过服务端直接调用需要
+          - code [ref=e468]: X-Internal-Token
+          - text: 的 AI 接口。

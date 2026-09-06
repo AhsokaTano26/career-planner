@@ -1,0 +1,124 @@
+- generic [ref=f2e31]:
+  - complementary [ref=f2e32]:
+    - generic [ref=f2e33]:
+      - generic [ref=f2e34]: C
+      - generic [ref=f2e35]: CAREER / ARCHIVE
+    - generic [ref=f2e36]:
+      - generic [ref=f2e37]: 李
+      - generic [ref=f2e38]:
+        - generic [ref=f2e39]: 李明
+        - generic [ref=f2e40]: 学生工作台 · 在线
+    - navigation [ref=f2e41]:
+      - paragraph [ref=f2e42]: 我的生涯
+      - button "◼ 生涯总览" [ref=f2e43] [cursor=pointer]:
+        - generic [ref=f2e44]: ◼
+        - text: 生涯总览
+      - button "◼ 个人资料" [ref=f2e45] [cursor=pointer]:
+        - generic [ref=f2e46]: ◼
+        - text: 个人资料
+      - button "◼ 经历管理" [ref=f2e47] [cursor=pointer]:
+        - generic [ref=f2e48]: ◼
+        - text: 经历管理
+      - button "◼ 生涯测评" [ref=f2e49] [cursor=pointer]:
+        - generic [ref=f2e50]: ◼
+        - text: 生涯测评
+      - button "◼ 能力画像" [active] [ref=f2e51] [cursor=pointer]:
+        - generic [ref=f2e52]: ◼
+        - text: 能力画像
+    - navigation [ref=f2e53]:
+      - paragraph [ref=f2e54]: 探索与行动
+      - button "◼ 路径探索" [ref=f2e55] [cursor=pointer]:
+        - generic [ref=f2e56]: ◼
+        - text: 路径探索
+      - button "◼ 方向推荐" [ref=f2e57] [cursor=pointer]:
+        - generic [ref=f2e58]: ◼
+        - text: 方向推荐
+      - button "◼ 方向对比" [ref=f2e59] [cursor=pointer]:
+        - generic [ref=f2e60]: ◼
+        - text: 方向对比
+      - button "◼ 我的收藏" [ref=f2e61] [cursor=pointer]:
+        - generic [ref=f2e62]: ◼
+        - text: 我的收藏
+      - button "◼ 目标管理" [ref=f2e63] [cursor=pointer]:
+        - generic [ref=f2e64]: ◼
+        - text: 目标管理
+      - button "◼ 学期计划" [ref=f2e65] [cursor=pointer]:
+        - generic [ref=f2e66]: ◼
+        - text: 学期计划
+      - button "◼ 任务看板" [ref=f2e67] [cursor=pointer]:
+        - generic [ref=f2e68]: ◼
+        - text: 任务看板
+      - button "◼ 阶段复盘" [ref=f2e69] [cursor=pointer]:
+        - generic [ref=f2e70]: ◼
+        - text: 阶段复盘
+    - navigation [ref=f2e71]:
+      - paragraph [ref=f2e72]: 支持与设置
+      - button "◼ 任务提醒" [ref=f2e73] [cursor=pointer]:
+        - generic [ref=f2e74]: ◼
+        - text: 任务提醒
+      - button "◼ AI 咨询" [ref=f2e75] [cursor=pointer]:
+        - generic [ref=f2e76]: ◼
+        - text: AI 咨询
+      - button "◼ 隐私与账户" [ref=f2e77] [cursor=pointer]:
+        - generic [ref=f2e78]: ◼
+        - text: 隐私与账户
+    - generic [ref=f2e79]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=f2e80]:
+    - generic [ref=f2e81]:
+      - generic [ref=f2e82]: 学生工作台 / 2026-2027 · FIRST TERM
+      - generic [ref=f2e83]:
+        - button "↙ 退出登录" [ref=f2e84] [cursor=pointer]
+        - button "+ 新建" [ref=f2e85] [cursor=pointer]
+        - button "●" [ref=f2e86] [cursor=pointer]
+    - generic [ref=f2e87]:
+      - generic [ref=f2e89]:
+        - paragraph [ref=f2e90]: PROFILE / SIX DIMENSIONS
+        - heading "此刻的你，有很多可能" [level=1] [ref=f2e185]
+        - paragraph [ref=f2e92]: 能力画像会随着测评、经历和反馈持续更新。
+      - generic [ref=f2e186]:
+        - generic [ref=f2e187]:
+          - generic [ref=f2e188]:
+            - generic [ref=f2e189]:
+              - paragraph [ref=f2e190]: SIX DIMENSIONS
+              - heading "个人能力画像" [level=2] [ref=f2e191]
+            - generic [ref=f2e192]: LIVE DATA
+          - generic [ref=f2e193]:
+            - img [ref=f2e194]:
+              - generic [ref=f2e208]: 兴趣
+              - generic [ref=f2e209]: 价值观
+              - generic [ref=f2e210]: 能力
+              - generic [ref=f2e211]: 学业
+              - generic [ref=f2e212]: 倾向
+              - generic [ref=f2e213]: 实践
+            - generic [ref=f2e214]:
+              - generic [ref=f2e215]:
+                - generic [ref=f2e216]: 兴趣
+                - emphasis [ref=f2e218]
+                - generic [ref=f2e219]: "80"
+              - generic [ref=f2e220]:
+                - generic [ref=f2e221]: 价值观
+                - emphasis [ref=f2e223]
+                - generic [ref=f2e224]: "60"
+              - generic [ref=f2e225]:
+                - generic [ref=f2e226]: 能力
+                - emphasis [ref=f2e228]
+                - generic [ref=f2e229]: "100"
+              - generic [ref=f2e230]:
+                - generic [ref=f2e231]: 学业
+                - emphasis [ref=f2e233]
+                - generic [ref=f2e234]: "80"
+              - generic [ref=f2e235]:
+                - generic [ref=f2e236]: 倾向
+                - emphasis [ref=f2e238]
+                - generic [ref=f2e239]: "60"
+              - generic [ref=f2e240]:
+                - generic [ref=f2e241]: 实践
+                - emphasis [ref=f2e243]
+                - generic [ref=f2e244]: "40"
+        - complementary [ref=f2e245]:
+          - paragraph [ref=f2e246]: PROFILE / INSIGHT
+          - heading "一份正在成形的优势" [level=2] [ref=f2e247]
+          - paragraph [ref=f2e248]: 你的优势维度在「能力」（100），可在「实践」方向继续探索提升。
+          - generic [ref=f2e249]: 优势：能力(100)优势：兴趣(80)待探索：实践(40)待探索：价值观(60)
+          - separator [ref=f2e250]
+          - button "刷新画像" [ref=f2e251] [cursor=pointer]

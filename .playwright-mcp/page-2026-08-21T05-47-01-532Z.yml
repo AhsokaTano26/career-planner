@@ -1,0 +1,111 @@
+- generic [ref=e266]:
+  - complementary [ref=e267]:
+    - generic [ref=e268]:
+      - generic [ref=e269]: C
+      - generic [ref=e270]: CAREER / ARCHIVE
+    - generic [ref=e271]:
+      - generic [ref=e272]: 系
+      - generic [ref=e273]:
+        - generic [ref=e274]: 系统管理员
+        - generic [ref=e275]: 系统管理台 · 在线
+    - navigation [ref=e276]:
+      - paragraph [ref=e277]: 平台配置
+      - button "◼ 运行总览" [ref=e278] [cursor=pointer]:
+        - generic [ref=e279]: ◼
+        - text: 运行总览
+      - button "◼ 用户管理" [ref=e280] [cursor=pointer]:
+        - generic [ref=e281]: ◼
+        - text: 用户管理
+      - button "◼ 白名单" [ref=e282] [cursor=pointer]:
+        - generic [ref=e283]: ◼
+        - text: 白名单
+      - button "◼ 师生关系" [ref=e284] [cursor=pointer]:
+        - generic [ref=e285]: ◼
+        - text: 师生关系
+      - button "◼ 问卷管理" [active] [ref=e286] [cursor=pointer]:
+        - generic [ref=e287]: ◼
+        - text: 问卷管理
+      - button "◼ 方向库" [ref=e288] [cursor=pointer]:
+        - generic [ref=e289]: ◼
+        - text: 方向库
+      - button "◼ 能力标签" [ref=e290] [cursor=pointer]:
+        - generic [ref=e291]: ◼
+        - text: 能力标签
+      - button "◼ 任务模板" [ref=e292] [cursor=pointer]:
+        - generic [ref=e293]: ◼
+        - text: 任务模板
+    - navigation [ref=e294]:
+      - paragraph [ref=e295]: 内容与治理
+      - button "◼ 培养方案" [ref=e296] [cursor=pointer]:
+        - generic [ref=e297]: ◼
+        - text: 培养方案
+      - button "◼ 推荐权重" [ref=e298] [cursor=pointer]:
+        - generic [ref=e299]: ◼
+        - text: 推荐权重
+      - button "◼ 模型与提示词" [ref=e300] [cursor=pointer]:
+        - generic [ref=e301]: ◼
+        - text: 模型与提示词
+      - button "◼ 导出任务" [ref=e302] [cursor=pointer]:
+        - generic [ref=e303]: ◼
+        - text: 导出任务
+      - button "◼ 审计日志" [ref=e304] [cursor=pointer]:
+        - generic [ref=e305]: ◼
+        - text: 审计日志
+    - generic [ref=e306]: 当前登录身份由后端 JWT 决定智能生成，仅供探索参考
+  - main [ref=e307]:
+    - generic [ref=e308]:
+      - generic [ref=e309]: 系统管理台 / 2026-2027 · FIRST TERM
+      - generic [ref=e310]:
+        - button "↙ 退出登录" [ref=e311] [cursor=pointer]
+        - button "+ 新建" [ref=e312] [cursor=pointer]
+        - button "●" [ref=e313] [cursor=pointer]
+    - generic [ref=e314]:
+      - generic [ref=e316]:
+        - paragraph [ref=e317]: MODULE / QUESTIONNAIRES
+        - heading "问卷管理" [level=1] [ref=e371]
+        - paragraph
+      - generic [ref=e372]:
+        - generic [ref=e373]:
+          - generic [ref=e374]:
+            - paragraph [ref=e375]: ADMIN / QUESTIONNAIRES
+            - heading "问卷管理" [level=2] [ref=e376]
+          - generic [ref=e377]:
+            - generic [ref=e378]:
+              - generic [ref=e379]: 搜索
+              - textbox "搜索" [ref=e380]:
+                - /placeholder: 搜索问卷名
+            - button "刷新" [ref=e381] [cursor=pointer]
+        - generic [ref=e382]: 共 4 份问卷
+        - generic [ref=e384]:
+          - generic [ref=e385]:
+            - generic [ref=e386]: 编号
+            - generic [ref=e387]: 内容
+            - generic [ref=e388]: 状态
+          - article [ref=e389]:
+            - generic [ref=e390]: Q-102
+            - generic [ref=e391]: 能力 · 1 题 · V1
+            - emphasis [ref=e393]: PUBLISHED
+            - generic [ref=e394]:
+              - button "发布最新版" [ref=e395] [cursor=pointer]
+              - button "停用" [ref=e396] [cursor=pointer]
+          - article [ref=e397]:
+            - generic [ref=e398]: Q-101
+            - generic [ref=e399]: 能力 · 1 题 · V1
+            - emphasis [ref=e401]: PUBLISHED
+            - generic [ref=e402]:
+              - button "发布最新版" [ref=e403] [cursor=pointer]
+              - button "停用" [ref=e404] [cursor=pointer]
+          - article [ref=e405]:
+            - generic [ref=e406]: Q-001
+            - generic [ref=e407]: 鑳藉姏鑷瘎 · 6 题 · V1
+            - emphasis [ref=e409]: PUBLISHED
+            - generic [ref=e410]:
+              - button "发布最新版" [ref=e411] [cursor=pointer]
+              - button "停用" [ref=e412] [cursor=pointer]
+          - article [ref=e413]:
+            - generic [ref=e414]: Q-002
+            - generic [ref=e415]: 闇嶅叞寰峰叴瓒� · 3 题 · V1
+            - emphasis [ref=e417]: PUBLISHED
+            - generic [ref=e418]:
+              - button "发布最新版" [ref=e419] [cursor=pointer]
+              - button "停用" [ref=e420] [cursor=pointer]

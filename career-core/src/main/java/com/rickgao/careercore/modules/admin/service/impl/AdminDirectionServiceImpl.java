@@ -56,9 +56,13 @@ public class AdminDirectionServiceImpl implements AdminDirectionService {
         int currentPage = page == null || page < 1 ? DEFAULT_PAGE : page;
         int currentSize = size == null || size < 1 ? DEFAULT_SIZE : Math.min(size, MAX_SIZE);
         String[] sortPair = resolveSort(sort);
-        long total = directionMapper.countDirections(path, status, keyword);
+        // Demo 增强点：前端/Apifox 常以空串传 path/status/keyword，归一为 null 以免 MyBatis 空串当成过滤条件
+        String pathFilter = StringUtils.hasText(path) ? path : null;
+        String statusFilter = StringUtils.hasText(status) ? status : null;
+        String keywordFilter = StringUtils.hasText(keyword) ? keyword : null;
+        long total = directionMapper.countDirections(pathFilter, statusFilter, keywordFilter);
         List<AdminDirectionVO> list = directionMapper.selectDirectionPage(
-                path, status, keyword, sortPair[0], sortPair[1],
+                pathFilter, statusFilter, keywordFilter, sortPair[0], sortPair[1],
                 (currentPage - 1) * currentSize, currentSize);
         return PageResult.of(list, total, currentPage, currentSize);
     }
