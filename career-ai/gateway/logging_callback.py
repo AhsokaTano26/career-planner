@@ -32,6 +32,7 @@ class AiCallLogHandler(CustomLogger):
 
     def __init__(self) -> None:
         super().__init__()
+        # 稳定性：request_id 唯一递增，无上限即缓慢泄漏；超 1 万清掉最旧一半
         self._seen: dict[str, str] = {}
         self._lock = threading.Lock()
 
@@ -62,6 +63,10 @@ class AiCallLogHandler(CustomLogger):
                 # 重试/降级恢复的成功记 DEGRADED，保留「发生过失败」的可观测信息
                 effective = "DEGRADED" if (status == "SUCCESS" and seen in ("FAILED", "TIMEOUT")) else status
                 self._seen[request_id] = effective
+                if len(self._seen) > 10000:
+                    # 删最旧一半（dict 保插入序）
+                    for old_key in list(self._seen)[:5000]:
+                        del self._seen[old_key]
             duration_ms = self._duration_ms(start_time, end_time)
             insert_ai_call_log(
                 request_id=request_id,

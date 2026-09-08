@@ -50,6 +50,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+        <!-- OpenAPI 文档生成 (本地同步 Apifox 用，非生产镜像必需) -->
+        <!-- Demo 精简点 / 后续迭代替换位置：仅用于 dev 期生成 /v3/api-docs，生产可移除 -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.6.0</version>
+        </dependency>
         <!-- MyBatis -->
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>

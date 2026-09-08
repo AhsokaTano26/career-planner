@@ -55,13 +55,13 @@ public class RecommendationController {
 
     @GetMapping("/recommendation-runs/{runId}")
     public ApiResponse<RecRunVO> getRunDetail(@PathVariable String runId) {
-        return ApiResponse.ok(recommendationService.getRunDetail(runId));
+        return ApiResponse.ok(recommendationService.getRunDetail(runId, SecurityUtils.currentUserId()));
     }
 
     @PostMapping("/recommendation-results/{resultId}/feedback")
     public ApiResponse<RecResultVO> addFeedback(@PathVariable String resultId,
                                                            @Valid @RequestBody RecommendationFeedbackRequest req) {
-        return ApiResponse.ok(recommendationService.addFeedback(resultId, req));
+        return ApiResponse.ok(recommendationService.addFeedback(resultId, SecurityUtils.currentUserId(), req));
     }
 }
 

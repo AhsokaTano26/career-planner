@@ -30,6 +30,10 @@ class GatewayConfig:
     rpm: int
     timeout: float
     max_retries: int
+    # 生产化（2026-09）：按 scene 的 max_tokens 上限 + 单日 token 预算（见 .env.example）。
+    # 缺省不限（零行为变化）；超预算由 client 抛 GatewayRateLimited（映射 429）。
+    scene_max_tokens: dict[str, int] = field(default_factory=dict)
+    daily_token_budget: dict[str, int] = field(default_factory=dict)
 
     def group(self, name: str) -> ModelGroup | None:
         for g in self.groups:
@@ -50,7 +54,29 @@ def load_config() -> GatewayConfig:
         rpm=_to_int(os.getenv("GATEWAY_RPM"), 60),
         timeout=_to_float(os.getenv("GATEWAY_TIMEOUT"), 30.0),
         max_retries=_to_int(os.getenv("GATEWAY_MAX_RETRIES"), 2),
+        scene_max_tokens=_parse_int_map(os.getenv("GATEWAY_SCENE_MAX_TOKENS", "")),
+        daily_token_budget=_parse_int_map(os.getenv("GATEWAY_DAILY_TOKEN_BUDGET", "")),
     )
+
+
+def _parse_int_map(raw: str) -> dict[str, int]:
+    """解析 {"scene": 整数} JSON；非法/非正数条目丢弃（fail-open，不阻断启动）。"""
+    if not raw or not raw.strip():
+        return {}
+    try:
+        data = json.loads(raw)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return {}
+    out: dict[str, int] = {}
+    if isinstance(data, dict):
+        for key, value in data.items():
+            try:
+                number = int(value)
+            except (TypeError, ValueError):
+                continue
+            if key and number > 0:
+                out[str(key)] = number
+    return out
 
 
 def channel_credentials(model: str) -> tuple[str | None, str | None]:

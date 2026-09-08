@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS assessment_session (
     KEY idx_session_student_status (student_id, status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='测评会话';
 
--- 旧表的缺列由 DatabaseSchemaMigration 在 SQL 初始化后检测并补齐，
--- 避免依赖低版本 MySQL 不支持的 ADD COLUMN IF NOT EXISTS 语法。
+-- advisor-domain.sql 可能先建过最小结构；旧表缺列由 Java 侧 DatabaseSchemaMigration
+-- 在 SQL 初始化后检测并补齐（先检测再 ALTER，兼容标准 MySQL 8，不用 ADD COLUMN IF NOT EXISTS）。
 
 -- ---------- 画像快照 ----------
 CREATE TABLE IF NOT EXISTS profile_snapshot (
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS profile_snapshot (
     KEY idx_snapshot_student (student_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='画像快照';
 
--- 旧表的缺列由 DatabaseSchemaMigration 在 SQL 初始化后检测并补齐。
+-- 旧表缺列由 DatabaseSchemaMigration 在 SQL 初始化后统一检测补齐。
 
 -- ---------- 推荐批次 ----------
 CREATE TABLE IF NOT EXISTS recommendation_run (
@@ -179,6 +179,7 @@ CREATE TABLE IF NOT EXISTS stage_review (
     created_at       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
+    UNIQUE KEY uk_review_student_cycle (student_id, cycle),
     KEY idx_review_student (student_id, submitted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='阶段复盘';
 

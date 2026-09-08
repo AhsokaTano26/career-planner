@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { api, getErrorMessage } from '../../api/request'
+import { onSessionReset } from '../../composables/useAuth'
 import BaseModal from '../../components/BaseModal.vue'
 import PageHeader from '../../components/BasePageHeader.vue'
 
@@ -41,6 +42,12 @@ const historyError = ref('')
 const historyList = ref<{messageId:string;role:string;content:string;createdAt?:string}[]>([])
 const historySelectedId = ref('')
 const successMsg = ref('')
+// 稳定性：切号/401 时清空 playground 状态（含上号的响应与历史）
+onSessionReset(()=>{
+  active.value=null; response.value=''; errorMsg.value=''; successMsg.value=''
+  historyList.value=[]; historyPreview.value=''; historyError.value=''; historySelectedId.value=''
+  sending.value=false; historyLoading.value=false
+})
 
 function open(ep:Endpoint) {
   active.value = ep

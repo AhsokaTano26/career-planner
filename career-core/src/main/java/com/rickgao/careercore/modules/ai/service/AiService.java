@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rickgao.careercore.common.exception.BizException;
 import com.rickgao.careercore.common.response.ResultCode;
 import com.rickgao.careercore.common.util.IdGenerator;
+import com.rickgao.careercore.modules.admin.entity.CareerDirection;
+import com.rickgao.careercore.modules.admin.mapper.AdminDirectionMapper;
 import com.rickgao.careercore.modules.ai.dto.AiChatContext;
 import com.rickgao.careercore.modules.ai.dto.AiChatFeedbackRequest;
 import com.rickgao.careercore.modules.ai.dto.AiChatRequest;
 import com.rickgao.careercore.modules.ai.dto.AiExplainBatchRequest;
+import com.rickgao.careercore.modules.ai.dto.AiExplainResultItem;
 import com.rickgao.careercore.modules.ai.dto.AiPdfParseRequest;
 import com.rickgao.careercore.modules.ai.dto.AiPlanGenerateRequest;
 import com.rickgao.careercore.modules.ai.dto.AiReviewSummarizeRequest;
@@ -16,6 +19,8 @@ import com.rickgao.careercore.modules.ai.entity.AiChatFeedback;
 import com.rickgao.careercore.modules.ai.entity.AiChatMessage;
 import com.rickgao.careercore.modules.ai.mapper.AiChatFeedbackMapper;
 import com.rickgao.careercore.modules.ai.mapper.AiChatMessageMapper;
+import com.rickgao.careercore.modules.portrait.entity.ProfileSnapshot;
+import com.rickgao.careercore.modules.portrait.mapper.ProfileSnapshotMapper;
 import com.rickgao.careercore.modules.ai.vo.AiChatHistoryVO;
 import com.rickgao.careercore.modules.ai.vo.AiChatVO;
 import com.rickgao.careercore.modules.ai.vo.AiExplainBatchVO;
@@ -45,10 +50,15 @@ import java.util.Map;
  * 2026-09 Phase 1：chat 历史与反馈落 MySQL（ai_chat_message / ai_chat_feedback），
  * 身份以 JWT 优先，请求体 studentRef 仅作兼容兑底（与 JWT 不一致则报错）。
  *
+ * <p>2026-09 回答质量迭代：chat/explain/plan 的 prompt 注入画像六维（中文名）、方向名+简介、
+ * chat 另回送最近 6 轮记忆（core DB 为准，fail-open）；四 scene 提示词版本记入 ai_call_log。
+ * 画像/历史/方向缺失时静默降级为原行为，主流程不受影响。
+ *
  * <p>Demo 精简点 / 后续迭代替换位置：
  *  - chat 历史与反馈已落库（取代原 ConcurrentHashMap / CopyOnWriteArrayList）；
  *  - 转人工检测用关键词匹配；
- *  - 大模型失败时抛 BizException(INTERNAL_ERROR)，由调用方决定降级。
+ *  - 大模型不可用（未配置/超时/502/输出非法）时本类直接返回确定性模板内容
+ *    （FALLBACK，主业务流程不失败；ai_call_log 仍由 LlmGateway 记录 FAILED）。
  */
 @Service
 public class AiService {
@@ -62,28 +72,52 @@ public class AiService {
 
     private static final List<String> FEEDBACK_TYPES = List.of("HELPFUL", "NEUTRAL", "MISMATCH", "NOT_INTERESTED");
 
+    /**
+     * 提示词版本（2026-09 回答质量迭代）：随请求记入 ai_call_log.prompt_version，
+     * prompt 文案变更即升版，为下轮评估闭环提供归因键。career-ai 侧 prompts/*.txt 版本与此对齐。
+     */
+    private static final String CHAT_PROMPT_VERSION = "chat.v2";
+    private static final String EXPLAIN_PROMPT_VERSION = "explain.v2";
+    private static final String PLAN_PROMPT_VERSION = "plan.v2";
+    private static final String REVIEW_PROMPT_VERSION = "review.v1";
+
+    /** 画像维度 key→中文名（与 PortraitService.DIM_NAMES 同源，跨模块复用时本地冗余一份避免服务耦合）。 */
+    private static final Map<String, String> DIM_NAMES = Map.of(
+            "interest", "兴趣", "values", "价值观", "ability", "能力",
+            "academic", "学业", "tendency", "倾向", "practice", "实践");
+
+    /** 多轮记忆回送上限：最近 6 轮（12 条消息），单条截断防 prompt 膨胀。 */
+    private static final int HISTORY_ROUNDS = 6;
+    private static final int HISTORY_CONTENT_LIMIT = 400;
+
     private final LlmGateway llm;
     private final ObjectMapper objectMapper;
     private final AiChatMessageMapper chatMessageMapper;
     private final AiChatFeedbackMapper chatFeedbackMapper;
+    private final ProfileSnapshotMapper snapshotMapper;
+    private final AdminDirectionMapper directionMapper;
     private final IdGenerator idGenerator;
     private final Desensitizer desensitizer;
 
     public AiService(LlmGateway llm, ObjectMapper objectMapper,
                      AiChatMessageMapper chatMessageMapper, AiChatFeedbackMapper chatFeedbackMapper,
+                     ProfileSnapshotMapper snapshotMapper, AdminDirectionMapper directionMapper,
                      IdGenerator idGenerator,
                      Desensitizer desensitizer) {
         this.llm = llm;
         this.objectMapper = objectMapper;
         this.chatMessageMapper = chatMessageMapper;
         this.chatFeedbackMapper = chatFeedbackMapper;
+        this.snapshotMapper = snapshotMapper;
+        this.directionMapper = directionMapper;
         this.idGenerator = idGenerator;
         this.desensitizer = desensitizer;
     }
 
     // ---------------------------------------------------------------- chat
 
-    @Transactional
+    // 注意：此处刻意不用 @Transactional——先调远程 LLM（数十秒），再单语句落库；
+    // 若包事务会长期占用 DB 连接导致池耗尽（2026-09 稳定性）。insertBatch 单语句原子性足够。
     public AiChatVO chat(AiChatRequest req) {
         String userId = resolveUserId(req.getStudentRef());
         String messageGroup = java.util.UUID.randomUUID().toString().replace("-", "");
@@ -94,8 +128,15 @@ public class AiService {
         if (needsHuman) {
             answer = "该问题可能涉及心理健康、医疗或法律等专业领域，建议联系辅导员或专业机构获取帮助。";
         } else {
-            answer = llm.generate(buildChatMessages(sanitizedQuestion, req.getContext()), 0.7, 2000,
-                    "career_chat", userId, null, messageGroup);
+            try {
+                answer = llm.generate(buildChatMessages(sanitizedQuestion, req.getContext(), userId), 0.7,
+                        llm.sceneMaxTokens("career_chat"),
+                        "career_chat", userId, CHAT_PROMPT_VERSION, messageGroup);
+            } catch (BizException exc) {
+                // Demo 精简点：网关不可用时回退确定性答复（主流程不失败）
+                log.warn("生涯咨询大模型不可用，回退模板答复: {}", exc.getMessage());
+                answer = "AI 服务暂时不可用，你可以先对照推荐方向完成一门基础课与一个小项目，稍后再来提问（" + DISCLAIMER + "）。";
+            }
         }
         String supportReason = needsHuman ? "涉及心理健康/医疗/法律等话题，建议转人工或专业机构" : "";
 
@@ -178,23 +219,55 @@ public class AiService {
         List<Map<String, String>> messages = List.of(
                 mapOf("role", "system", "content", EXPLAIN_SYSTEM_PROMPT),
                 mapOf("role", "user", "content", desensitizer.maskFreeText(buildExplainPrompt(req))));
-        String content = llm.generate(messages, 0.7, 2000, "recommendation_explain", runId, null, runId);
-        List<Map<String, String>> items = parseExplainJson(content);
         List<AiExplanationItemVO> vos = new ArrayList<>();
-        for (Map<String, String> item : items) {
-            vos.add(AiExplanationItemVO.builder()
-                    .directionId(item.get("directionId"))
-                    .summary(item.get("summary"))
-                    .confidenceText(item.getOrDefault("confidenceText", "数据基本完整，供参考"))
-                    .disclaimer(item.getOrDefault("disclaimer", DISCLAIMER))
-                    .build());
+        try {
+            String content = llm.generate(messages, 0.7, llm.sceneMaxTokens("recommendation_explain"),
+                    "recommendation_explain", runId, EXPLAIN_PROMPT_VERSION, runId);
+            List<Map<String, String>> items = parseExplainJson(content);
+            for (Map<String, String> item : items) {
+                vos.add(AiExplanationItemVO.builder()
+                        .directionId(item.get("directionId"))
+                        .summary(item.get("summary"))
+                        .confidenceText(item.getOrDefault("confidenceText", "数据基本完整，供参考"))
+                        .disclaimer(item.getOrDefault("disclaimer", DISCLAIMER))
+                        .build());
+            }
+        } catch (BizException exc) {
+            // Demo 精简点：网关不可用/输出非法时按规则分回退模板解释
+            log.warn("推荐解释大模型不可用，回退规则模板: {}", exc.getMessage());
+            vos = fallbackExplanations(req);
         }
         return AiExplainBatchVO.builder().runId(runId).explanations(vos).build();
     }
 
+    /**
+     * 推荐解释回退：按规则评分生成确定性解释（只引用候选项，不下结论）。
+     * Demo 精简点 / 后续迭代替换位置：话术固定，后续可按画像维度细化。
+     */
+    private List<AiExplanationItemVO> fallbackExplanations(AiExplainBatchRequest req) {
+        List<AiExplanationItemVO> out = new ArrayList<>();
+        if (req.getResults() == null) {
+            return out;
+        }
+        for (AiExplainResultItem r : req.getResults()) {
+            double score = r.getScore() == null ? 0 : r.getScore();
+            String level = score >= 75 ? "匹配度较高" : score >= 55 ? "匹配度中等" : "匹配度一般";
+            out.add(AiExplanationItemVO.builder()
+                    .directionId(r.getDirectionId())
+                    .summary("方向" + r.getDirectionId() + "规则评分"
+                            + Math.round(score) + "分（排名第" + r.getRank() + "），" + level
+                            + "，建议结合兴趣与已修课程进一步探索（模板生成，" + DISCLAIMER + "）。")
+                    .confidenceText(score >= 75 ? "数据较完整，供参考"
+                            : score >= 55 ? "数据基本完整，供参考" : "数据较少，仅供初步参考")
+                    .disclaimer(DISCLAIMER)
+                    .build());
+        }
+        return out;
+    }
+
     // ---------------------------------------------------------------- 计划生成
 
-    @Transactional
+    // 注意：同 chat，不包事务（本方法无写库，仅组装 LLM 输入输出）。
     public AiPlanResultVO generatePlan(AiPlanGenerateRequest req) {
         String userId = resolveUserId(req.getStudentRef());
         String goal = (req.getGoalSummary() != null && !req.getGoalSummary().isBlank())
@@ -202,48 +275,116 @@ public class AiService {
                 : (req.getTemplate() != null && req.getTemplate().getGoalSummary() != null
                     ? req.getTemplate().getGoalSummary() : "围绕目标方向打好基础，完成一个小项目");
         String templateJson = req.getTemplate() == null ? "{}" : writeJson(req.getTemplate());
-        String userPrompt = "方向编码：" + nvl(req.getDirectionId())
+        String portraitBlock = buildPortraitBlock(userId);
+        String userPrompt = "方向：" + directionLine(req.getDirectionId())
                 + "\n学期：" + nvl(req.getSemester())
+                + (portraitBlock.isBlank() ? "" : "\n" + portraitBlock)
                 + "\n目标摘要：" + goal
                 + "\n参考模板：" + templateJson
-                + "\n请生成计划草案 JSON。";
+                + "\n请生成计划草案 JSON。计划须针对画像短板维度安排至少一个任务。";
         String reqId = "plan-" + java.util.UUID.randomUUID().toString().substring(0, 8);
-        String content = llm.generate(List.of(
-                mapOf("role", "system", "content", PLAN_SYSTEM_PROMPT),
-                mapOf("role", "user", "content", desensitizer.maskFreeText(userPrompt))), 0.7, 2000,
-                "plan_generate", req.getDirectionId(), null, reqId);
-        JsonNode node = parseJson(content);
-        AiPlanResultVO result = AiPlanResultVO.builder()
-                .goalSummary(textOr(node, "goalSummary", "围绕目标方向完成一学期学习与一个小项目"))
-                .semesterGoals(parseSemesterGoals(node.path("semesterGoals")))
-                .monthlyTasks(parseMonthlyTasks(node.path("monthlyTasks")))
-                .notes(textList(node.path("notes")))
-                .build();
+        AiPlanResultVO result;
+        try {
+            String content = llm.generate(List.of(
+                    mapOf("role", "system", "content", PLAN_SYSTEM_PROMPT),
+                    mapOf("role", "user", "content", desensitizer.maskFreeText(userPrompt))), 0.7,
+                    llm.sceneMaxTokens("plan_generate"),
+                    "plan_generate", req.getDirectionId(), PLAN_PROMPT_VERSION, reqId);
+            JsonNode node = parseJson(content);
+            result = AiPlanResultVO.builder()
+                    .goalSummary(textOr(node, "goalSummary", "围绕目标方向完成一学期学习与一个小项目"))
+                    .semesterGoals(parseSemesterGoals(node.path("semesterGoals")))
+                    .monthlyTasks(parseMonthlyTasks(node.path("monthlyTasks")))
+                    .notes(textList(node.path("notes")))
+                    .build();
+        } catch (BizException exc) {
+            // Demo 精简点：网关不可用/输出非法时回退模板计划（有模板用模板，否则默认）
+            log.warn("计划生成大模型不可用，回退模板计划: {}", exc.getMessage());
+            result = fallbackPlanResult(req, goal);
+        }
 
         return result;
     }
 
+    /**
+     * 计划生成回退：优先采用请求自带模板，否则返回默认四段式学期计划。
+     * Demo 精简点 / 后续迭代替换位置：默认任务固定，后续可按方向任务模板库生成。
+     */
+    private AiPlanResultVO fallbackPlanResult(AiPlanGenerateRequest req, String goal) {
+        if (req.getTemplate() != null) {
+            List<AiSemesterGoalVO> goals = new ArrayList<>();
+            if (req.getTemplate().getSemesterGoals() != null) {
+                for (var g : req.getTemplate().getSemesterGoals()) {
+                    goals.add(AiSemesterGoalVO.builder()
+                            .title(g.getTitle()).abilityTag(g.getAbilityTag()).build());
+                }
+            }
+            List<AiMonthlyTaskVO> tasks = new ArrayList<>();
+            if (req.getTemplate().getMonthlyTasks() != null) {
+                for (var t : req.getTemplate().getMonthlyTasks()) {
+                    tasks.add(AiMonthlyTaskVO.builder()
+                            .month(t.getMonth()).title(t.getTitle())
+                            .taskType(t.getTaskType()).estimatedHours(t.getEstimatedHours()).build());
+                }
+            }
+            return AiPlanResultVO.builder()
+                    .goalSummary(req.getTemplate().getGoalSummary() != null
+                            ? req.getTemplate().getGoalSummary() : goal)
+                    .semesterGoals(goals)
+                    .monthlyTasks(tasks)
+                    .notes(List.of("模板生成，" + DISCLAIMER))
+                    .build();
+        }
+        String[] titles = {"完成基础课程学习", "参与一个项目实践", "参加行业讲座", "整理学习心得与复盘"};
+        String[] types = {"LEARNING", "PRACTICE", "CAREER", "REVIEW"};
+        java.time.LocalDate base = java.time.LocalDate.now().withDayOfMonth(1);
+        List<AiMonthlyTaskVO> tasks = new ArrayList<>();
+        for (int i = 0; i < titles.length; i++) {
+            tasks.add(AiMonthlyTaskVO.builder()
+                    .month(base.plusMonths(i).toString().substring(0, 7))
+                    .title(titles[i]).taskType(types[i]).estimatedHours(20.0).build());
+        }
+        return AiPlanResultVO.builder()
+                .goalSummary(goal)
+                .semesterGoals(List.of(AiSemesterGoalVO.builder().title("打好方向基础").build()))
+                .monthlyTasks(tasks)
+                .notes(List.of("模板生成，" + DISCLAIMER))
+                .build();
+    }
+
     // ---------------------------------------------------------------- 复盘总结
 
-    @Transactional
+    // 注意：同 chat，不包事务（本方法无写库）。
     public AiReviewSummaryVO reviewSummarize(AiReviewSummarizeRequest req) {
         String userId = resolveUserId(req.getStudentRef());
         String cycle = req.getCycle();
         String userPrompt = desensitizer.maskFreeText(buildReviewPrompt(req));
         String reqId = "review-" + java.util.UUID.randomUUID().toString().substring(0, 8);
-        String content = llm.generate(List.of(
-                mapOf("role", "system", "content", REVIEW_SYSTEM_PROMPT),
-                mapOf("role", "user", "content", userPrompt)), 0.5, 1500,
-                "review_summarize", cycle, null, reqId);
         AiReviewSummaryVO result;
         try {
-            JsonNode node = parseJson(content);
-            String summary = textOr(node, "summary", content);
-            List<String> suggestions = textList(node.path("suggestions"));
-            result = AiReviewSummaryVO.builder().summary(summary).suggestions(suggestions).build();
+            String content = llm.generate(List.of(
+                    mapOf("role", "system", "content", REVIEW_SYSTEM_PROMPT),
+                    mapOf("role", "user", "content", userPrompt)), 0.5,
+                    llm.sceneMaxTokens("review_summarize"),
+                    "review_summarize", cycle, REVIEW_PROMPT_VERSION, reqId);
+            try {
+                JsonNode node = parseJson(content);
+                String summary = textOr(node, "summary", content);
+                List<String> suggestions = textList(node.path("suggestions"));
+                result = AiReviewSummaryVO.builder().summary(summary).suggestions(suggestions).build();
+            } catch (BizException exc) {
+                // Demo 精简点：复盘总结输出非 JSON 时回退为原文本（对齐 career-ai summarize）
+                result = AiReviewSummaryVO.builder().summary(content).suggestions(List.of()).build();
+            }
         } catch (BizException exc) {
-            // Demo 精简点：复盘总结输出非 JSON 时回退为原文本（对齐 career-ai summarize）
-            result = AiReviewSummaryVO.builder().summary(content).suggestions(List.of()).build();
+            // Demo 精简点：网关不可用时回退固定总结（主流程不失败）
+            log.warn("复盘总结大模型不可用，回退固定总结: {}", exc.getMessage());
+            String done = req.getReviewContent() != null && req.getReviewContent().getDone() != null
+                    ? req.getReviewContent().getDone() : "按计划推进中";
+            result = AiReviewSummaryVO.builder()
+                    .summary("本期已完成：" + done + "。AI 服务暂时不可用，以下建议为模板生成（" + DISCLAIMER + "）。")
+                    .suggestions(List.of("对照计划检查未完成任务并更新状态", "下期聚焦一个可验证的小目标", "带着问题去请教辅导员或学长"))
+                    .build();
         }
 
         return result;
@@ -407,58 +548,203 @@ public class AiService {
     }
 
     private byte[] fetch(String url) {
+        // 安全：仅 http/https，禁止内网/回环地址（SSRF 防护；行为与 career-ai pdf_parser 对齐）
+        if (!isFetchUrlAllowed(url)) {
+            log.warn("文件拉取拒绝（地址不合法，已脱敏）");
+            return null;
+        }
         try {
             var factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
             factory.setConnectTimeout(10000);
             factory.setReadTimeout(10000);
             var client = org.springframework.web.client.RestClient.builder()
                     .requestFactory(factory).build();
-            return client.get().uri(URI.create(url)).retrieve().body(byte[].class);
+            byte[] data = client.get().uri(URI.create(url)).retrieve().body(byte[].class);
+            if (data != null && data.length > 20 * 1024 * 1024) {
+                log.warn("文件拉取拒绝（超 20MB）");
+                return null;
+            }
+            return data;
         } catch (Exception exc) {
+            log.warn("文件拉取失败：{}", exc.getMessage());
             return null;
         }
     }
 
-    private List<Map<String, String>> buildChatMessages(String sanitizedQuestion, AiChatContext context) {
+    private boolean isFetchUrlAllowed(String url) {
+        try {
+            URI uri = URI.create(url);
+            String scheme = uri.getScheme();
+            if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+                return false;
+            }
+            String host = uri.getHost();
+            if (host == null || host.isBlank()) {
+                return false;
+            }
+            for (java.net.InetAddress addr : java.net.InetAddress.getAllByName(host)) {
+                if (addr.isSiteLocalAddress() || addr.isLoopbackAddress() || addr.isLinkLocalAddress()
+                        || addr.isMulticastAddress() || addr.isAnyLocalAddress()) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception exc) {
+            return false;
+        }
+    }
+
+    /**
+     * 组装咨询消息：system + 画像/目标上下文 + 最近多轮记忆 + 当问。
+     * 2026-09 回答质量迭代：此前仅 system+当问，画像与历史均未进入 prompt。
+     * 记忆以 core DB（ai_chat_message）为准；历史与画像缺失时静默降级为原行为。
+     */
+    private List<Map<String, String>> buildChatMessages(String sanitizedQuestion, AiChatContext context, String userId) {
         List<Map<String, String>> messages = new ArrayList<>();
         messages.add(mapOf("role", "system", "content", CHAT_SYSTEM_PROMPT));
+        // 画像与目标上下文（Step1）：六维中文名+得分、画像摘要、方向名+简介
+        String portraitBlock = buildPortraitBlock(userId);
         String question = sanitizedQuestion;
+        List<String> ctxParts = new ArrayList<>();
+        if (!portraitBlock.isBlank()) {
+            ctxParts.add(portraitBlock);
+        }
         if (context != null) {
-            List<String> parts = new ArrayList<>();
-            parts.add(question);
             if (context.getDirectionId() != null && !context.getDirectionId().isBlank()) {
-                parts.add("当前关注方向：" + context.getDirectionId());
+                ctxParts.add("当前关注方向：" + directionLine(context.getDirectionId()));
             }
             if (context.getGoalSummary() != null && !context.getGoalSummary().isBlank()) {
-                parts.add("当前目标摘要：" + context.getGoalSummary());
+                ctxParts.add("当前目标摘要：" + context.getGoalSummary());
             }
-            question = String.join("\n", parts);
         }
+        if (!ctxParts.isEmpty()) {
+            question = "【学生背景】\n" + String.join("\n", ctxParts) + "\n【本次提问】\n" + question;
+        }
+        // 多轮记忆（Step2）：最近 HISTORY_ROUNDS 轮按时间正序回送，内容截断+脱敏
+        messages.addAll(recentHistoryMessages(userId));
         messages.add(mapOf("role", "user", "content", question));
         return messages;
     }
 
+    /** 最近多轮对话（时间正序，role 仅取 user/assistant）。 */
+    private List<Map<String, String>> recentHistoryMessages(String userId) {
+        List<Map<String, String>> out = new ArrayList<>();
+        if (userId == null) {
+            return out;
+        }
+        try {
+            List<AiChatMessage> rows = chatMessageMapper.findByUserId(userId, 0, HISTORY_ROUNDS * 2);
+            if (rows == null || rows.isEmpty()) {
+                return out;
+            }
+            // findByUserId 最新在前，回送需正序
+            List<AiChatMessage> chrono = new ArrayList<>(rows);
+            java.util.Collections.reverse(chrono);
+            for (AiChatMessage row : chrono) {
+                String role = row.getRole();
+                if (!"user".equals(role) && !"assistant".equals(role)) {
+                    continue;
+                }
+                String content = row.getContent() == null ? "" : row.getContent();
+                if (content.length() > HISTORY_CONTENT_LIMIT) {
+                    content = content.substring(0, HISTORY_CONTENT_LIMIT) + "…";
+                }
+                content = desensitizer.maskFreeText(content);
+                if (!content.isBlank()) {
+                    out.add(mapOf("role", role, "content", content));
+                }
+            }
+        } catch (Exception exc) {
+            // 稳定性：历史查询失败不阻断主流程（fail-open），记 warn
+            log.warn("咨询历史回送查询失败，已降级为单轮：{}", exc.getMessage());
+        }
+        return out;
+    }
+
+    /** 画像上下文块：六维得分 + 摘要（无画像返回空串，调用方降级）。 */
+    private String buildPortraitBlock(String userId) {
+        if (userId == null) {
+            return "";
+        }
+        try {
+            ProfileSnapshot snap = snapshotMapper.findLatestByStudent(userId);
+            if (snap == null || snap.getDimensionJson() == null) {
+                return "";
+            }
+            JsonNode arr = objectMapper.readTree(snap.getDimensionJson());
+            List<String> dims = new ArrayList<>();
+            if (arr.isArray()) {
+                for (JsonNode n : arr) {
+                    String key = n.path("key").asText("");
+                    if (!key.isBlank()) {
+                        dims.add(DIM_NAMES.getOrDefault(key, key)
+                                + Math.round(n.path("score").asDouble()) + "分");
+                    }
+                }
+            }
+            if (dims.isEmpty()) {
+                return "";
+            }
+            StringBuilder sb = new StringBuilder("学生画像（0-100分）：").append(String.join("、", dims));
+            if (snap.getSummary() != null && !snap.getSummary().isBlank()) {
+                String summary = snap.getSummary();
+                sb.append("；画像小结：").append(summary.length() > 200 ? summary.substring(0, 200) + "…" : summary);
+            }
+            return sb.toString();
+        } catch (Exception exc) {
+            log.warn("画像上下文组装失败，已降级：{}", exc.getMessage());
+            return "";
+        }
+    }
+
+    /** 方向一行描述：名 + 简介（查不到返回原 id，保证不中断）。 */
+    private String directionLine(String directionId) {
+        if (directionId == null || directionId.isBlank()) {
+            return "未指定";
+        }
+        try {
+            CareerDirection d = directionMapper.findById(directionId);
+            if (d == null) {
+                return directionId;
+            }
+            String intro = d.getIntro() == null ? "" : d.getIntro();
+            if (intro.length() > 120) {
+                intro = intro.substring(0, 120) + "…";
+            }
+            return d.getName() + (intro.isBlank() ? "" : "（" + intro + "）");
+        } catch (Exception exc) {
+            log.warn("方向上下文查询失败，已降级为 id：{}", exc.getMessage());
+            return directionId;
+        }
+    }
+
+    /**
+     * 推荐解释 prompt：画像六维（中文名）+ 候选方向（名+简介+得分排名）。
+     * 2026-09 回答质量迭代：此前只有裸分数与方向 id，模型只能复述数字；
+     * 注入方向名/简介后解释可回答“为什么适合我”。
+     */
     private String buildExplainPrompt(AiExplainBatchRequest req) {
         List<String> lines = new ArrayList<>();
         if (req.getProfile() != null) {
             List<String> dims = new ArrayList<>();
             var p = req.getProfile();
-            if (p.getInterest() != null) dims.add("interest=" + Math.round(p.getInterest() * 100) + "%");
-            if (p.getValues() != null) dims.add("values=" + Math.round(p.getValues() * 100) + "%");
-            if (p.getAbility() != null) dims.add("ability=" + Math.round(p.getAbility() * 100) + "%");
-            if (p.getAcademic() != null) dims.add("academic=" + Math.round(p.getAcademic() * 100) + "%");
-            if (p.getTendency() != null) dims.add("tendency=" + Math.round(p.getTendency() * 100) + "%");
-            if (p.getPractice() != null) dims.add("practice=" + Math.round(p.getPractice() * 100) + "%");
-            lines.add("画像维度得分：" + (dims.isEmpty() ? "无" : String.join("；", dims)));
+            if (p.getInterest() != null) dims.add("兴趣" + Math.round(p.getInterest() * 100) + "分");
+            if (p.getValues() != null) dims.add("价值观" + Math.round(p.getValues() * 100) + "分");
+            if (p.getAbility() != null) dims.add("能力" + Math.round(p.getAbility() * 100) + "分");
+            if (p.getAcademic() != null) dims.add("学业" + Math.round(p.getAcademic() * 100) + "分");
+            if (p.getTendency() != null) dims.add("倾向" + Math.round(p.getTendency() * 100) + "分");
+            if (p.getPractice() != null) dims.add("实践" + Math.round(p.getPractice() * 100) + "分");
+            lines.add("画像维度得分（0-100分）：" + (dims.isEmpty() ? "无" : String.join("、", dims)));
         }
         List<String> items = new ArrayList<>();
         if (req.getResults() != null) {
             for (var r : req.getResults()) {
-                items.add("- " + r.getDirectionId() + "：得分 " + r.getScore() + "，排名 " + r.getRank());
+                items.add("- " + directionLine(r.getDirectionId()) + "：得分 " + r.getScore() + "，排名 " + r.getRank());
             }
         }
         lines.add("候选方向：" + (items.isEmpty() ? "无" : String.join("\n", items)));
-        lines.add("请为每个候选方向生成解释 JSON。");
+        lines.add("请为每个候选方向生成解释 JSON。解释须结合该学生的画像维度得分说明匹配原因，"
+                + "引用方向简介中的关键信息，只依据输入信息，不得虚构课程与就业数据。");
         return String.join("\n", lines);
     }
 

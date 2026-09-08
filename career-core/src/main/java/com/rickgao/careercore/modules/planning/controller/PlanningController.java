@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -119,8 +120,10 @@ public class PlanningController {
     }
 
     @PostMapping("/students/me/tasks")
-    public ApiResponse<TaskVO> createTask(@Valid @RequestBody TaskRequest req) {
-        return ApiResponse.ok(planningService.createTask(SecurityUtils.currentUserId(), req));
+    public ApiResponse<TaskVO> createTask(
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
+            @Valid @RequestBody TaskRequest req) {
+        return ApiResponse.ok(planningService.createTask(SecurityUtils.currentUserId(), req, idempotencyKey));
     }
 
     @PutMapping("/students/me/tasks/{taskId}")
@@ -131,8 +134,9 @@ public class PlanningController {
 
     @PostMapping("/students/me/tasks/{taskId}/checkin")
     public ApiResponse<TaskVO> checkinTask(@PathVariable String taskId,
+                                           @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
                                            @Valid @RequestBody TaskCheckinRequest req) {
-        return ApiResponse.ok(planningService.checkinTask(SecurityUtils.currentUserId(), taskId, req));
+        return ApiResponse.ok(planningService.checkinTask(SecurityUtils.currentUserId(), taskId, req, idempotencyKey));
     }
 
     // ==================== 复盘 ====================

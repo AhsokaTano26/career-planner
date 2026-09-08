@@ -21,9 +21,18 @@ public interface AssessmentMapper {
 
     Questionnaire findQuestionnaireById(@Param("id") String id);
 
+    /** 批量按 ID 查问卷（稳定性：listMySessions N+1 合并）。 */
+    List<Questionnaire> listQuestionnairesByIds(@Param("ids") List<String> ids);
+
     QuestionnaireVersion findLatestVersion(@Param("questionnaireId") String questionnaireId);
 
+    /** 批量取各问卷最新版本（稳定性：listQuestionnaires N+1 合并）。 */
+    List<QuestionnaireVersion> listLatestVersions(@Param("questionnaireIds") List<String> questionnaireIds);
+
     QuestionnaireVersion findVersionById(@Param("id") String id);
+
+    /** 批量按 ID 查版本（稳定性：listMySessions N+1 合并）。 */
+    List<QuestionnaireVersion> listVersionsByIds(@Param("ids") List<String> ids);
 
     List<QuestionnaireVersion> listVersions(@Param("questionnaireId") String questionnaireId);
 

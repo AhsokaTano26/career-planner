@@ -69,18 +69,19 @@ def insert_ai_call_log(
     engine = get_engine()
     if engine is None:
         return False
+    # 稳定性：按 ai_call_log 列宽截断（此前仅 request_id 截断，超长 scene 直接 Data too long 静默丢失整行）
     row: dict[str, Any] = {
         "id": uuid.uuid4().hex[:32],
-        "request_id": request_id[:64],
-        "user_ref": (user_ref or None),
-        "scene": scene,
-        "model_name": model_name,
-        "prompt_version": prompt_version,
+        "request_id": (request_id or "")[:64],
+        "user_ref": (user_ref[:64] if user_ref else None),
+        "scene": (scene or "unknown")[:32],
+        "model_name": (model_name[:64] if model_name else None),
+        "prompt_version": (prompt_version[:32] if prompt_version else None),
         "duration_ms": duration_ms,
         "status": status,
         "token_estimate": token_estimate,
-        "request_hash": request_hash,
-        "input_hash": input_hash,
+        "request_hash": (request_hash[:64] if request_hash else None),
+        "input_hash": (input_hash[:64] if input_hash else None),
     }
     try:
         with engine.begin() as conn:

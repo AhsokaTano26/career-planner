@@ -169,7 +169,8 @@ def _gw_key(monkeypatch):
 
 
 def test_路由_缺密钥401(_gw_key):
-    resp = client.post("/v1/chat/completions", json={
+    # conftest 会自动补鉴权头；传空头模拟“缺失”场景
+    resp = client.post("/v1/chat/completions", headers={"Authorization": ""}, json={
         "messages": [{"role": "user", "content": "hi"}]})
     assert resp.status_code == 401
     resp = client.post("/v1/chat/completions", headers={"Authorization": "Bearer wrong"}, json={
@@ -233,3 +234,35 @@ def test_健康检查含网关概要():
     body = resp.json()
     assert body["status"] == "ok"
     assert "gateway" in body
+
+
+# ---------------------------------------------------------------- 边界 C:AI 调用日志不存原文
+def test_日志回调_不记录原始内容仅存哈希(monkeypatch):
+    """ai_call_log 仅落元数据与哈希,不得写入 prompt/content/messages 原文(spec 4.2 不保留原文日志)。"""
+    recorded = []
+
+    def fake_insert(**kw):
+        recorded.append(kw)
+        return True
+
+    monkeypatch.setattr("gateway.logging_callback.insert_ai_call_log", fake_insert)
+    handler = AiCallLogHandler()
+    kwargs = {
+        "model": "deepseek/m1",
+        "litellm_params": {
+            "metadata": {
+                "request_id": "r-c", "scene": "career_chat", "user_ref": "u1",
+                "input_hash": "ihash", "request_hash": "rhash",
+                # 模拟 LiteLLM 可能夹带的原始内容,绝不能被落库
+                "messages": [{"role": "user", "content": "我的手机号13812345678"}],
+            }
+        },
+    }
+    handler.log_success_event(kwargs, SimpleNamespace(usage=SimpleNamespace(prompt_tokens=10, completion_tokens=5)),
+                              datetime.now(), datetime.now())
+    assert len(recorded) == 1
+    row = recorded[0]
+    assert row["request_hash"] == "rhash"
+    assert row["input_hash"] == "ihash"
+    assert "content" not in row and "messages" not in row and "prompt" not in row
+    assert "13812345678" not in str(row)

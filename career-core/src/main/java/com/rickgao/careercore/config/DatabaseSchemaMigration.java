@@ -25,6 +25,9 @@ public class DatabaseSchemaMigration implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         ensurePasswordChangeRequiredColumn();
+        ensureTokenVersionColumn();
+        ensureRefreshTokenHashColumn();
+        ensureReviewCycleUniqueKey();
         ensureAssessmentSessionColumns();
         ensureProfileSnapshotColumns();
     }
@@ -32,6 +35,36 @@ public class DatabaseSchemaMigration implements InitializingBean {
     private void ensurePasswordChangeRequiredColumn() {
         ensureColumn("sys_user", "password_change_required",
                 "TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否必须修改初始密码'");
+    }
+
+    /**
+     * 令牌版本列（2026-09 稳定性：改密/停用后旧 accessToken 即刻失效，见 JwtAuthFilter）。
+     * Demo 精简点 / 后续迭代替换位置：正式环境请改用 Flyway/Liquibase 版本化迁移。
+     */
+    private void ensureTokenVersionColumn() {
+        ensureColumn("sys_user", "token_version",
+                "INT NOT NULL DEFAULT 0 COMMENT '令牌版本'");
+    }
+
+    /**
+     * 刷新令牌哈希列（2026-09 复审：refresh 明文入库→哈希入库；双写兼容一轮，
+     * 老行 token_hash 为空时读取回退明文并回填；下轮切读后可停写 token 明文）。
+     */
+    private void ensureRefreshTokenHashColumn() {
+        ensureColumn("refresh_token", "token_hash",
+                "VARCHAR(64) DEFAULT NULL COMMENT '刷新令牌SHA-256'");
+        ensureIndex("refresh_token", "uk_token_hash",
+                "ADD UNIQUE KEY uk_token_hash (token_hash)");
+    }
+
+    /**
+     * 复盘周期唯一键（2026-09 复审：createReviewDraft 先查后写并发双击会产生重复 DRAFT；
+     * UK(student_id, cycle) 让 DB 兜底，冲突走 409/回读更新。同一周期草稿与提交为同一行流转，
+     * 故周期内只允许一行符合现有业务）。
+     */
+    private void ensureReviewCycleUniqueKey() {
+        ensureIndex("stage_review", "uk_review_student_cycle",
+                "ADD UNIQUE KEY uk_review_student_cycle (student_id, cycle)");
     }
 
     private void ensureAssessmentSessionColumns() {
@@ -60,6 +93,27 @@ public class DatabaseSchemaMigration implements InitializingBean {
         if (!columnExists(tableName, columnName) && tableExists(tableName)) {
             jdbcTemplate.execute("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition);
         }
+    }
+
+    private void ensureIndex(String tableName, String indexName, String addIndexDdl) {
+        if (!tableExists(tableName) || indexExists(tableName, indexName)) {
+            return;
+        }
+        jdbcTemplate.execute("ALTER TABLE " + tableName + " " + addIndexDdl);
+    }
+
+    private boolean indexExists(String tableName, String indexName) {
+        return Boolean.TRUE.equals(jdbcTemplate.execute((ConnectionCallback<Boolean>) connection -> {
+            try (ResultSet indexes = connection.getMetaData()
+                    .getIndexInfo(connection.getCatalog(), null, tableName, false, false)) {
+                while (indexes.next()) {
+                    if (indexName.equalsIgnoreCase(indexes.getString("INDEX_NAME"))) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }));
     }
 
     private boolean columnExists(String tableName, String columnName) {

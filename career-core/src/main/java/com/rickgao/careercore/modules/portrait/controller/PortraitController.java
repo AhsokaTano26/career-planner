@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1")
+@Tag(name = "学生画像")
 public class PortraitController {
 
     private final PortraitService portraitService;
@@ -45,12 +47,12 @@ public class PortraitController {
 
     @GetMapping("/profile-snapshots/{snapshotId}")
     public ApiResponse<ProfileSnapshotVO> getSnapshot(@PathVariable String snapshotId) {
-        return ApiResponse.ok(portraitService.getSnapshot(snapshotId));
+        return ApiResponse.ok(portraitService.getSnapshot(snapshotId, SecurityUtils.currentUserId()));
     }
 
     @PostMapping("/profile-snapshots/{snapshotId}/feedback")
     public ApiResponse<ProfileSnapshotVO> addFeedback(@PathVariable String snapshotId,
                                                       @Valid @RequestBody ProfileFeedbackRequest req) {
-        return ApiResponse.ok(portraitService.addFeedback(snapshotId, req));
+        return ApiResponse.ok(portraitService.addFeedback(snapshotId, SecurityUtils.currentUserId(), req));
     }
 }

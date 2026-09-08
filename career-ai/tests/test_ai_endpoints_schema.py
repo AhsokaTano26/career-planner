@@ -133,8 +133,13 @@ def test_pdf_parse_拉取失败(monkeypatch):
 
 
 def _reset_history():
-    routes_ai._CHAT_HISTORY.clear()
+    routes_ai._HIST_BY_REF.clear()
+    routes_ai._MSG_OWNER.clear()
     routes_ai._CHAT_FEEDBACK.clear()
+
+
+def _ref_history(ref: str = "student_ref_8f3a"):
+    return routes_ai._HIST_BY_REF.get(ref, [])
 
 
 def test_history_空历史返回ChatHistoryResponse():
@@ -158,20 +163,33 @@ def test_history_契约测试空查询参数返回200():
                          "supportReason", "disclaimer"}
 
 
-def test_history_返回最近一条回答含messageId():
+def test_history_无studentRef返回空对象防串读():
+    """复审 P0：未传 studentRef 时返回空对象而非全局最近一条。"""
     _reset_history()
     client.post("/api/v1/ai/chat", json={
         "studentRef": "student_ref_8f3a",
-        "sessionId": "CHAT-H1",
+        "sessionId": "CHAT-H0",
         "question": "我最近很抑郁，该怎么办？",
     })
-    resp = client.get("/api/v1/ai/chat/history?page=1&size=20&sort=-createdAt")
+    resp = client.get("/api/v1/ai/chat/history")
     assert resp.status_code == 200
-    body = resp.json()
-    assert body["answer"]
-    assert body["needsHumanSupport"] is True
-    assert body["supportReason"]
-    assert body["messageId"] == routes_ai._CHAT_HISTORY[0]["messageId"]
+    assert resp.json()["messageId"] == ""
+    assert resp.json()["answer"] == ""
+
+
+def test_history_按studentRef隔离():
+    """复审 P0：他人 studentRef 读不到自己的问答。"""
+    _reset_history()
+    client.post("/api/v1/ai/chat", json={
+        "studentRef": "student_ref_8f3a",
+        "sessionId": "CHAT-ISO",
+        "question": "我最近很抑郁，该怎么办？",
+    })
+    other = client.get("/api/v1/ai/chat/history?studentRef=other_student").json()
+    assert other["messageId"] == ""
+    own = client.get("/api/v1/ai/chat/history?studentRef=student_ref_8f3a").json()
+    assert own["messageId"]
+    assert own["messageId"] == _ref_history()[0]["messageId"]
 
 
 def test_history_messageId可用于反馈():
@@ -181,7 +199,7 @@ def test_history_messageId可用于反馈():
         "sessionId": "CHAT-H2",
         "question": "我最近很焦虑，怎么办？",
     })
-    hist = client.get("/api/v1/ai/chat/history").json()
+    hist = client.get("/api/v1/ai/chat/history?studentRef=student_ref_8f3a").json()
     assert hist["messageId"]
     resp = client.post(f"/api/v1/ai/chat/{hist['messageId']}/feedback",
                        json={"feedbackType": "HELPFUL"})
@@ -196,7 +214,7 @@ def test_feedback_有效messageId返回统一包装():
         "sessionId": "CHAT-F1",
         "question": "我最近很抑郁，该怎么办？",
     })
-    message_id = routes_ai._CHAT_HISTORY[0]["messageId"]
+    message_id = _ref_history()[0]["messageId"]
     resp = client.post(f"/api/v1/ai/chat/{message_id}/feedback", json={
         "feedbackType": "HELPFUL",
         "comment": "有帮助",
@@ -235,7 +253,7 @@ def test_feedback_空messageId兜底写入最近一条():
         "sessionId": "CHAT-F2",
         "question": "我最近很焦虑，怎么办？",
     })
-    latest_id = routes_ai._CHAT_HISTORY[-1]["messageId"]
+    latest_id = _ref_history()[-1]["messageId"]
     resp = client.post("/api/v1/ai/chat//feedback", json={
         "feedbackType": "NOT_INTERESTED", "comment": "不需要",
     })

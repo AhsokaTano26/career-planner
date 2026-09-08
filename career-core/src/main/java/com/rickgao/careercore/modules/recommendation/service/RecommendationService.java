@@ -17,6 +17,8 @@ import com.rickgao.careercore.modules.recommendation.mapper.RecommendationMapper
 import com.rickgao.careercore.modules.recommendation.vo.RecFeedbackVO;
 import com.rickgao.careercore.modules.recommendation.vo.RecResultVO;
 import com.rickgao.careercore.modules.recommendation.vo.RecRunVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class RecommendationService {
+
+    private static final Logger log = LoggerFactory.getLogger(RecommendationService.class);
 
     private static final String[] DIMENSIONS = {"interest", "values", "ability", "academic", "tendency", "practice"};
     private static final Map<String, Double> DEFAULT_WEIGHTS = Map.of(
@@ -134,20 +138,29 @@ public class RecommendationService {
         return recommendationMapper.countRunsByStudent(studentId);
     }
 
-    public RecRunVO getRunDetail(String runId) {
+    public RecRunVO getRunDetail(String runId, String studentId) {
         RecommendationRun run = recommendationMapper.findRunById(runId);
         if (run == null) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "推荐批次不存在");
+        }
+        // 安全：批次按 ID 直接寻址，必须校验归属，防止枚举他人推荐
+        if (studentId == null || !studentId.equals(run.getStudentId())) {
+            throw new BizException(ResultCode.FORBIDDEN, "无权访问该推荐批次");
         }
         return toRunVO(run, true);
     }
 
     @Transactional
-    public RecResultVO addFeedback(String resultId, RecommendationFeedbackRequest req) {
+    public RecResultVO addFeedback(String resultId, String studentId, RecommendationFeedbackRequest req) {
         validateFeedback(req.getFeedbackType());
         RecommendationResult result = recommendationMapper.findResultById(resultId);
         if (result == null) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "推荐结果不存在");
+        }
+        // 安全：经所属批次校验归属，防止污染他人反馈
+        RecommendationRun run = recommendationMapper.findRunById(result.getRunId());
+        if (run == null || studentId == null || !studentId.equals(run.getStudentId())) {
+            throw new BizException(ResultCode.FORBIDDEN, "无权操作该推荐结果");
         }
         RecFeedbackVO fb = RecFeedbackVO.builder()
                 .feedbackType(req.getFeedbackType()).comment(req.getComment()).build();
@@ -185,7 +198,9 @@ public class RecommendationService {
                     out.put(n.path("key").asText(), n.path("score").asDouble());
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            // 稳定性：脏 JSON 不再静默归零，记 warn 便于定位
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
         }
         return out;
     }
@@ -205,7 +220,9 @@ public class RecommendationService {
                     out.put(d, obj.get(d).asDouble() * 100.0);
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            // 稳定性：脏 JSON 不再静默归零，记 warn 便于定位
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
         }
         return out;
     }
@@ -287,7 +304,9 @@ public class RecommendationService {
                     out.add(n.asText());
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            // 稳定性：脏 JSON 不再静默归零，记 warn 便于定位
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
         }
         return out;
     }
@@ -302,7 +321,9 @@ public class RecommendationService {
                     .feedbackType(n.path("feedbackType").asText())
                     .comment(n.path("comment").asText(""))
                     .build();
-        } catch (Exception ignored) {
+        } catch (Exception exc) {
+            // 稳定性：脏 JSON 不再静默归零，记 warn 便于定位
+            log.warn("JSON 解析失败，使用默认值：{}", exc.getMessage());
             return null;
         }
     }

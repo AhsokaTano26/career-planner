@@ -57,9 +57,15 @@ public interface PlanningService {
 
     TaskVO createTask(String studentId, TaskRequest req);
 
+    /** 携带 Idempotency-Key 的任务创建（key 为空时等价于无幂等）。 */
+    TaskVO createTask(String studentId, TaskRequest req, String idempotencyKey);
+
     TaskVO updateTask(String studentId, String taskId, TaskStatusUpdate req);
 
     TaskVO checkinTask(String studentId, String taskId, TaskCheckinRequest req);
+
+    /** 携带 Idempotency-Key 的打卡（key 为空时等价于无幂等）。 */
+    TaskVO checkinTask(String studentId, String taskId, TaskCheckinRequest req, String idempotencyKey);
 
     // ---------- 复盘 ----------
 

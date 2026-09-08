@@ -5,6 +5,7 @@ import com.rickgao.careercore.common.constant.CommonConstants;
 import com.rickgao.careercore.common.exception.BizException;
 import com.rickgao.careercore.common.response.ResultCode;
 import com.rickgao.careercore.common.util.IdGenerator;
+import com.rickgao.careercore.common.util.MaskUtil;
 import com.rickgao.careercore.modules.auth.entity.SysUser;
 import com.rickgao.careercore.modules.auth.mapper.SysUserMapper;
 import com.rickgao.careercore.modules.student.dto.DeletionRequestDTO;
@@ -16,6 +17,7 @@ import com.rickgao.careercore.modules.student.entity.StudentProfile;
 import com.rickgao.careercore.modules.student.mapper.DeletionRequestMapper;
 import com.rickgao.careercore.modules.student.mapper.StudentExperienceMapper;
 import com.rickgao.careercore.modules.student.mapper.StudentProfileMapper;
+import com.rickgao.careercore.modules.student.model.BasicInfo;
 import com.rickgao.careercore.modules.student.service.CompletenessCalculator;
 import com.rickgao.careercore.modules.student.service.StudentProfileService;
 import com.rickgao.careercore.modules.student.vo.CompletenessDetailVO;
@@ -213,7 +215,7 @@ public class StudentProfileServiceImpl implements StudentProfileService {
                 .className(profile.getClassName())
                 .grade(profile.getGrade())
                 .majorCategory(profile.getMajorCategory())
-                .basic(profile.getBasic())
+                .basic(maskedBasic(profile.getBasic()))
                 .academic(profile.getAcademic())
                 .interestPrefs(profile.getInterestPrefs())
                 .abilitySelf(profile.getAbilitySelf())
@@ -224,6 +226,19 @@ public class StudentProfileServiceImpl implements StudentProfileService {
                 .completeness(completenessCalculator.calculate(profile).getScore())
                 .updatedAt(profile.getUpdatedAt())
                 .build();
+    }
+
+    /** 脱敏副本:仅掩码 phone(live.yaml 合同要求手机号脱敏展示),不改动入参实体。 */
+    private BasicInfo maskedBasic(BasicInfo src) {
+        if (src == null) {
+            return null;
+        }
+        BasicInfo copy = new BasicInfo();
+        copy.setGender(src.getGender());
+        copy.setHometown(src.getHometown());
+        copy.setBirthday(src.getBirthday());
+        copy.setPhone(MaskUtil.maskPhone(src.getPhone()));
+        return copy;
     }
 
     private ExperienceVO toExperienceVO(StudentExperience experience) {

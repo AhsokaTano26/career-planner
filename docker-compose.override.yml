@@ -1,0 +1,9 @@
+# 本地联调覆盖：把 app 改为本地构建（root Dockerfile 含 fronted + career-core），
+# 无需先 push 到 Docker Hub 拉取 DOCKER_IMAGE。
+# 用法：docker compose -f docker-compose.yml -f docker-compose.override.yml up --build
+services:
+  app:
+    image: career-planner-app:local
+    build:
+      context: .
+      dockerfile: Dockerfile

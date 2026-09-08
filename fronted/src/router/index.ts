@@ -17,6 +17,7 @@ import StudentPrivacyPage from '../views/student/StudentPrivacyPage.vue'
 import StudentDevelopmentPage from '../views/student/StudentDevelopmentPage.vue'
 import AdvisorDashboardPage from '../views/advisor/AdvisorDashboardPage.vue'
 import AdvisorStudentsPage from '../views/advisor/AdvisorStudentsPage.vue'
+import AdvisorStudentDetailPage from '../views/advisor/AdvisorStudentDetailPage.vue'
 import AdvisorAttentionPage from '../views/advisor/AdvisorAttentionPage.vue'
 import AdvisorGuidancePage from '../views/advisor/AdvisorGuidancePage.vue'
 import AdvisorStatisticsPage from '../views/advisor/AdvisorStatisticsPage.vue'
@@ -66,6 +67,7 @@ const routes: RouteRecordRaw[] = [
       { path: '', redirect: '/advisor/overview' },
       { path: 'overview', name: 'advisor-overview', component: AdvisorDashboardPage },
       { path: 'students', name: 'advisor-students', component: AdvisorStudentsPage },
+      { path: 'students/:id', name: 'advisor-student-detail', component: AdvisorStudentDetailPage },
       { path: 'attention', name: 'advisor-attention', component: AdvisorAttentionPage },
       { path: 'guidance', name: 'advisor-guidance', component: AdvisorGuidancePage },
       { path: 'statistics', name: 'advisor-statistics', component: AdvisorStatisticsPage },
@@ -147,6 +149,15 @@ router.beforeEach(async (to) => {
     const requiredRole = to.meta.role as Role | undefined
     if (requiredRole && auth.role.value !== requiredRole) {
       return { name: defaultRouteName(auth.role.value) }
+    }
+    // 复审 Batch4：强制改密中央拦截（此前仅各 load() 早退，手动输路由可漫游到空骨架页）。
+    // 允许页：改密页（student-privacy/advisor-account）+ admin 全系（无独立改密页，由后端 403 兜底）。
+    const passwordPages = ['student-privacy', 'advisor-account']
+    if (auth.forcePasswordChange.value
+        && auth.role.value !== 'ADMIN'
+        && typeof to.name === 'string'
+        && !passwordPages.includes(to.name)) {
+      return { name: auth.role.value === 'ADVISOR' ? 'advisor-account' : 'student-privacy' }
     }
   } else if (to.meta.guestOnly) {
     if (auth.loggedIn.value) {

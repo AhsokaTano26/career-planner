@@ -144,5 +144,6 @@ CREATE TABLE IF NOT EXISTS stage_review (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
+    UNIQUE KEY uk_review_student_cycle (student_id, cycle),
     KEY idx_review_student (student_id, submitted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='阶段复盘';

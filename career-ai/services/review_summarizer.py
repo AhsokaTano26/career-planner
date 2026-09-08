@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from services.desensitizer import mask_free_text
 from services.llm_gateway import generate
 
 _SYSTEM_PROMPT = (
@@ -23,6 +24,8 @@ def summarize(review_content: dict, cycle: str, task_summary: str | None = None,
     user_ref 为脱敏用户引用（写入 ai_call_log）。
     """
     user_prompt = _build_prompt(review_content, cycle, task_summary)
+    # 复盘为自由文本：截断到 2000 字 + 脱敏（spec 4.2「已脱敏复盘」）
+    user_prompt = mask_free_text(user_prompt, limit=2000)
     content = generate(
         [
             {"role": "system", "content": _SYSTEM_PROMPT},
@@ -39,10 +42,23 @@ def summarize(review_content: dict, cycle: str, task_summary: str | None = None,
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end <= start:
         return {"summary": content, "suggestions": []}
-    data = json.loads(text[start:end + 1])
+    # 稳定性：模型截断/杂文本导致 JSON 非法时抛 ValueError，由路由映射为 503
+    # （此前裸奔为 500，打破“失败一律可回退”约定）
+    try:
+        data = json.loads(text[start:end + 1])
+    except (json.JSONDecodeError, ValueError) as exc:
+        raise ValueError("复盘总结输出非合法 JSON：%s" % exc) from exc
+    if not isinstance(data, dict):
+        raise ValueError("复盘总结输出非 JSON 对象")
     if not data.get("summary"):
         data["summary"] = content
-    data.setdefault("suggestions", [])
+    suggestions = data.get("suggestions", [])
+    # suggestions 必须为字符串列表；模型返回裸字符串/脏类型时归一化，避免出口 Pydantic 500
+    if isinstance(suggestions, str):
+        suggestions = [suggestions] if suggestions.strip() else []
+    elif not isinstance(suggestions, list):
+        suggestions = []
+    data["suggestions"] = [str(s) for s in suggestions if s is not None][:10]
     return data
 
 

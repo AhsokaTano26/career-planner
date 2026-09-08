@@ -37,12 +37,15 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final AdminUserMapper adminUserMapper;
     private final SysUserMapper sysUserMapper;
     private final IdempotencyService idempotencyService;
+    private final com.rickgao.careercore.security.AuthUserCache authUserCache;
 
     public AdminUserServiceImpl(AdminUserMapper adminUserMapper, SysUserMapper sysUserMapper,
-                                IdempotencyService idempotencyService) {
+                                IdempotencyService idempotencyService,
+                                com.rickgao.careercore.security.AuthUserCache authUserCache) {
         this.adminUserMapper = adminUserMapper;
         this.sysUserMapper = sysUserMapper;
         this.idempotencyService = idempotencyService;
+        this.authUserCache = authUserCache;
     }
 
     @Override
@@ -58,9 +61,13 @@ public class AdminUserServiceImpl implements AdminUserService {
         int currentPage = page == null || page < 1 ? DEFAULT_PAGE : page;
         int currentSize = size == null || size < 1 ? DEFAULT_SIZE : Math.min(size, MAX_SIZE);
         String[] sortPair = resolveSort(sort);
-        long total = adminUserMapper.countUsers(keyword, role, status);
+        // Demo 增强点：前端/Apifox 常以空串传 role/status/keyword，归一为 null 以免 MyBatis 空串当成过滤条件
+        String roleFilter = StringUtils.hasText(role) ? role : null;
+        String statusFilter = StringUtils.hasText(status) ? status : null;
+        String keywordFilter = StringUtils.hasText(keyword) ? keyword : null;
+        long total = adminUserMapper.countUsers(keywordFilter, roleFilter, statusFilter);
         List<AdminUserVO> list = adminUserMapper.selectUserPage(
-                keyword, role, status, sortPair[0], sortPair[1],
+                keywordFilter, roleFilter, statusFilter, sortPair[0], sortPair[1],
                 (currentPage - 1) * currentSize, currentSize);
         return PageResult.of(list, total, currentPage, currentSize);
     }
@@ -94,6 +101,11 @@ public class AdminUserServiceImpl implements AdminUserService {
             throw new BizException(ResultCode.VALIDATION_ERROR, "不能停用当前登录账号");
         }
         adminUserMapper.updateStatusAndClass(userId, status, className);
+        // 稳定性：停用/启用变更即递增令牌版本，旧会话即刻失效（权限回收不等待 token 过期）
+        if (status != null && !status.equals(user.getStatus())) {
+            sysUserMapper.incrementTokenVersion(userId);
+            authUserCache.evict(userId);
+        }
         // TODO(审计): 高风险操作(更新用户状态/班级)需写入审计日志,由审计模块队友接入
     }
 

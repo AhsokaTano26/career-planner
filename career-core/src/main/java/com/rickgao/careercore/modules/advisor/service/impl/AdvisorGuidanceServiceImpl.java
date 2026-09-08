@@ -76,7 +76,8 @@ public class AdvisorGuidanceServiceImpl implements AdvisorGuidanceService {
 
     private void validate(GuidanceCommentRequest request) {
         String type = request.getAdviceType();
-        if (!ADVICE_TYPES.contains(type)) {
+        // 防御：Set.of().contains(null) 抛 NPE，缺字段应报 400 而非 500
+        if (type == null || !ADVICE_TYPES.contains(type)) {
             throw new BizException(ResultCode.VALIDATION_ERROR,
                     "adviceType 仅支持 COMMENT/SUGGEST_TASK/SUGGEST_RETEST");
         }

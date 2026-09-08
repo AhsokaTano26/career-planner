@@ -50,6 +50,13 @@ public interface PlanningMapper {
 
     SemesterPlan selectLatestPlanByStatus(@Param("studentId") String studentId, @Param("status") String status);
 
+    /**
+     * 加锁读最新计划（复审加固）：updatePlan/confirmPlan 在事务内持行锁，
+     * 并发编辑串行化，防先查后写静默覆盖。
+     */
+    SemesterPlan selectLatestPlanByStatusForUpdate(@Param("studentId") String studentId,
+                                                   @Param("status") String status);
+
     SemesterPlan selectLatestPlan(@Param("studentId") String studentId);
 
     int insertPlan(SemesterPlan plan);
@@ -90,6 +97,9 @@ public interface PlanningMapper {
 
     TaskCheckin selectLatestCheckinByTask(@Param("taskId") String taskId);
 
+    /** 批量取各任务最新打卡（稳定性：listTasks N+1 合并为单查询，Java 侧按任务取首条）。 */
+    java.util.List<TaskCheckin> selectLatestCheckinsByTaskIds(@Param("taskIds") java.util.List<String> taskIds);
+
     int insertCheckin(TaskCheckin checkin);
 
     // ---------- 阶段复盘 stage_review ----------
@@ -103,6 +113,12 @@ public interface PlanningMapper {
     int insertReview(StageReview review);
 
     int updateReview(StageReview review);
+
+    /**
+     * 条件更新复盘（复审加固）：仅 DRAFT/SUBMITTED 行可写，返回影响行数；
+     * 并发提交/总结冲突时返回 0，调用方转 409。
+     */
+    int updateReviewIfSubmittable(StageReview review);
 
     // ---------- 站内提醒 reminder ----------
 

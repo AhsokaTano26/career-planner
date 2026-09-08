@@ -1,5 +1,6 @@
 package com.rickgao.careercore.modules.advisor.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.List;
  * 画像快照。对齐 openapi ProfileSnapshot。
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProfileSnapshotVO {
 
     private String id;

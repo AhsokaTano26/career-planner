@@ -2,7 +2,9 @@ package com.rickgao.careercore.modules.planning.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.rickgao.careercore.common.exception.BizException;
+import com.rickgao.careercore.common.idempotency.IdempotencyService;
 import com.rickgao.careercore.common.page.PageResult;
+import com.rickgao.careercore.common.response.ApiResponse;
 import com.rickgao.careercore.common.response.ResultCode;
 import com.rickgao.careercore.common.util.IdGenerator;
 import com.rickgao.careercore.common.util.JsonUtil;
@@ -30,6 +32,7 @@ import com.rickgao.careercore.modules.planning.dto.TaskCheckinRequest;
 import com.rickgao.careercore.modules.planning.dto.TaskRequest;
 import com.rickgao.careercore.modules.planning.dto.TaskStatusUpdate;
 import com.rickgao.careercore.modules.planning.entity.GoalVersion;
+import org.springframework.context.annotation.Lazy;
 import com.rickgao.careercore.modules.planning.entity.PlanTask;
 import com.rickgao.careercore.modules.planning.entity.PlanVersion;
 import com.rickgao.careercore.modules.planning.entity.Reminder;
@@ -73,15 +76,22 @@ public class PlanningServiceImpl implements PlanningService {
     private final AdminDirectionMapper directionMapper;
     private final AiService aiService;
     private final IdGenerator idGenerator;
+    private final IdempotencyService idempotencyService;
+
+    private final PlanningServiceImpl self;
 
     public PlanningServiceImpl(PlanningMapper mapper,
                                AdminDirectionMapper directionMapper,
                                AiService aiService,
-                               IdGenerator idGenerator) {
+                               IdGenerator idGenerator,
+                               IdempotencyService idempotencyService,
+                               @Lazy PlanningServiceImpl self) {
         this.mapper = mapper;
         this.directionMapper = directionMapper;
         this.aiService = aiService;
         this.idGenerator = idGenerator;
+        this.idempotencyService = idempotencyService;
+        this.self = self;
     }
 
     // ================================================================ 目标
@@ -259,8 +269,8 @@ public class PlanningServiceImpl implements PlanningService {
     }
 
     @Override
-    @Transactional
     public PlanVO generateDraft(String studentId, PlanDraftRequest req) {
+        // 稳定性：远程 LLM 调用必须在事务外（否则长持 DB 连接）；落库走代理进事务
         String directionId = req.getDirectionId();
         if (!StringUtils.hasText(directionId)) {
             directionId = primaryDirectionId(studentId);
@@ -298,7 +308,15 @@ public class PlanningServiceImpl implements PlanningService {
             source = "TEMPLATE";
         }
 
-        // 保存为新 DRAFT 计划
+        // 保存为新 DRAFT 计划（事务内多写原子）
+        return self.persistDraft(studentId, goalSummary, semesterGoals, monthlyTasks, notes, source);
+    }
+
+    @Transactional
+    public PlanVO persistDraft(String studentId, String goalSummary,
+                               List<PlanVO.SemesterGoal> semesterGoals,
+                               List<PlanVO.MonthlyTask> monthlyTasks,
+                               List<String> notes, String source) {
         SemesterPlan plan = new SemesterPlan();
         plan.setId(idGenerator.semesterPlanId());
         plan.setStudentId(studentId);
@@ -321,7 +339,8 @@ public class PlanningServiceImpl implements PlanningService {
     @Override
     @Transactional
     public PlanVO confirmPlan(String studentId, PlanConfirmRequest req) {
-        SemesterPlan draft = mapper.selectLatestPlanByStatus(studentId, "DRAFT");
+        // 复审加固：加锁读，并发确认串行化
+        SemesterPlan draft = mapper.selectLatestPlanByStatusForUpdate(studentId, "DRAFT");
         if (draft == null) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "没有可确认的计划草案");
         }
@@ -342,9 +361,10 @@ public class PlanningServiceImpl implements PlanningService {
     @Override
     @Transactional
     public PlanVO updatePlan(String studentId, PlanUpdateRequest req) {
-        SemesterPlan plan = mapper.selectLatestPlanByStatus(studentId, "DRAFT");
+        // 复审加固：加锁读，并发编辑串行化，防静默后写覆盖
+        SemesterPlan plan = mapper.selectLatestPlanByStatusForUpdate(studentId, "DRAFT");
         if (plan == null) {
-            plan = mapper.selectLatestPlanByStatus(studentId, "CONFIRMED");
+            plan = mapper.selectLatestPlanByStatusForUpdate(studentId, "CONFIRMED");
         }
         if (plan == null) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "没有可编辑的计划");
@@ -472,11 +492,27 @@ public class PlanningServiceImpl implements PlanningService {
         int p = page < 1 ? DEFAULT_PAGE : page;
         int s = size < 1 ? DEFAULT_SIZE : Math.min(size, MAX_SIZE);
         int offset = (p - 1) * s;
-        List<TaskVO> list = mapper.selectTasksByStudent(studentId, month, status, offset, s).stream()
-                .map(t -> toTaskVO(t, mapper.selectLatestCheckinByTask(t.getId())))
+        List<PlanTask> tasks = mapper.selectTasksByStudent(studentId, month, status, offset, s);
+        // 稳定性：最新打卡批量一次查出（此前每任务一查，N+1）
+        Map<String, TaskCheckin> latestCheckins = latestCheckinMap(
+                tasks.stream().map(PlanTask::getId).collect(Collectors.toList()));
+        List<TaskVO> list = tasks.stream()
+                .map(t -> toTaskVO(t, latestCheckins.get(t.getId())))
                 .toList();
         long total = mapper.countTasks(studentId, month, status);
         return PageResult.of(list, total, p, s);
+    }
+
+    private Map<String, TaskCheckin> latestCheckinMap(List<String> taskIds) {
+        Map<String, TaskCheckin> out = new java.util.LinkedHashMap<>();
+        if (taskIds == null || taskIds.isEmpty()) {
+            return out;
+        }
+        // SQL 已按 task_id, checked_in_at DESC 排序，首条即最新
+        for (TaskCheckin checkin : mapper.selectLatestCheckinsByTaskIds(taskIds)) {
+            out.putIfAbsent(checkin.getTaskId(), checkin);
+        }
+        return out;
     }
 
     @Override
@@ -491,11 +527,34 @@ public class PlanningServiceImpl implements PlanningService {
     @Override
     @Transactional
     public TaskVO createTask(String studentId, TaskRequest req) {
+        return createTask(studentId, req, null);
+    }
+
+    /**
+     * 复审加固：Idempotency-Key 可选——携带时走幂等（双击只建一个任务），
+     * 缺省时保持原行为（兼容不断 key 的老客户端）。
+     */
+    @Override
+    @Transactional
+    public TaskVO createTask(String studentId, TaskRequest req, String idempotencyKey) {        if (!StringUtils.hasText(idempotencyKey)) {
+            return doCreateTask(studentId, req);
+        }
+        ApiResponse<TaskVO> response = idempotencyService.execute(
+                studentId, "planning:createTask", idempotencyKey, TaskVO.class,
+                () -> ApiResponse.ok(doCreateTask(studentId, req)));
+        return response.getData();
+    }
+
+    private TaskVO doCreateTask(String studentId, TaskRequest req) {
         if (!StringUtils.hasText(req.getTitle())) {
             throw new BizException(ResultCode.VALIDATION_ERROR, "任务标题不能为空");
         }
         SemesterPlan plan = mapper.selectLatestPlanByStatus(studentId, "CONFIRMED");
         String planId = plan == null ? null : plan.getId();
+        if (planId == null) {
+            // 复审 Batch4：此前 plan_id 置空后由 DB 非空约束抛 500，现前置为明确 400
+            throw new BizException(ResultCode.VALIDATION_ERROR, "暂无已确认的计划，请先生成并确认计划");
+        }
         PlanTask task = new PlanTask();
         task.setId(idGenerator.planTaskId());
         task.setPlanId(planId);
@@ -543,6 +602,23 @@ public class PlanningServiceImpl implements PlanningService {
     @Override
     @Transactional
     public TaskVO checkinTask(String studentId, String taskId, TaskCheckinRequest req) {
+        return checkinTask(studentId, taskId, req, null);
+    }
+
+    /** 复审加固：打卡幂等（同上，key 可选）。 */
+    @Override
+    @Transactional
+    public TaskVO checkinTask(String studentId, String taskId, TaskCheckinRequest req, String idempotencyKey) {
+        if (!StringUtils.hasText(idempotencyKey)) {
+            return doCheckinTask(studentId, taskId, req);
+        }
+        ApiResponse<TaskVO> response = idempotencyService.execute(
+                studentId, "planning:checkinTask", idempotencyKey, TaskVO.class,
+                () -> ApiResponse.ok(doCheckinTask(studentId, taskId, req)));
+        return response.getData();
+    }
+
+    private TaskVO doCheckinTask(String studentId, String taskId, TaskCheckinRequest req) {
         PlanTask task = mapper.selectTaskById(taskId);
         if (task == null || !studentId.equals(task.getStudentId())) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "任务不存在");
@@ -637,7 +713,18 @@ public class PlanningServiceImpl implements PlanningService {
             review.setCreatedAt(LocalDateTime.now());
             review.setUpdatedAt(LocalDateTime.now());
             review.setContentJson(req.getContent() == null ? null : JsonUtil.toJson(req.getContent()));
-            mapper.insertReview(review);
+            try {
+                mapper.insertReview(review);
+            } catch (org.springframework.dao.DuplicateKeyException e) {
+                // 复审加固：并发双击同时走到 insert 时 UK(student_id, cycle) 兜底，
+                // 回读已存在的行并更新内容（幂等语义），而非 500。
+                review = mapper.selectReviewsByStudent(studentId).stream()
+                        .filter(r -> cycle.equals(r.getCycle()))
+                        .findFirst()
+                        .orElseThrow(() -> e);
+                review.setContentJson(req.getContent() == null ? null : JsonUtil.toJson(req.getContent()));
+                mapper.updateReview(review);
+            }
         } else {
             review.setContentJson(req.getContent() == null ? null : JsonUtil.toJson(req.getContent()));
             mapper.updateReview(review);
@@ -658,22 +745,30 @@ public class PlanningServiceImpl implements PlanningService {
     }
 
     @Override
-    @Transactional
     public ReviewVO submitReview(String studentId, String reviewId) {
+        // 稳定性：AI 总结（远程）在事务外，落库走代理进事务
         StageReview review = loadOwnReview(studentId, reviewId);
         review.setStatus("SUBMITTED");
         review.setSubmittedAt(LocalDateTime.now());
         applyAiSummary(review);
-        mapper.updateReview(review);
-        return toReviewVO(review);
+        return self.persistReview(review);
     }
 
     @Override
-    @Transactional
     public ReviewVO summarizeReview(String studentId, String reviewId) {
         StageReview review = loadOwnReview(studentId, reviewId);
         applyAiSummary(review);
-        mapper.updateReview(review);
+        return self.persistReview(review);
+    }
+
+    @Transactional
+    public ReviewVO persistReview(StageReview review) {
+        // 复审加固：条件写——仅当行仍为 DRAFT/SUBMITTED 才落库，并发提交/总结冲突时 0 行
+        // 抛 409 而非静默后写覆盖（调用方 submit/summarize 已在事务外做完 AI，此处只做原子落点）
+        int rows = mapper.updateReviewIfSubmittable(review);
+        if (rows == 0) {
+            throw new BizException(ResultCode.STATE_CONFLICT, "复盘状态已变化，请刷新后重试");
+        }
         return toReviewVO(review);
     }
 
@@ -807,6 +902,8 @@ public class PlanningServiceImpl implements PlanningService {
         List<ReminderVO> result = new ArrayList<>();
         LocalDate today = LocalDate.now();
         LocalDate soon = today.plusDays(7);
+        // 复审加固：已存在的未读提醒不再重复生成（此前每次调用都 insert，轮询即膨胀）
+        List<Reminder> unread = mapper.selectRemindersByStudent(studentId, true, 0, 200);
         // 近 7 天截止的未完成任务
         List<PlanTask> tasks = mapper.selectTasksByStudent(studentId, null, null, 0, Integer.MAX_VALUE).stream()
                 .filter(t -> t.getDeadline() != null
@@ -815,6 +912,9 @@ public class PlanningServiceImpl implements PlanningService {
                         && !List.of("DONE", "ABANDONED").contains(t.getStatus()))
                 .toList();
         for (PlanTask task : tasks) {
+            if (hasUnreadFor(unread, "TASK_DEADLINE", task.getTitle())) {
+                continue;
+            }
             Reminder r = new Reminder();
             r.setId(idGenerator.reminderId());
             r.setStudentId(studentId);
@@ -831,7 +931,7 @@ public class PlanningServiceImpl implements PlanningService {
         String month = today.format(MONTH_FMT);
         boolean reviewedThisMonth = latest != null && month.equals(latest.getCycle())
                 && "SUBMITTED".equals(latest.getStatus());
-        if (!reviewedThisMonth) {
+        if (!reviewedThisMonth && !hasUnreadFor(unread, "REVIEW_REMIND", month)) {
             Reminder r = new Reminder();
             r.setId(idGenerator.reminderId());
             r.setStudentId(studentId);
@@ -844,6 +944,19 @@ public class PlanningServiceImpl implements PlanningService {
             result.add(toReminderVO(r));
         }
         return result;
+    }
+
+    /** 已有同类型未读提醒且内容包含同一标识（任务标题/月份）时视为重复，不再生成。 */
+    private boolean hasUnreadFor(List<Reminder> unread, String type, String marker) {
+        if (marker == null) {
+            return false;
+        }
+        for (Reminder r : unread) {
+            if (type.equals(r.getType()) && r.getContent() != null && r.getContent().contains(marker)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ReminderVO toReminderVO(Reminder r) {

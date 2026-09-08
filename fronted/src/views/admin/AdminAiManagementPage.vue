@@ -3,12 +3,15 @@ import { computed, onMounted, ref } from 'vue'
 import BaseModal from '../../components/BaseModal.vue'
 import BaseSelect from '../../components/BaseSelect.vue'
 import { api, getErrorMessage } from '../../api/request'
+import { onSessionReset } from '../../composables/useAuth'
 import { useToast } from '../../composables/useToast'
 
 type Row = Record<string, any>
 const { show } = useToast()
 const tab = ref('model'), busy = ref(''), configs = ref<Row[]>([]), prompts = ref<Row[]>([]), scenes = ref<string[]>([]), scene = ref(''), questionnaires = ref<Row[]>([]), keyword = ref(''), page = ref(1), totalPages = ref(1)
 const promptForm = ref({scene:'',version:'',content:''}), questionnaireForm = ref({type:'CAREER',name:'',typeName:'',minutes:'10',tip:'',changeNote:'',questionsText:''}), modal = ref(false), editing = ref<Row|null>(null), versions = ref<Row[]>([])
+// 稳定性：切号/401 时清空管理数据，避免看到上号内容
+onSessionReset(()=>{ configs.value=[]; prompts.value=[]; scenes.value=[]; questionnaires.value=[]; versions.value=[]; page.value=1; totalPages.value=1; modal.value=false; editing.value=null; busy.value='' })
 const sceneOptions = computed(()=>[{value:'',label:'全部场景'},...scenes.value.map(item=>({value:item,label:item}))])
 const statusOptions = [{value:'DRAFT',label:'草稿'},{value:'PUBLISHED',label:'已发布'},{value:'DISABLED',label:'已停用'}]
 const tabs = [{value:'model',label:'模型配置'},{value:'prompt',label:'提示词版本'},{value:'questionnaire',label:'问卷管理'}]

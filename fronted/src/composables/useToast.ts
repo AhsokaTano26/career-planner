@@ -12,3 +12,10 @@ export function useToast() {
   }
   return { toast: message, show }
 }
+
+/** 会话清理：登出/401 时清掉可能跨号闪现的提示。 */
+export function resetToast() {
+  window.clearTimeout(timer)
+  timer = undefined
+  message.value = ''
+}
