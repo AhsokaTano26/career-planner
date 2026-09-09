@@ -59,6 +59,7 @@ class GatewayClient:
         max_tokens: int = 500,
         model_group: str | None = None,
         prompt_version: str | None = None,
+        response_format: dict | None = None,
     ) -> GenerateResult:
         """统一生成入口。
 
@@ -84,7 +85,7 @@ class GatewayClient:
             self._bucket.acquire()
             # 预算预占（防 check-then-act 并发超限，多退少补见 settle）
             self._budget.reserve(scene, effective_max_tokens)
-            response = self._router.completion(
+            completion_kwargs: dict = dict(
                 model=group,
                 messages=messages,
                 temperature=temperature,
@@ -93,6 +94,10 @@ class GatewayClient:
                 timeout=self.config.timeout,
                 metadata=metadata,
             )
+            # JSON mode：仅透传给真实 Router；_FakeRouter（测试桩）按 **kwargs 接收无影响
+            if response_format is not None:
+                completion_kwargs["response_format"] = response_format
+            response = self._router.completion(**completion_kwargs)
         except GatewayRateLimited:
             metrics.observe(scene, "RATE_LIMITED", time.perf_counter() - started, None)
             raise

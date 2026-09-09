@@ -20,9 +20,13 @@ public class RecResultVO {
 
     private String resultId;
     private String directionId;
+    /** 方向中文名（前端直接展示，不再裸露 directionId 编码）。 */
+    private String directionName;
     private Integer rank;
     private Double score;
     private String confidence;
+    /** 置信度中文（HIGH=匹配度高/MEDIUM=匹配度中/LOW=匹配度一般）。 */
+    private String confidenceName;
     private List<String> reasons;
     private List<String> strengths;
     private List<String> gaps;

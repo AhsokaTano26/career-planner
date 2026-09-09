@@ -150,15 +150,6 @@ router.beforeEach(async (to) => {
     if (requiredRole && auth.role.value !== requiredRole) {
       return { name: defaultRouteName(auth.role.value) }
     }
-    // 复审 Batch4：强制改密中央拦截（此前仅各 load() 早退，手动输路由可漫游到空骨架页）。
-    // 允许页：改密页（student-privacy/advisor-account）+ admin 全系（无独立改密页，由后端 403 兜底）。
-    const passwordPages = ['student-privacy', 'advisor-account']
-    if (auth.forcePasswordChange.value
-        && auth.role.value !== 'ADMIN'
-        && typeof to.name === 'string'
-        && !passwordPages.includes(to.name)) {
-      return { name: auth.role.value === 'ADVISOR' ? 'advisor-account' : 'student-privacy' }
-    }
   } else if (to.meta.guestOnly) {
     if (auth.loggedIn.value) {
       return { name: defaultRouteName(auth.role.value) }

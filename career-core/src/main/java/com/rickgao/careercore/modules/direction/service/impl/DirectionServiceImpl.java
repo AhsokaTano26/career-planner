@@ -5,7 +5,9 @@ import com.rickgao.careercore.common.exception.BizException;
 import com.rickgao.careercore.common.response.ResultCode;
 import com.rickgao.careercore.common.util.IdGenerator;
 import com.rickgao.careercore.common.util.JsonUtil;
+import com.rickgao.careercore.modules.admin.entity.AbilityTag;
 import com.rickgao.careercore.modules.admin.entity.CareerDirection;
+import com.rickgao.careercore.modules.admin.mapper.AdminAbilityMapper;
 import com.rickgao.careercore.modules.admin.mapper.AdminDirectionMapper;
 import com.rickgao.careercore.modules.direction.entity.Favorite;
 import com.rickgao.careercore.modules.direction.mapper.FavoriteMapper;
@@ -30,14 +32,21 @@ public class DirectionServiceImpl implements DirectionService {
 
     private static final Set<String> PATH_ENUM = Set.of("graduate", "employment", "overseas");
 
+    /** 展示用中文映射（接口透出英文编码时，前端可直接用 pathName 展示）。 */
+    private static final Map<String, String> PATH_NAMES = Map.of(
+            "graduate", "国内升学", "employment", "就业发展", "overseas", "出国留学");
+
     private final AdminDirectionMapper directionMapper;
+    private final AdminAbilityMapper abilityMapper;
     private final FavoriteMapper favoriteMapper;
     private final IdGenerator idGenerator;
 
     public DirectionServiceImpl(AdminDirectionMapper directionMapper,
+                                AdminAbilityMapper abilityMapper,
                                 FavoriteMapper favoriteMapper,
                                 IdGenerator idGenerator) {
         this.directionMapper = directionMapper;
+        this.abilityMapper = abilityMapper;
         this.favoriteMapper = favoriteMapper;
         this.idGenerator = idGenerator;
     }
@@ -53,6 +62,7 @@ public class DirectionServiceImpl implements DirectionService {
                     vo.setId(d.getId());
                     vo.setName(d.getName());
                     vo.setPath(d.getPath());
+                    vo.setPathName(PATH_NAMES.getOrDefault(d.getPath(), d.getPath()));
                     vo.setIcon(d.getIcon());
                     vo.setIntro(d.getIntro());
                     vo.setFavorited(favorited.contains(d.getId()));
@@ -71,11 +81,13 @@ public class DirectionServiceImpl implements DirectionService {
         vo.setId(d.getId());
         vo.setName(d.getName());
         vo.setPath(d.getPath());
+        vo.setPathName(PATH_NAMES.getOrDefault(d.getPath(), d.getPath()));
         vo.setIcon(d.getIcon());
         vo.setIntro(d.getIntro());
         vo.setTarget(parseMap(d.getTargetJson()));
         vo.setLearning(parseStringList(d.getLearningJson()));
         vo.setAbilities(parseStringList(d.getAbilitiesJson()));
+        vo.setAbilityNames(abilityNames(parseStringList(d.getAbilitiesJson())));
         vo.setCourses(parseStringList(d.getCoursesJson()));
         vo.setActivities(parseStringList(d.getActivitiesJson()));
         vo.setPathDesc(parseStringList(d.getPathDescJson()));
@@ -98,11 +110,13 @@ public class DirectionServiceImpl implements DirectionService {
                     vo.setId(d.getId());
                     vo.setName(d.getName());
                     vo.setPath(d.getPath());
+                    vo.setPathName(PATH_NAMES.getOrDefault(d.getPath(), d.getPath()));
                     vo.setIcon(d.getIcon());
                     vo.setIntro(d.getIntro());
                     vo.setTarget(parseMap(d.getTargetJson()));
                     vo.setLearning(parseStringList(d.getLearningJson()));
                     vo.setAbilities(parseStringList(d.getAbilitiesJson()));
+                    vo.setAbilityNames(abilityNames(parseStringList(d.getAbilitiesJson())));
                     vo.setCourses(parseStringList(d.getCoursesJson()));
                     vo.setActivities(parseStringList(d.getActivitiesJson()));
                     vo.setPathDesc(parseStringList(d.getPathDescJson()));
@@ -143,6 +157,19 @@ public class DirectionServiceImpl implements DirectionService {
         return favoriteMapper.selectByStudent(studentId).stream()
                 .map(Favorite::getDirectionId)
                 .collect(Collectors.toSet());
+    }
+
+    private List<String> abilityNames(List<String> ids) {
+        return ids.stream()
+                .map(id -> {
+                    try {
+                        AbilityTag tag = abilityMapper.findById(id);
+                        return tag == null ? id : tag.getName();
+                    } catch (Exception exc) {
+                        return id;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private List<String> parseStringList(String json) {

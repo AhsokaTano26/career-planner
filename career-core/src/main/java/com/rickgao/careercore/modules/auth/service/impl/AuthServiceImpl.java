@@ -105,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
         user.setStudentNo(request.getStudentNo());
         user.setUsername(request.getStudentNo());
         user.setName(request.getName());
-        // 注册时使用管理员分配的初始密码；首次进入后必须修改。
+        // 注册时使用管理员分配的初始密码；强制改密已取消，新账号直接可用。
         user.setPasswordHash(passwordEncoder.encode(request.getInitialPassword()));
         user.setRole(CommonConstants.ROLE_STUDENT);
         user.setStatus(CommonConstants.USER_STATUS_ACTIVE);
@@ -113,7 +113,7 @@ public class AuthServiceImpl implements AuthService {
         user.setGrade(deriveGrade(request.getStudentNo()));
         user.setClassName(StringUtils.hasText(request.getClassName()) ? request.getClassName() : whitelist.getClassName());
         user.setConsentAgreed(false);
-        user.setPasswordChangeRequired(true);
+        user.setPasswordChangeRequired(false);
         sysUserMapper.insert(user);
         studentWhitelistMapper.markUsed(request.getStudentNo());
 
@@ -181,10 +181,6 @@ public class AuthServiceImpl implements AuthService {
         SysUser user = sysUserMapper.findById(stored.getUserId());
         if (user == null || !CommonConstants.USER_STATUS_ACTIVE.equals(user.getStatus())) {
             throw new BizException(ResultCode.AUTH_REQUIRED, "账号不可用");
-        }
-        // 安全：首改密码未完成前不允许经 refresh 续期，防止无限推迟强制改密
-        if (Boolean.TRUE.equals(user.getPasswordChangeRequired())) {
-            throw new BizException(ResultCode.FORBIDDEN, "首次登录请先修改初始密码");
         }
         // 刷新轮换:旧刷新令牌随即作废
         refreshTokenMapper.revoke(stored.getId());
@@ -258,7 +254,7 @@ public class AuthServiceImpl implements AuthService {
         if (target == null) {
             throw new BizException(ResultCode.RESOURCE_NOT_FOUND, "未找到该学号的用户");
         }
-        sysUserMapper.updatePassword(target.getId(), passwordEncoder.encode(request.getNewPassword()), true);
+        sysUserMapper.updatePassword(target.getId(), passwordEncoder.encode(request.getNewPassword()), false);
         sysUserMapper.incrementTokenVersion(target.getId());
         authUserCache.evict(target.getId());
         refreshTokenMapper.revokeByUserId(target.getId());

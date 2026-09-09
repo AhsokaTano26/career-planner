@@ -22,8 +22,12 @@ public class RecRunVO {
     private String runId;
     private Integer profileVersion;
     private String ruleVersion;
+    /** 规则版本中文（R1.0=六维加权规则 v1.0）。 */
+    private String ruleVersionName;
     private String generatedAt;
     private String status;
+    /** 状态中文（SUCCESS=已生成）。 */
+    private String statusName;
     private List<RecResultVO> results;
 }
 

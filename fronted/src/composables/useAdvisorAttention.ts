@@ -1,4 +1,4 @@
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { api, getErrorMessage } from '../api/request'
 import type { AdvisorAttention } from '../types/domain'
 import { onSessionReset, useAuth } from './useAuth'
@@ -18,7 +18,6 @@ export function useAdvisorAttention() {
   const auth = useAuth()
 
   async function load() {
-    if (auth.forcePasswordChange.value) return
     // 稳定性：序号防卫（与 useAdvisorStudents 同模式）
     const seq = ++loadSeq
     loading.value = true
@@ -36,9 +35,6 @@ export function useAdvisorAttention() {
   }
 
   onMounted(() => { if (auth.role.value === 'ADVISOR') load() })
-  watch(() => auth.forcePasswordChange.value, (forced) => {
-    if (!forced && auth.loggedIn.value) load()
-  })
 
   return { items, loading, error, load }
 }

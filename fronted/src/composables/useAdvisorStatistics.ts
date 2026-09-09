@@ -1,4 +1,4 @@
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { api, getErrorMessage } from '../api/request'
 import type { AdvisorStatistics } from '../types/domain'
 import { onSessionReset, useAuth } from './useAuth'
@@ -17,7 +17,6 @@ export function useAdvisorStatistics() {
   const auth = useAuth()
 
   async function load() {
-    if (auth.forcePasswordChange.value) return
     loading.value = true
     error.value = ''
     try {
@@ -30,9 +29,6 @@ export function useAdvisorStatistics() {
   }
 
   onMounted(() => { if (auth.role.value === 'ADVISOR') load() })
-  watch(() => auth.forcePasswordChange.value, (forced) => {
-    if (!forced && auth.loggedIn.value) load()
-  })
 
   return { statistics, loading, error, load }
 }

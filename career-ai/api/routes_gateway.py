@@ -52,6 +52,8 @@ class ChatCompletionRequest(BaseModel):
     max_tokens: int = Field(default=500, ge=1, le=8000)
     stream: bool = False
     user: Optional[str] = Field(default=None, max_length=64)  # 脱敏用户引用（写入 ai_call_log.user_ref)
+    # 回答质量迭代：JSON mode 透传（LiteLLM response_format，如 {"type": "json_object"}）
+    response_format: Optional[dict] = None
 
     @model_validator(mode="after")
     def _check_total_size(self):
@@ -77,6 +79,7 @@ def chat_completions(req: ChatCompletionRequest,
             temperature=req.temperature,
             max_tokens=req.max_tokens,
             model_group=req.model,
+            response_format=req.response_format,
         )
     except GatewayRateLimited as exc:
         raise HTTPException(status_code=429, detail=str(exc)) from exc

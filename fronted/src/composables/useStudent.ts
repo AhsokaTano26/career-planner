@@ -1,4 +1,4 @@
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { api, getErrorMessage } from '../api/request'
 import type { Completeness, ConsentStatus, Experience, ExperienceDraft, Profile, ProfileForm } from '../types/domain'
 import { onSessionReset, useAuth } from './useAuth'
@@ -37,7 +37,7 @@ export function useStudent() {
   function endSaving(key: string) { savingOps.delete(key); savingRef.value = savingOps.size > 0 }
 
   async function load() {
-    if (auth.role.value !== 'STUDENT' || auth.forcePasswordChange.value) return
+    if (auth.role.value !== 'STUDENT') return
     // 稳定性：序号防卫，慢响应不得覆盖新请求的结果
     const seq = ++loadSeq
     // 复审 Batch4：弱依赖降级——完整度/经历/知情同意任一抖动不再掀翻整个工作台（此前 Promise.all
@@ -148,10 +148,6 @@ export function useStudent() {
   }
 
   onMounted(() => { load() })
-  // When the mandatory password change completes, the gate lifts and data loads once.
-  watch(() => auth.forcePasswordChange.value, (forced) => {
-    if (!forced && auth.loggedIn.value) load()
-  })
 
   return { profile, completeness, experiences, consent, consentAgreed, saving, load, saveProfile, saveExperience, removeExperience, saveConsent, requestDeletion }
 }

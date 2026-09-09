@@ -1,89 +1,78 @@
 # IDE metadata
 .idea/
+.vscode/
+
+# CommandCode / agent local state (never commit; local session only)
+.commandcode/
+.mcp.json
+skills-lock.json
+.opencode/
+.agents/
+opencode.json
+.worktrees/
 
 # Source requirement and design documents (kept locally)
 生涯规划系统开发设计说明书_MVP_V1.0.docx
 生涯规划系统需求规格说明书_MVP_V1.0.docx
 
+# Docs (not needed to run; kept locally)
+*.md
+docs/
+career-core/docs/
+IMPLEMENTATION_PROGRESS.md
+/*.html
+/前端
+/前锟斤拷
+/生涯规划系统.openapi.json
+
+# CI / meta (not needed to run; kept locally)
+.github/
+
 # Environment secrets (never commit)
 .env
 .env.*
 !.env.example
-
-# VS Code workspace secrets (Apifox access token etc., never commit)
-.vscode/mcp.json
+docker-compose.local.yml
 
 # Build artifacts (never commit)
 **/target/
-
-# Python cache (never commit)
+node_modules/
+fronted/dist/
+*.tsbuildinfo
 **/__pycache__/
 *.pyc
+.venv/
+career-ai/.venv/
 
-# Local backups & test artifacts (never commit)
-career-core-backup-*/
-career-core-backup-20260815-105330/
-run_resp.json
-
-# Local Git worktrees
-.worktrees/
-# Local one-click start script (machine-specific, never commit)
-start-all.bat
-start_all.bat
-
-# OpenAPI 临时备份与拉取产物（避免污染仓库；正式源是 Apifox 项目 + docs/openapi/career-core-apis-live.yaml）
-docs/openapi/_apifox_main.json
-docs/openapi/_apifox_pulled.yaml
-docs/openapi/_premerge_backup.yaml
-docs/openapi/_local_backup_pre_sync.yaml
-docs/openapi/_*.yaml
-docs/openapi/_*.json
-!docs/openapi/career-core-apis-live.yaml
-!docs/openapi/career-core-apis-live-summary.md
-
-# ==================== preview 精简：以下文件不入库 ====================
-# AI / opencode 配置
-.opencode/
-.agents/
-opencode.json
-AGENTS.md
-
-# Apifox 配置与测试报告
-.apifox/
-apifox-reports/
-apifox-reports-*.html
-
-# Playwright 截图日志
-.playwright-mcp/
-
-# 项目文档（非运行必需）
-docs/
-career-core/docs/
-IMPLEMENTATION_PROGRESS.md
-
-# 测试产物（Apifox 报告、反馈、临时脚本）
-tests/apifox-reports/
-tests/feedback.json
-tests/smoke_api.py
-tests/ai_gateway_smoke.py
-tests/seed_*.py
-tests/test_*.py
-
-# 临时文件与目录
-career-ai(8000)
+# Logs, local data, backups (never commit)
+*.log
+*.err
+career-core/data/
 data/
-scripts/
-career-ai/ai.log
+career-core-backup-*/
+run_resp.json
 temp_login.json
 temp_update.json
 debug-script.txt
 debug-task-script.txt
-.vscode/
+career-ai(8000)
+career-ai/ai.log
+start-all.bat
+start_all.bat
 
-# 顶层中文 HTML 参考页
-*.html
+# Tests (not needed to run; kept locally)
+career-ai/tests/
+career-core/src/test/
+**/*.test.ts
+fronted/scripts/
+fronted/vitest.config.ts
+tests/
+test_*.py
 
-# 顶层 GBK 乱码/参考文件（历史遗留，非运行必需）
-/前端
-/前锟斤拷
-/生涯规划系统.openapi.json
+# Local run scripts (kept locally, not tracked)
+scripts/
+career-ai/scripts/
+
+# Legacy deploy sample (root docker-compose.yml is canonical; kept locally)
+deploy/
+career-core/compose.yaml

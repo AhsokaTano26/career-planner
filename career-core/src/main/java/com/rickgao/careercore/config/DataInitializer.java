@@ -63,7 +63,7 @@ public class DataInitializer implements CommandLineRunner {
             admin.setPasswordHash(passwordEncoder.encode(ADMIN_PASSWORD));
             admin.setStatus(CommonConstants.USER_STATUS_ACTIVE);
             admin.setConsentAgreed(true);
-            admin.setPasswordChangeRequired(true);
+            admin.setPasswordChangeRequired(false);
             sysUserMapper.insert(admin);
             log.info("初始化管理员账号: {}", ADMIN_USERNAME);
         }

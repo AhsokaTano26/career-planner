@@ -19,7 +19,9 @@ import com.rickgao.careercore.modules.ai.vo.AiMonthlyTaskVO;
 import com.rickgao.careercore.modules.ai.vo.AiPlanResultVO;
 import com.rickgao.careercore.modules.ai.vo.AiReviewSummaryVO;
 import com.rickgao.careercore.modules.ai.vo.AiSemesterGoalVO;
+import com.rickgao.careercore.modules.admin.entity.AbilityTag;
 import com.rickgao.careercore.modules.admin.entity.CareerDirection;
+import com.rickgao.careercore.modules.admin.mapper.AdminAbilityMapper;
 import com.rickgao.careercore.modules.admin.mapper.AdminDirectionMapper;
 import com.rickgao.careercore.modules.planning.dto.AdoptAdviceRequest;
 import com.rickgao.careercore.modules.planning.dto.GoalRequest;
@@ -74,6 +76,7 @@ public class PlanningServiceImpl implements PlanningService {
 
     private final PlanningMapper mapper;
     private final AdminDirectionMapper directionMapper;
+    private final AdminAbilityMapper abilityMapper;
     private final AiService aiService;
     private final IdGenerator idGenerator;
     private final IdempotencyService idempotencyService;
@@ -82,12 +85,14 @@ public class PlanningServiceImpl implements PlanningService {
 
     public PlanningServiceImpl(PlanningMapper mapper,
                                AdminDirectionMapper directionMapper,
+                               AdminAbilityMapper abilityMapper,
                                AiService aiService,
                                IdGenerator idGenerator,
                                IdempotencyService idempotencyService,
                                @Lazy PlanningServiceImpl self) {
         this.mapper = mapper;
         this.directionMapper = directionMapper;
+        this.abilityMapper = abilityMapper;
         this.aiService = aiService;
         this.idGenerator = idGenerator;
         this.idempotencyService = idempotencyService;
@@ -235,9 +240,15 @@ public class PlanningServiceImpl implements PlanningService {
                     .filter(g -> e.getKey().equals(g.getVersionNo()))
                     .toList();
             snapshot.stream().filter(g -> "PRIMARY".equals(g.getGoalType())).findFirst()
-                    .ifPresent(g -> vo.setPrimaryDirectionId(g.getDirectionId()));
+                    .ifPresent(g -> {
+                        vo.setPrimaryDirectionId(g.getDirectionId());
+                        vo.setPrimaryDirectionName(directionNameOf(g.getDirectionId()));
+                    });
             snapshot.stream().filter(g -> "BACKUP".equals(g.getGoalType())).findFirst()
-                    .ifPresent(g -> vo.setBackupDirectionId(g.getDirectionId()));
+                    .ifPresent(g -> {
+                        vo.setBackupDirectionId(g.getDirectionId());
+                        vo.setBackupDirectionName(directionNameOf(g.getDirectionId()));
+                    });
             result.add(vo);
         }
         result.sort((a, b) -> b.getVersion().compareTo(a.getVersion()));
@@ -290,6 +301,7 @@ public class PlanningServiceImpl implements PlanningService {
                         PlanVO.SemesterGoal sg = new PlanVO.SemesterGoal();
                         sg.setTitle(g.getTitle());
                         sg.setAbilityTag(g.getAbilityTag());
+                        sg.setAbilityTagName(abilityName(g.getAbilityTag()));
                         return sg;
                     }).collect(Collectors.toCollection(ArrayList::new));
             monthlyTasks = ai.getMonthlyTasks().stream()
@@ -302,6 +314,7 @@ public class PlanningServiceImpl implements PlanningService {
             PlanVO.SemesterGoal sg = new PlanVO.SemesterGoal();
             sg.setTitle(goalSummary);
             sg.setAbilityTag(direction == null ? null : abilityTagsOf(direction));
+            sg.setAbilityTagName(abilityName(sg.getAbilityTag()));
             semesterGoals.add(sg);
             monthlyTasks = buildDefaultMonthlyTasks();
             notes = List.of("模板生成，可手动调整");
@@ -449,6 +462,7 @@ public class PlanningServiceImpl implements PlanningService {
             mt.setMonth(base.plusMonths(i).format(MONTH_FMT));
             mt.setTitle(titles[i]);
             mt.setTaskType(types[i]);
+            mt.setTaskTypeName(taskTypeName(types[i]));
             mt.setEstimatedHours(20.0);
             list.add(mt);
         }
@@ -470,6 +484,7 @@ public class PlanningServiceImpl implements PlanningService {
         m.setMonth(mt.getMonth());
         m.setTitle(mt.getTitle());
         m.setTaskType(mt.getTaskType());
+        m.setTaskTypeName(taskTypeName(mt.getTaskType()));
         m.setEstimatedHours(mt.getEstimatedHours());
         return m;
     }
@@ -655,8 +670,10 @@ public class PlanningServiceImpl implements PlanningService {
         vo.setMonth(task.getMonth());
         vo.setTitle(task.getTitle());
         vo.setType(task.getTaskType());
+        vo.setTypeName(taskTypeName(task.getTaskType()));
         vo.setEstHours(task.getEstHours() == null ? null : task.getEstHours().doubleValue());
         vo.setStatus(task.getStatus());
+        vo.setStatusName(taskStatusName(task.getStatus()));
         vo.setDeadline(task.getDeadline());
         vo.setAbilityTags(parseStringList(task.getAbilityTagsJson()));
         vo.setNote(task.getNote());
@@ -972,17 +989,95 @@ public class PlanningServiceImpl implements PlanningService {
 
     // ================================================================ 通用工具
 
+    private String planStatusName(String status) {
+        return switch (status == null ? "" : status) {
+            case "DRAFT" -> "草稿";
+            case "CONFIRMED" -> "已确认";
+            default -> status;
+        };
+    }
+
+    private String planSourceName(String source) {
+        return switch (source == null ? "" : source) {
+            case "AI" -> "智能生成";
+            case "TEMPLATE" -> "模板生成";
+            case "MANUAL" -> "手动创建";
+            default -> source;
+        };
+    }
+
+    private String taskTypeName(String taskType) {
+        return switch (taskType == null ? "" : taskType) {
+            case "LEARNING" -> "学习";
+            case "PRACTICE" -> "实践";
+            case "CAREER" -> "职业探索";
+            case "REVIEW" -> "复盘";
+            default -> taskType;
+        };
+    }
+
+    private String taskStatusName(String status) {
+        return switch (status == null ? "" : status) {
+            case "PENDING" -> "待开始";
+            case "DOING" -> "进行中";
+            case "DONE" -> "已完成";
+            case "DELAYED" -> "已延期";
+            case "ABANDONED" -> "已放弃";
+            default -> status;
+        };
+    }
+
+    private List<PlanVO.SemesterGoal> withAbilityNames(List<PlanVO.SemesterGoal> goals) {
+        for (PlanVO.SemesterGoal g : goals) {
+            g.setAbilityTagName(abilityName(g.getAbilityTag()));
+        }
+        return goals;
+    }
+
+    private List<PlanVO.MonthlyTask> withTaskTypeNames(List<PlanVO.MonthlyTask> tasks) {
+        for (PlanVO.MonthlyTask t : tasks) {
+            t.setTaskTypeName(taskTypeName(t.getTaskType()));
+        }
+        return tasks;
+    }
+
+    private String directionNameOf(String directionId) {
+        if (!StringUtils.hasText(directionId)) {
+            return null;
+        }
+        try {
+            CareerDirection d = directionMapper.findById(directionId);
+            return d == null ? directionId : d.getName();
+        } catch (Exception exc) {
+            return directionId;
+        }
+    }
+
+    private String abilityName(String tagId) {
+        if (!StringUtils.hasText(tagId)) {
+            return null;
+        }
+        try {
+            AbilityTag tag = abilityMapper.findById(tagId);
+            return tag == null ? tagId : tag.getName();
+        } catch (Exception exc) {
+            return tagId;
+        }
+    }
+
     private PlanVO toPlanVO(SemesterPlan plan) {
         PlanVO vo = new PlanVO();
         vo.setId(plan.getId());
         vo.setVersion("P-v" + (plan.getVersionNo() == null ? 1 : plan.getVersionNo()));
         vo.setStatus(plan.getStatus());
+        vo.setStatusName(planStatusName(plan.getStatus()));
         vo.setSource(plan.getSource());
+        vo.setSourceName(planSourceName(plan.getSource()));
         vo.setGoalSummary(plan.getGoalSummary());
-        vo.setSemesterGoals(parseList(plan.getSemesterGoalsJson(), new TypeReference<List<PlanVO.SemesterGoal>>() {
-        }));
-        vo.setMonthlyTasks(parseList(plan.getMonthlyTasksJson(), new TypeReference<List<PlanVO.MonthlyTask>>() {
-        }));
+        vo.setSemesterGoals(withAbilityNames(parseList(plan.getSemesterGoalsJson(), new TypeReference<List<PlanVO.SemesterGoal>>() {
+        })));
+        vo.setMonthlyTasks(withTaskTypeNames(parseList(plan.getMonthlyTasksJson(), new TypeReference<List<PlanVO.MonthlyTask>>() {
+        })));
         vo.setNotes(parseList(plan.getNotesJson(), new TypeReference<List<String>>() {
         }));
         vo.setConfirmedAt(plan.getConfirmedAt());

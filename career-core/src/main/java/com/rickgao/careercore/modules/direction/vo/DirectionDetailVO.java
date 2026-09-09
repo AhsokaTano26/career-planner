@@ -16,12 +16,16 @@ public class DirectionDetailVO {
     private String id;
     private String name;
     private String path;
+    /** 路径中文（graduate=国内升学/employment=就业发展/overseas=出国留学）。 */
+    private String pathName;
     private String icon;
     private String intro;
     /** 六维目标值 {interest,values,ability,academic,tendency,practice} */
     private Map<String, Object> target;
     private List<String> learning;
     private List<String> abilities;
+    /** 能力要求中文名（与 abilities 同序，前端直接展示）。 */
+    private List<String> abilityNames;
     private List<String> courses;
     private List<String> activities;
     private List<String> pathDesc;

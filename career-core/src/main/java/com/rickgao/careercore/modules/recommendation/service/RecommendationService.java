@@ -49,7 +49,13 @@ public class RecommendationService {
     private static final Map<String, Double> DEFAULT_WEIGHTS = Map.of(
             "interest", 0.20, "values", 0.15, "ability", 0.25,
             "academic", 0.15, "tendency", 0.20, "practice", 0.05);
-    private static final List<String> FEEDBACK_TYPES = List.of("HELPFUL", "NEUTRAL", "MISMATCH", "NOT_INTERESTED");
+    private static final List<String> FEEDBACK_TYPES = List.of("HELPFUL", "NEUTRAL", "MISMATCH", "INTERESTED", "NOT_INTERESTED");
+
+    /** 展示用中文映射（接口透出英文编码时，前端可直接用 *Name 字段展示）。 */
+    private static final Map<String, String> CONFIDENCE_NAMES = Map.of(
+            "HIGH", "匹配度高", "MEDIUM", "匹配度中", "LOW", "匹配度一般");
+    private static final Map<String, String> PATH_NAMES = Map.of(
+            "graduate", "国内升学", "employment", "就业发展", "overseas", "出国留学");
 
     private final RecommendationMapper recommendationMapper;
     private final AdminDirectionMapper directionMapper;
@@ -275,15 +281,19 @@ public class RecommendationService {
                 : List.of();
         return RecRunVO.builder()
                 .runId(run.getId()).profileVersion(profileVersion).ruleVersion(run.getRuleVersion())
-                .generatedAt(ts(run.getGeneratedAt())).status(run.getStatus()).results(results)
+                .ruleVersionName(ruleVersionName(run.getRuleVersion()))
+                .generatedAt(ts(run.getGeneratedAt())).status(run.getStatus())
+                .statusName(runStatusName(run.getStatus())).results(results)
                 .build();
     }
 
     private RecResultVO toResultVO(RecommendationResult r) {
         return RecResultVO.builder()
-                .resultId(r.getId()).directionId(r.getDirectionId()).rank(r.getRank())
+                .resultId(r.getId()).directionId(r.getDirectionId())
+                .directionName(directionName(r.getDirectionId())).rank(r.getRank())
                 .score(r.getScore() == null ? null : r.getScore().doubleValue())
                 .confidence(r.getConfidence())
+                .confidenceName(CONFIDENCE_NAMES.getOrDefault(r.getConfidence(), r.getConfidence()))
                 .reasons(parseStrList(r.getReasonsJson()))
                 .strengths(parseStrList(r.getStrengthsJson()))
                 .gaps(parseStrList(r.getGapsJson()))
@@ -332,6 +342,27 @@ public class RecommendationService {
         if (type == null || !FEEDBACK_TYPES.contains(type)) {
             throw new BizException(ResultCode.VALIDATION_ERROR, "feedbackType 不合法：" + type);
         }
+    }
+
+    private String directionName(String directionId) {
+        if (directionId == null) {
+            return null;
+        }
+        try {
+            CareerDirection d = directionMapper.findById(directionId);
+            return d == null ? directionId : d.getName();
+        } catch (Exception exc) {
+            log.warn("方向名称查询失败：{}", exc.getMessage());
+            return directionId;
+        }
+    }
+
+    private String ruleVersionName(String ruleVersion) {
+        return "R1.0".equals(ruleVersion) ? "六维加权规则 v1.0" : ruleVersion;
+    }
+
+    private String runStatusName(String status) {
+        return "SUCCESS".equals(status) ? "已生成" : status;
     }
 
     private String writeJson(Object obj) {

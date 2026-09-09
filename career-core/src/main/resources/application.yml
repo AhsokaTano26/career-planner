@@ -9,8 +9,9 @@ spring:
     default: local
   sql:
     init:
-      # 应用启动时执行建表与种子脚本(幂等)
+      # 应用启动时执行建表与种子脚本(幂等)；encoding 固定 UTF-8，防 Windows 默认 GBK 误读中文种子
       mode: always
+      encoding: UTF-8
       schema-locations: classpath:db/schema.sql,classpath:db/advisor.sql,classpath:db/advisor-domain.sql,classpath:db/admin-config.sql,classpath:db/admin-curriculum.sql,classpath:db/admin-log.sql,classpath:db/ai-chat.sql,classpath:db/core-domains.sql
       data-locations: classpath:db/data.sql,classpath:db/seed-directions.sql,classpath:db/seed-questionnaires.sql
       continue-on-error: false

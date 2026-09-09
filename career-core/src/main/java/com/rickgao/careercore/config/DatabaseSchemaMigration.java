@@ -1,6 +1,7 @@
 package com.rickgao.careercore.config;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -99,7 +100,13 @@ public class DatabaseSchemaMigration implements InitializingBean {
         if (!tableExists(tableName) || indexExists(tableName, indexName)) {
             return;
         }
-        jdbcTemplate.execute("ALTER TABLE " + tableName + " " + addIndexDdl);
+        try {
+            jdbcTemplate.execute("ALTER TABLE " + tableName + " " + addIndexDdl);
+        } catch (DataAccessException ex) {
+            if (!indexExists(tableName, indexName) && !isDuplicateKeyError(ex)) {
+                throw ex;
+            }
+        }
     }
 
     private boolean indexExists(String tableName, String indexName) {
@@ -114,6 +121,16 @@ public class DatabaseSchemaMigration implements InitializingBean {
             }
             return false;
         }));
+    }
+
+    private boolean isDuplicateKeyError(DataAccessException ex) {
+        for (Throwable cause = ex; cause != null; cause = cause.getCause()) {
+            String message = String.valueOf(cause.getMessage()).toLowerCase();
+            if (message.contains("already exists") || message.contains("duplicate")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean columnExists(String tableName, String columnName) {

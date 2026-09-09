@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
-import { defaultRouteName, postLoginTarget } from '../router'
+import { postLoginTarget } from '../router'
 
 type Mode='login'|'register'|'reset'
 const mode=ref<Mode>('login'), account=ref(''), password=ref(''), studentNo=ref(''), name=ref(''), className=ref(''), initialPassword=ref('')
@@ -23,9 +23,7 @@ async function submit(){
     initialPassword: initialPassword.value,
   })
   if (!ok) return
-  const target = auth.forcePasswordChange.value
-    ? { name: defaultRouteName(auth.role.value) }
-    : postLoginTarget(redirect, auth.role.value)
+  const target = postLoginTarget(redirect, auth.role.value)
   // 稳定性：await 导航，守卫打断时不抛未处理 rejection（此前直接 push，越权 redirect 会落 /error）
   await router.push(target).catch(() => { /* 守卫重定向属正常情况 */ })
 }

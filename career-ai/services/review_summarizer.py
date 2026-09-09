@@ -7,12 +7,14 @@
 from __future__ import annotations
 
 from services.desensitizer import mask_free_text
-from services.llm_gateway import generate
+from services.llm_gateway import generate_json
+from services.prompt_loader import load_prompt
 
-_SYSTEM_PROMPT = (
+_SYSTEM_PROMPT = load_prompt(
+    "review_summarizer.txt",
     "你是生涯规划系统中的「阶段复盘总结器」。请阅读学生的阶段复盘内容，输出 JSON："
     "{\"summary\": 一段阶段总结, \"suggestions\": [若干调整建议]}。只输出 JSON，"
-    "不要输出任何额外文字或 Markdown 代码块。"
+    "不要输出任何额外文字或 Markdown 代码块。",
 )
 
 
@@ -26,22 +28,28 @@ def summarize(review_content: dict, cycle: str, task_summary: str | None = None,
     user_prompt = _build_prompt(review_content, cycle, task_summary)
     # 复盘为自由文本：截断到 2000 字 + 脱敏（spec 4.2「已脱敏复盘」）
     user_prompt = mask_free_text(user_prompt, limit=2000)
-    content = generate(
+    data = generate_json(
         [
             {"role": "system", "content": _SYSTEM_PROMPT},
             {"role": "user", "content": user_prompt},
         ],
+        _parse_json,
         temperature=0.5,
         # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
         max_tokens=1500,
         scene="review_summarize",
         user_ref=user_ref,
     )
+    return _normalize(data, fallback_summary="")
+
+
+def _parse_json(content: str) -> dict:
+    """解析模型输出的 JSON；失败抛 ValueError 触发回修（generate_json 内置 1 次）。"""
     import json
     text = content.strip()
     start, end = text.find("{"), text.rfind("}")
     if start < 0 or end <= start:
-        return {"summary": content, "suggestions": []}
+        raise ValueError("复盘总结输出不含合法 JSON")
     # 稳定性：模型截断/杂文本导致 JSON 非法时抛 ValueError，由路由映射为 503
     # （此前裸奔为 500，打破“失败一律可回退”约定）
     try:
@@ -50,8 +58,12 @@ def summarize(review_content: dict, cycle: str, task_summary: str | None = None,
         raise ValueError("复盘总结输出非合法 JSON：%s" % exc) from exc
     if not isinstance(data, dict):
         raise ValueError("复盘总结输出非 JSON 对象")
+    return data
+
+
+def _normalize(data: dict, fallback_summary: str) -> dict:
     if not data.get("summary"):
-        data["summary"] = content
+        data["summary"] = fallback_summary
     suggestions = data.get("suggestions", [])
     # suggestions 必须为字符串列表；模型返回裸字符串/脏类型时归一化，避免出口 Pydantic 500
     if isinstance(suggestions, str):
@@ -63,7 +75,7 @@ def summarize(review_content: dict, cycle: str, task_summary: str | None = None,
 
 
 def _build_prompt(review_content: dict, cycle: str, task_summary: str | None) -> str:
-    """把复盘结构化内容拼成易读文本。"""
+    """把复盘结构化内容拼成易读文本（建议须引用 undone/next/taskSummary 原文）。"""
     parts = [f"复盘周期：{cycle or '未指定'}"]
     labels = [("done", "本阶段完成情况"), ("undone", "未完成情况及原因"),
               ("interest", "方向兴趣变化"), ("ability", "能力提升"), ("next", "下一步安排")]
@@ -73,6 +85,7 @@ def _build_prompt(review_content: dict, cycle: str, task_summary: str | None) ->
             parts.append(f"{label}：{value}")
     if task_summary:
         parts.append(f"任务完成情况：{task_summary}")
+    parts.append("要求：suggestions 每条须针对上述未完成/下一步/任务情况给出，不泛化。")
     return "\n".join(parts)
 
 

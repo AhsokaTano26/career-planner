@@ -19,8 +19,6 @@ const role = ref<Role>('STUDENT')
 const loggedIn = ref(false)
 const loading = ref(false)
 const error = ref('')
-const forcePasswordChange = ref(false)
-const forcedPasswordSaving = ref(false)
 /** Generic "an action is in flight" flag shared by student/advisor account actions. */
 const saving = ref(false)
 
@@ -43,10 +41,8 @@ function resetSessionState() {
   currentUser.value = null
   role.value = 'STUDENT'
   loggedIn.value = false
-  forcePasswordChange.value = false
   error.value = ''
   saving.value = false
-  forcedPasswordSaving.value = false
   resetToast()
   runSessionResets()
   restoring = null
@@ -72,7 +68,6 @@ export function useAuth() {
         currentUser.value = user
         role.value = user.role
         loggedIn.value = true
-        forcePasswordChange.value = Boolean(user.passwordChangeRequired)
       } catch {
         clearAuthSession()
         resetSession()
@@ -101,7 +96,6 @@ export function useAuth() {
       currentUser.value = result.user
       role.value = result.user.role
       loggedIn.value = true
-      forcePasswordChange.value = Boolean(result.user.passwordChangeRequired)
       return true
     } catch (e) {
       error.value = getErrorMessage(e)
@@ -120,23 +114,6 @@ export function useAuth() {
     try { await api.auth.logout() } catch { /* server may already have dropped the session */ }
     clearAuthSession()
     resetSession()
-  }
-
-  async function completeForcedPasswordChange(oldPassword: string, newPassword: string) {
-    forcedPasswordSaving.value = true
-    try {
-      await api.auth.changePassword({ oldPassword, newPassword })
-      currentUser.value = await api.auth.me()
-      forcePasswordChange.value = Boolean(currentUser.value?.passwordChangeRequired)
-      if (forcePasswordChange.value) {
-        // 后端仍未清除强制修改标记，避免死锁：登出会话，让用户重新登录。
-        clearAuthSession()
-        resetSession()
-        throw new Error('密码已修改，请重新登录')
-      }
-    } finally {
-      forcedPasswordSaving.value = false
-    }
   }
 
   async function saveAccount(name: string): Promise<boolean> {
@@ -169,8 +146,8 @@ export function useAuth() {
 
   return {
     currentUser, role, loggedIn, loading, error,
-    forcePasswordChange, forcedPasswordSaving, saving,
+    saving,
     restore, authenticate, logout, resetSession,
-    completeForcedPasswordChange, saveAccount, changePassword,
+    saveAccount, changePassword,
   }
 }

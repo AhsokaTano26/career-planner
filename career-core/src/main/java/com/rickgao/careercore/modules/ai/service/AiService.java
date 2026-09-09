@@ -50,8 +50,9 @@ import java.util.Map;
  * 2026-09 Phase 1：chat 历史与反馈落 MySQL（ai_chat_message / ai_chat_feedback），
  * 身份以 JWT 优先，请求体 studentRef 仅作兼容兑底（与 JWT 不一致则报错）。
  *
- * <p>2026-09 回答质量迭代：chat/explain/plan 的 prompt 注入画像六维（中文名）、方向名+简介、
- * chat 另回送最近 6 轮记忆（core DB 为准，fail-open）；四 scene 提示词版本记入 ai_call_log。
+ * <p>2026-09 回答质量迭代 v3：chat/explain/plan 的 prompt 注入画像六维（中文名）、方向名+简介、
+ * chat 另回送最近 6 轮记忆（core DB 为准，fail-open）；explain 温度 0.3、plan 0.5；
+ * 四 scene 提示词版本记入 ai_call_log。career-ai 侧 prompts/*.txt 版本与此对齐（v3）。
  * 画像/历史/方向缺失时静默降级为原行为，主流程不受影响。
  *
  * <p>Demo 精简点 / 后续迭代替换位置：
@@ -76,10 +77,10 @@ public class AiService {
      * 提示词版本（2026-09 回答质量迭代）：随请求记入 ai_call_log.prompt_version，
      * prompt 文案变更即升版，为下轮评估闭环提供归因键。career-ai 侧 prompts/*.txt 版本与此对齐。
      */
-    private static final String CHAT_PROMPT_VERSION = "chat.v2";
-    private static final String EXPLAIN_PROMPT_VERSION = "explain.v2";
-    private static final String PLAN_PROMPT_VERSION = "plan.v2";
-    private static final String REVIEW_PROMPT_VERSION = "review.v1";
+    private static final String CHAT_PROMPT_VERSION = "chat.v3";
+    private static final String EXPLAIN_PROMPT_VERSION = "explain.v3";
+    private static final String PLAN_PROMPT_VERSION = "plan.v3";
+    private static final String REVIEW_PROMPT_VERSION = "review.v2";
 
     /** 画像维度 key→中文名（与 PortraitService.DIM_NAMES 同源，跨模块复用时本地冗余一份避免服务耦合）。 */
     private static final Map<String, String> DIM_NAMES = Map.of(
@@ -221,7 +222,7 @@ public class AiService {
                 mapOf("role", "user", "content", desensitizer.maskFreeText(buildExplainPrompt(req))));
         List<AiExplanationItemVO> vos = new ArrayList<>();
         try {
-            String content = llm.generate(messages, 0.7, llm.sceneMaxTokens("recommendation_explain"),
+            String content = llm.generate(messages, 0.3, llm.sceneMaxTokens("recommendation_explain"),
                     "recommendation_explain", runId, EXPLAIN_PROMPT_VERSION, runId);
             List<Map<String, String>> items = parseExplainJson(content);
             for (Map<String, String> item : items) {
@@ -287,7 +288,7 @@ public class AiService {
         try {
             String content = llm.generate(List.of(
                     mapOf("role", "system", "content", PLAN_SYSTEM_PROMPT),
-                    mapOf("role", "user", "content", desensitizer.maskFreeText(userPrompt))), 0.7,
+                    mapOf("role", "user", "content", desensitizer.maskFreeText(userPrompt))), 0.5,
                     llm.sceneMaxTokens("plan_generate"),
                     "plan_generate", req.getDirectionId(), PLAN_PROMPT_VERSION, reqId);
             JsonNode node = parseJson(content);

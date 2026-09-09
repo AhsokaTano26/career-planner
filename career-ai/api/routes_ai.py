@@ -110,6 +110,7 @@ _SizeParam = Annotated[int, BeforeValidator(_default_int(20))]
 # ---------------------------------------------------------------- 模型定义（对齐 Apifox 线上 schema）
 class ChatContext(BaseModel):
     directionId: Optional[str] = Field(default=None, max_length=64)
+    directionName: Optional[str] = Field(default=None, max_length=128)
     goalSummary: Optional[str] = Field(default=None, max_length=2000)
 
 
@@ -119,6 +120,8 @@ class ChatRequest(BaseModel):
     # 稳定性：问题长度封顶（超长直接 400，避免巨 prompt 费用/延迟爆炸后再转 502）
     question: str = Field(min_length=1, max_length=5000)
     context: Optional[ChatContext] = None
+    # 回答质量迭代：可选画像六维（0-1 或 0-100），缺省不拼背景块
+    profile: Optional["ExplainProfile"] = None
 
 
 class ChatResponse(BaseModel):
@@ -155,8 +158,15 @@ class ExplainProfile(BaseModel):
 
 class ExplainResultItem(BaseModel):
     directionId: str = Field(max_length=64)
+    # 回答质量迭代：方向详情（名/匹配Top/差距Top），缺省仅用 ID
+    directionName: Optional[str] = Field(default=None, max_length=128)
+    matches: Optional[dict] = None
+    gaps: Optional[dict] = None
     score: float = Field(ge=0, le=100)
     rank: int = Field(ge=1, le=100)
+
+
+ChatRequest.model_rebuild()
 
 
 class ExplainBatchRequest(BaseModel):
@@ -203,9 +213,14 @@ class PlanDraft(BaseModel):
 class PlanGenerateRequest(BaseModel):
     studentRef: str = Field(max_length=64)
     directionId: str = Field(max_length=64)
+    directionName: Optional[str] = Field(default=None, max_length=128)
     semester: str = Field(max_length=64)
     goalSummary: Optional[str] = Field(default=None, max_length=2000)
+    profile: Optional["ExplainProfile"] = None
     template: Optional[PlanDraft] = None
+
+
+PlanGenerateRequest.model_rebuild()
 
 
 class PlanGenerateResult(BaseModel):
@@ -293,8 +308,15 @@ def ai_chat(req: ChatRequest, authorization: Optional[str] = Header(default=None
         answer = "该问题可能涉及心理健康、医疗或法律等专业领域，建议联系辅导员或专业机构获取帮助。"
     else:
         try:
+            history = [
+                {"role": m["role"], "content": m["content"]}
+                for m in _HIST_BY_REF.get(req.studentRef, [])
+                if m.get("sessionId") == req.sessionId
+            ]
             answer = chat_service(req.question, req.context.model_dump() if req.context else None,
-                                  user_ref=req.studentRef)
+                                  user_ref=req.studentRef,
+                                  profile=req.profile.model_dump() if req.profile else None,
+                                  history=history or None)
         except GatewayError as exc:
             raise HTTPException(status_code=503, detail=f"生涯咨询生成失败：{exc}") from exc
 
@@ -346,6 +368,8 @@ def ai_plan_generate(req: PlanGenerateRequest, authorization: Optional[str] = He
             goal_summary=req.goalSummary,
             template=req.template.model_dump() if req.template else None,
             user_ref=req.studentRef,
+            direction_name=req.directionName,
+            profile=req.profile.model_dump() if req.profile else None,
         )
     except GatewayError as exc:
         raise HTTPException(status_code=503, detail=f"计划生成失败：{exc}") from exc

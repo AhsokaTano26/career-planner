@@ -18,7 +18,7 @@ from fastapi import HTTPException
 from gateway.cache import explain_cache_enabled, new_explain_cache
 from providers.deepseek import DEFAULT_MODEL, LlmError
 from services.desensitizer import desensitize
-from services.llm_gateway import generate
+from services.llm_gateway import generate, generate_json
 
 # 读取系统提示词模板；缺失时使用内置兜底文案，保证服务可独立运行
 _PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / "recommendation_explainer.txt"
@@ -118,7 +118,7 @@ _BATCH_SYSTEM_PROMPT = (
 def explain_batch(profile: dict | None, results: list[dict], *, run_id: str | None = None,
                   user_ref: str | None = None, model_group: str | None = None,
                   prompt_version: str | None = None,
-                  temperature: float = 0.7) -> list[dict]:
+                  temperature: float = 0.3) -> list[dict]:
     """为候选方向批量生成推荐解释，返回 explanations 列表。
 
     输入按 Apifox ExplainRequest：profile（六维得分）、results（[{directionId, score, rank}]）。
@@ -142,18 +142,19 @@ def explain_batch(profile: dict | None, results: list[dict], *, run_id: str | No
 
             _metrics.observe("recommendation_explain", "SUCCESS", 0.0, None)
             return [dict(item) for item in hit]
-    content = generate(
+    content = generate_json(
         [
             {"role": "system", "content": _BATCH_SYSTEM_PROMPT},
             {"role": "user", "content": user_prompt},
         ],
+        _parse_batch_json,
         temperature=temperature,
         # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
         max_tokens=2000,
         scene="recommendation_explain",
         user_ref=user_ref,
     )
-    explanations = _parse_batch_json(content)
+    explanations = content
     if explain_cache_enabled():
         _EXPLAIN_CACHE.set(cache_key, [dict(item) for item in explanations])
     return explanations
@@ -192,15 +193,57 @@ def _log_cache_hit(user_ref: str | None) -> None:
 
 
 def _build_batch_prompt(profile: dict | None, results: list[dict]) -> str:
-    """把画像维度得分与候选方向拼成易读的 user 提示词。"""
+    """把画像维度得分与候选方向拼成易读的 user 提示词（含方向名/匹配Top3/差距Top2）。"""
     lines = []
     if profile:
-        dims = "；".join(f"{k}={round(v * 100)}%" for k, v in profile.items() if v is not None)
-        lines.append(f"画像维度得分：{dims or '无'}")
-    items = [f"- {r.get('directionId')}：得分 {r.get('score')}，排名 {r.get('rank')}" for r in results]
+        dims = "；".join(f"{_DIM_NAMES.get(k, k)}={_pct(v)}" for k, v in profile.items() if v is not None)
+        lines.append(f"画像维度得分（0-100分）：{dims or '无'}")
+    items = [_format_result(r) for r in results]
     lines.append("候选方向：" + ("\n".join(items) if items else "无"))
-    lines.append("请为每个候选方向生成解释 JSON。")
+    lines.append("请为每个候选方向生成解释 JSON。解释须结合画像维度说明匹配原因，"
+                 "引用方向的关键匹配/差距，不得虚构课程与就业数据。")
     return "\n".join(lines)
+
+
+_DIM_NAMES = {
+    "interest": "兴趣", "values": "价值观", "ability": "能力",
+    "academic": "学业", "tendency": "倾向", "practice": "实践",
+}
+
+
+def _pct(value) -> str:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return "无"
+    return f"{round(number * 100 if number <= 1 else number)}分"
+
+
+def _format_result(result: dict) -> str:
+    name = result.get("directionName") or result.get("directionId")
+    head = f"- {name}：得分 {result.get('score')}，排名 {result.get('rank')}"
+    matches = _top_map(result.get("matches"), 3)
+    gaps = _top_map(result.get("gaps"), 2, reverse=True)
+    tails = []
+    if matches:
+        tails.append("匹配：" + "、".join(matches))
+    if gaps:
+        tails.append("差距：" + "、".join(gaps))
+    return head + ("（" + "；".join(tails) + "）" if tails else "")
+
+
+def _top_map(mapping: dict | None, limit: int, reverse: bool = False) -> list[str]:
+    if not isinstance(mapping, dict) or not mapping:
+        return []
+    items = []
+    for key, value in mapping.items():
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            continue
+        items.append((key, number))
+    items.sort(key=lambda kv: kv[1], reverse=not reverse)
+    return [f"{_DIM_NAMES.get(k, k)}{_pct(v)}" for k, v in items[:limit]]
 
 
 def _parse_batch_json(content: str) -> list[dict]:

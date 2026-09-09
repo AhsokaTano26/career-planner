@@ -1,4 +1,4 @@
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { api, getErrorMessage } from '../api/request'
 import type { AdvisorFilters, AdvisorStudent } from '../types/domain'
 import { resolvePage } from '../utils/pagination'
@@ -46,7 +46,6 @@ export function useAdvisorStudents() {
   }
 
   async function load(current?: number) {
-    if (auth.forcePasswordChange.value) return
     const target = current ?? page.value
     // 稳定性：序号防卫，慢响应不得覆盖新筛选/翻页的结果
     const seq = ++loadSeq
@@ -94,9 +93,6 @@ export function useAdvisorStudents() {
   }
 
   onMounted(() => { if (auth.role.value === 'ADVISOR') { load(); loadDirections() } })
-  watch(() => auth.forcePasswordChange.value, (forced) => {
-    if (!forced && auth.loggedIn.value) { load(); loadDirections() }
-  })
 
   return { students, filters, total, page, totalPages, loading, error, load, updateFilters, apply, reset, directions, directionsError, loadDirections, setGuidanceRequested }
 }
