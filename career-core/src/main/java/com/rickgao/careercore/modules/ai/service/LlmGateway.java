@@ -214,6 +214,7 @@ public class LlmGateway {
         map.put("recommendation_explain", 2000);
         map.put("plan_generate", 2000);
         map.put("review_summarize", 1500);
+        map.put("explore_chat", 2000);
         map.put("gateway_api", 500);
         if (spec != null && !spec.isBlank()) {
             for (String entry : spec.split(",")) {

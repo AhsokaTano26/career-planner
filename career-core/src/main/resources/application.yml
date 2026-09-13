@@ -13,7 +13,7 @@ spring:
       mode: always
       encoding: UTF-8
       schema-locations: classpath:db/schema.sql,classpath:db/advisor.sql,classpath:db/advisor-domain.sql,classpath:db/admin-config.sql,classpath:db/admin-curriculum.sql,classpath:db/admin-log.sql,classpath:db/ai-chat.sql,classpath:db/core-domains.sql
-      data-locations: classpath:db/data.sql,classpath:db/seed-directions.sql,classpath:db/seed-questionnaires.sql
+      data-locations: classpath:db/data.sql,classpath:db/seed-directions.sql,classpath:db/seed-questionnaires.sql,classpath:db/seed-explore.sql
       continue-on-error: false
   jackson:
     time-zone: Asia/Shanghai

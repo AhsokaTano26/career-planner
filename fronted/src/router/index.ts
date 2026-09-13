@@ -11,6 +11,7 @@ import AdminAiManagementPage from '../views/admin/AdminAiManagementPage.vue'
 import ErrorView from '../views/ErrorView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import StudentOverviewPage from '../views/student/StudentOverviewPage.vue'
+import StudentExplorePage from '../views/student/StudentExplorePage.vue'
 import StudentProfilePage from '../views/student/StudentProfilePage.vue'
 import StudentExperiencesPage from '../views/student/StudentExperiencesPage.vue'
 import StudentPrivacyPage from '../views/student/StudentPrivacyPage.vue'
@@ -29,6 +30,7 @@ export type MenuGroups = Record<Exclude<Role, 'ADMIN'>, MenuGroup[]>
 
 export const menuGroups: MenuGroups = {
   STUDENT: [
+    { group: '生涯探索', links: [['/student/explore', '快速探索']] },
     { group: '个人档案', links: [['/student/overview', '档案概览'], ['/student/profile', '个人资料'], ['/student/experiences', '经历管理'], ['/student/development', '测评与发展']] },
     { group: '账户设置', links: [['/student/privacy', '隐私与账户']] },
   ],
@@ -51,7 +53,8 @@ const routes: RouteRecordRaw[] = [
     component: DefaultLayout,
     meta: { requiresAuth: true, role: 'STUDENT' },
     children: [
-      { path: '', redirect: '/student/overview' },
+      { path: '', redirect: '/student/explore' },
+      { path: 'explore', name: 'student-explore', component: StudentExplorePage },
       { path: 'overview', name: 'student-overview', component: StudentOverviewPage },
       { path: 'profile', name: 'student-profile', component: StudentProfilePage },
       { path: 'experiences', name: 'student-experiences', component: StudentExperiencesPage },
@@ -109,7 +112,7 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({ history: createWebHistory(), routes })
 
 const DEFAULT_ROUTES: Record<Role, string> = {
-  STUDENT: 'student-overview',
+  STUDENT: 'student-explore',
   ADVISOR: 'advisor-overview',
   ADMIN: 'admin-overview',
 }
