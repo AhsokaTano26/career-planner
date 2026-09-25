@@ -67,5 +67,24 @@ services:
       AI_GATEWAY_MODEL: ${AI_GATEWAY_MODEL:-default}
       AI_GATEWAY_TIMEOUT: ${AI_GATEWAY_TIMEOUT:-30}
 
+  agent_postgres:
+    # Agent 对话记忆（LangGraph checkpointing + Store，与 MySQL 业务库分离）
+    image: postgres:16
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${AGENT_PG_USER:-career_agent}
+      POSTGRES_PASSWORD: ${AGENT_PG_PASSWORD:-changeme}
+      POSTGRES_DB: ${AGENT_PG_DB:-agent_state}
+    volumes:
+      - agent_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AGENT_PG_USER:-career_agent}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   mysql-data:
+  agent_pg_data:
