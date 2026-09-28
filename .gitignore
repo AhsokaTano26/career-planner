@@ -16,8 +16,13 @@ opencode.json
 生涯规划系统需求规格说明书_MVP_V1.0.docx
 
 # Docs (not needed to run; kept locally)
+# 跟踪范围：仅保留根 AGENTS.md 与 docs/guides/依赖版本.md，其余文档不跟踪
 *.md
-docs/
+!/AGENTS.md
+docs/*
+!docs/guides/
+docs/guides/*
+!docs/guides/依赖版本.md
 career-core/docs/
 IMPLEMENTATION_PROGRESS.md
 /*.html
