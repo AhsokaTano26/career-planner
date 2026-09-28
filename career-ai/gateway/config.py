@@ -110,7 +110,7 @@ def _parse_groups(raw: str) -> list[ModelGroup]:
         except (json.JSONDecodeError, TypeError, ValueError):
             pass
     # 缺省：DeepSeek 单渠道（与 LLM_MODEL 对齐）
-    return [ModelGroup(name="default", models=[f"deepseek/{os.getenv('LLM_MODEL', 'deepseek-v4-flash')}"])]
+    return [ModelGroup(name="default", models=[f"deepseek/{os.getenv('LLM_MODEL', 'deepseek-flash')}"])]
 
 
 def _to_int(raw: str | None, default: int) -> int:

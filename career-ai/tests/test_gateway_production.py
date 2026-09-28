@@ -130,8 +130,10 @@ def test_推荐解释缓存_二次调用不调模型(monkeypatch):
 
     explainer.reset_explain_cache()
     calls = []
-    monkeypatch.setattr(explainer, "generate",
-                        lambda *a, **k: calls.append(1) or '{"explanations": [{"directionId": "d1", "summary": "好"}]}')
+    # seam 是 explainer.generate_json（explain_batch 走 JSON 场景统一入口）
+    monkeypatch.setattr(explainer, "generate_json",
+                        lambda messages, parse, **k: calls.append(1)
+                        or parse('{"explanations": [{"directionId": "d1", "summary": "好"}]}'))
     logged = []
     monkeypatch.setattr("gateway.db.insert_ai_call_log",
                         lambda **kw: logged.append(kw) or True)

@@ -1,7 +1,9 @@
 # 生涯规划系统 · 核心业务服务（career-core）
 
 第一版 Demo 后端，实现 5 个接口（接口路径与主结构按线上 Apifox 为准），目标「最小可用、跑通流程」。
-技术栈：**Spring Boot 3.5 + Java 25 + MySQL + JdbcTemplate**（贴合正式架构 Spring Boot/MySQL 8）。
+技术栈：**Spring Boot 3.3.4 + Java 17 + MySQL + MyBatis + JWT**。
+
+> ⚠️ 本 README 停留于早期 Demo，下方接口列表/示例已过时，请以 Apifox 线上 + 根目录 `README.md` 为准；仅「环境依赖」「构建与运行」两段已校正到实际（Java 17）。
 
 > 说明：线上 Apifox 无“提交阶段复盘”接口，故复盘接口已按线上为准删除；本 Demo 保留「画像」「推荐」「计划」模块。
 
@@ -20,9 +22,9 @@
 
 ## 二、环境依赖
 
-- JDK 25（本机：`D:\devtools\jdk25\jdk-25.0.2`）
-- Maven 3.9+（本机：`D:\devtools\maven\apache-maven-3.9.16`）
-- MySQL（本机：`D:\devtools\mysql\mysql-26.7.0-winx64`，端口 3306）
+- JDK 17（与 `pom.xml` `java.version=17` / `Dockerfile` temurin-17 一致）
+- Maven 3.9.16
+- MySQL 8.4（Docker `mysql:8.4`，或本机；端口 3306）
 
 ## 三、数据库
 
@@ -41,11 +43,10 @@
 
 ## 四、构建与运行
 
-```powershell
-$env:JAVA_HOME='D:\devtools\jdk25\jdk-25.0.2'
+```bash
 cd career-core
-mvn -DskipTests package
-java -jar target\career-core-0.0.1-SNAPSHOT.jar
+./mvnw -DskipTests package
+java -jar target/career-core-0.0.1-SNAPSHOT.jar
 ```
 
 启动后访问 `http://127.0.0.1:8080`。

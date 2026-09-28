@@ -45,7 +45,7 @@ def generate_plan(direction_id: str, semester: str, goal_summary: str | None = N
         ],
         _parse_json,
         temperature=0.5,
-        # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
+        # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-flash 实测）
         max_tokens=2000,
         scene="plan_generate",
         user_ref=user_ref,

@@ -24,6 +24,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      agent_postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
@@ -45,6 +47,17 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE:-career_core}
       LITELLM_LOG: ${LITELLM_LOG:-WARNING}
+      # Agent 持久化（LangGraph checkpointer → compose 内 agent_postgres，内部 5432）
+      AGENT_PG_HOST: agent_postgres
+      AGENT_PG_PORT: "5432"
+      AGENT_PG_USER: ${AGENT_PG_USER:-career_agent}
+      AGENT_PG_PASSWORD: ${AGENT_PG_PASSWORD:-changeme}
+      AGENT_PG_DB: ${AGENT_PG_DB:-agent_state}
+      # Agent 工具反调 career-core（compose 内 app 服务）
+      CAREER_CORE_BASE_URL: http://app:8080
+      # Agent 工具反调 career-core 的学生 JWT（运行时注入，不落盘：
+      #   AGENT_SERVICE_TOKEN=<学生JWT> docker compose -f docker-compose.yml -f docker-compose.override.yml up -d --force-recreate career-ai）
+      AGENT_SERVICE_TOKEN: ${AGENT_SERVICE_TOKEN:-}
 
   app:
     image: ${DOCKER_IMAGE:?set DOCKER_IMAGE in .env}
@@ -86,5 +99,8 @@ services:
       retries: 5
 
 volumes:
+  # 显式指定 name 复用已有的本地 volume（避免 compose 加项目名前缀建空库，保留已灌的种子数据）
   mysql-data:
+    name: mysql-data
   agent_pg_data:
+    name: agent_pg_data

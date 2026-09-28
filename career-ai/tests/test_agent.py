@@ -99,10 +99,10 @@ class TestLLMFactory:
 
     def test_get_agent_model_returns_chatopenai(self, monkeypatch):
         monkeypatch.setenv("GATEWAY_API_KEY", "test-key")
-        monkeypatch.setenv("LLM_MODEL", "deepseek-v4-flash")
+        monkeypatch.setenv("LLM_MODEL", "deepseek-flash")
         from agent.llm import get_agent_model
 
         get_agent_model.cache_clear()
         model = get_agent_model()
-        assert model.model_name == "deepseek-v4-flash"
+        assert model.model_name == "deepseek-flash"
         get_agent_model.cache_clear()

@@ -207,11 +207,11 @@ def test_career_chat_出站无原值(monkeypatch):
 def test_review_summarize_出站无原值(monkeypatch):
     captured = {}
 
-    def fake_generate(messages, **kwargs):
+    def fake_generate_json(messages, parse, **kwargs):
         captured["messages"] = messages
-        return '{"summary":"s","suggestions":[]}'
+        return parse('{"summary":"s","suggestions":[]}')
 
-    monkeypatch.setattr("services.review_summarizer.generate", fake_generate)
+    monkeypatch.setattr("services.review_summarizer.generate_json", fake_generate_json)
     from services.review_summarizer import summarize
 
     summarize({"done": "完成了13812345678项目", "undone": "没做完 a@b.com", "next": "学号2026011301"},
@@ -223,11 +223,11 @@ def test_review_summarize_出站无原值(monkeypatch):
 def test_plan_generate_goalSummary脱敏(monkeypatch):
     captured = {}
 
-    def fake_generate(messages, **kwargs):
+    def fake_generate_json(messages, parse, **kwargs):
         captured["messages"] = messages
-        return '{"goalSummary":"g","semesterGoals":[],"monthlyTasks":[],"notes":[]}'
+        return parse('{"goalSummary":"g","semesterGoals":[],"monthlyTasks":[],"notes":[]}')
 
-    monkeypatch.setattr("services.plan_generator.generate", fake_generate)
+    monkeypatch.setattr("services.plan_generator.generate_json", fake_generate_json)
     from services.plan_generator import generate_plan
 
     generate_plan(direction_id="D1", semester="2026", goal_summary="我的手机13812345678，邮箱a@b.com",

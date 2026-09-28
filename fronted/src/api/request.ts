@@ -241,13 +241,6 @@ export const api = {
     chatCompletions: (data:unknown) => postRaw<unknown>('/gateway/chat/completions', data),
   },
   ai: {
-    chat: (data:unknown) => post<unknown>('/ai/chat', data),
-    chatHistory: (params:{page?:number;size?:number}={}) => get<unknown>(`/ai/chat/history?page=${params.page ?? 1}&size=${params.size ?? 20}`),
-    chatFeedback: (id:string,data:unknown) => post<unknown>(`/ai/chat/${id}/feedback`,data),
-    chatFeedbackFallback: (data:unknown) => post<unknown>('/ai/chat/feedback',data),
-    reviewSummarize:(data:unknown)=>post<unknown>('/ai/review/summarize',data),
-    recommendationExplain:(data:unknown)=>post<unknown>('/ai/recommendation/explain',data),
-    planGenerate:(data:unknown)=>post<unknown>('/ai/plan/generate',data),
-    pdfParse:(data:unknown)=>post<unknown>('/ai/pdf/parse',data),
+    agentInvoke:(data:unknown)=>postRaw<unknown>('/ai/agent/invoke',data,180000),
   },
 }

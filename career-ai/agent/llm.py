@@ -20,11 +20,11 @@ def get_agent_model(model_name: str | None = None) -> ChatOpenAI:
     """返回指向 LiteLLM 网关的 ChatOpenAI 实例（进程级缓存）。
 
     网关是 OpenAI 兼容的（POST /v1/chat/completions），所以用 ChatOpenAI 即可。
-    :param model_name: 模型名，缺省用 LLM_MODEL（默认 deepseek-v4-flash）。
+    :param model_name: 模型名，缺省用 LLM_MODEL（默认 deepseek-flash）。
     """
     base_url = os.getenv("AGENT_GATEWAY_BASE_URL", "http://127.0.0.1:8000/v1")
     api_key = os.getenv("GATEWAY_API_KEY", "")
-    model = model_name or os.getenv("LLM_MODEL", "deepseek-v4-flash")
+    model = model_name or os.getenv("LLM_MODEL", "deepseek-flash")
     return ChatOpenAI(
         model=model,
         temperature=0.7,
@@ -33,6 +33,8 @@ def get_agent_model(model_name: str | None = None) -> ChatOpenAI:
         openai_api_key=api_key,
         max_retries=2,
         timeout=30,
+        # thinking 模式下推理+正文共用额度（网关默认 500 会截断回答）
+        max_tokens=int(os.getenv("AGENT_MAX_TOKENS", "6000")),
     )
 
 

@@ -6,6 +6,8 @@ pydantic>=2.13
 python-dotenv>=1.2
 python-multipart>=0.0.20
 pytest>=8.0
+# async 测试（tests/test_agent.py 的 @pytest.mark.asyncio 用例需要；缺了会直接 fail）
+pytest-asyncio>=1.0
 # AI 网关（复用 LiteLLM：多供应商路由/重试/降级/日志回调）
 # 注意：升级 litellm 前先查 https://docs.litellm.ai/blog 安全公告（2026-03 曾发生 v1.82.7/v1.82.8 投毒事件）；
 # 钉死小版本，升级后重跑 pytest + ai_gateway_smoke 双模式。

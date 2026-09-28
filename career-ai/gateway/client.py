@@ -34,6 +34,9 @@ class GenerateResult:
     request_id: str
     duration_ms: int
     total_tokens: int | None
+    tool_calls: list | None = None
+    reasoning_content: str | None = None
+    finish_reason: str | None = None
 
 
 class GatewayClient:
@@ -60,13 +63,16 @@ class GatewayClient:
         model_group: str | None = None,
         prompt_version: str | None = None,
         response_format: dict | None = None,
+        tools: list | None = None,
+        tool_choice: object | None = None,
     ) -> GenerateResult:
         """统一生成入口。
 
+        :param tools: OpenAI 函数调用工具列表（LangGraph Agent 场景透传，缺省不带）。
         :raises gateway.ratelimit.GatewayRateLimited: 超过 rpm 限流 / 单日 token 预算（映射 429）。
-        :raises GatewayError: 渠道全部失败 / 返回结构异常。
+        :raises GatewayError: 渠道全部失败 / 返回结构异常 / 未配置渠道。
         """
-        group = model_group or self._default_group_name()
+        group = self._resolve_group(model_group)
         # 生产化：按 scene 钳制 max_tokens（GATEWAY_SCENE_MAX_TOKENS，未配置不限）
         effective_max_tokens = self._clamp_max_tokens(scene, max_tokens)
         request_id = uuid.uuid4().hex
@@ -97,6 +103,11 @@ class GatewayClient:
             # JSON mode：仅透传给真实 Router；_FakeRouter（测试桩）按 **kwargs 接收无影响
             if response_format is not None:
                 completion_kwargs["response_format"] = response_format
+            # 函数调用透传（LangGraph Agent：model 节点绑定工具后经此链路下发上游 LLM）
+            if tools:
+                completion_kwargs["tools"] = tools
+            if tool_choice is not None:
+                completion_kwargs["tool_choice"] = tool_choice
             response = self._router.completion(**completion_kwargs)
         except GatewayRateLimited:
             metrics.observe(scene, "RATE_LIMITED", time.perf_counter() - started, None)
@@ -111,6 +122,9 @@ class GatewayClient:
             text = self._extract_text(response)
             model_used = self._model_used(response)
             total_tokens = self._total_tokens(response)
+            tool_calls = self._extract_tool_calls(response)
+            reasoning_content = self._extract_reasoning(response)
+            finish_reason = self._extract_finish_reason(response)
         except GatewayError:
             # 渠道返回 200 但结构异常：同样释放预算预占并记 FAILED（此前完全隐身）
             self._budget.settle(scene, effective_max_tokens, 0)
@@ -130,6 +144,9 @@ class GatewayClient:
             request_id=request_id,
             duration_ms=duration_ms,
             total_tokens=total_tokens,
+            tool_calls=tool_calls,
+            reasoning_content=reasoning_content,
+            finish_reason=finish_reason,
         )
 
     # ---------------------------------------------------------------- Router 构建
@@ -212,9 +229,37 @@ class GatewayClient:
     # ---------------------------------------------------------------- 响应提取
     def _extract_text(self, response) -> str:
         try:
-            return str(response["choices"][0]["message"]["content"]).strip()
+            msg = response["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
             raise GatewayError("大模型返回结构异常：%s" % (response,)) from exc
+        # 函数调用响应：content 可为空但带 tool_calls，不视为异常
+        if not msg.get("content") and msg.get("tool_calls"):
+            return ""
+        if not msg.get("content"):
+            raise GatewayError("大模型返回结构异常：%s" % (response,))
+        return str(msg["content"]).strip()
+
+    def _extract_tool_calls(self, response) -> list | None:
+        try:
+            tool_calls = response["choices"][0]["message"].get("tool_calls")
+        except (KeyError, IndexError, TypeError, AttributeError):
+            return None
+        return tool_calls or None
+
+    def _extract_reasoning(self, response) -> str | None:
+        """DeepSeek thinking 模式：reasoning_content 必须在后续轮次回传，否则上游 400。"""
+        try:
+            rc = response["choices"][0]["message"].get("reasoning_content")
+        except (KeyError, IndexError, TypeError, AttributeError):
+            return None
+        return str(rc) if rc else None
+
+    def _extract_finish_reason(self, response) -> str | None:
+        try:
+            fr = response["choices"][0].get("finish_reason")
+        except (KeyError, IndexError, TypeError, AttributeError):
+            return None
+        return str(fr) if fr else None
 
     def _model_used(self, response) -> str | None:
         model = getattr(response, "model", None) or (
@@ -238,6 +283,15 @@ class GatewayClient:
         if group is None:
             raise GatewayError("网关未配置模型组（检查 GATEWAY_MODEL_GROUPS）")
         return group.name
+
+    def _resolve_group(self, model_group: str | None) -> str:
+        """解析模型组：缺省或未识别（如调用方传的是上游模型名而非组名）→ 回退 default 组。
+
+        /v1/chat/completions 契约：model 传网关模型组名，未识别时回退 default 组。
+        """
+        if model_group and self.config.group(model_group) is not None:
+            return model_group
+        return self._default_group_name()
 
     @staticmethod
     def _sha256(text: str) -> str:

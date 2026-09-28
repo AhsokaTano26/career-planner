@@ -11,7 +11,7 @@ import os
 from gateway.client import GatewayError, get_gateway
 
 LlmError = GatewayError
-DEFAULT_MODEL = os.getenv("LLM_MODEL", "deepseek-v4-flash")
+DEFAULT_MODEL = os.getenv("LLM_MODEL", "deepseek-flash")
 
 
 def generate(messages: list[dict], **kwargs) -> str:

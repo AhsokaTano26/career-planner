@@ -149,7 +149,7 @@ def explain_batch(profile: dict | None, results: list[dict], *, run_id: str | No
         ],
         _parse_batch_json,
         temperature=temperature,
-        # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-v4-flash 实测）
+        # 推理模型需更大预算，避免 reasoning 占满后 content 为空（deepseek-flash 实测）
         max_tokens=2000,
         scene="recommendation_explain",
         user_ref=user_ref,

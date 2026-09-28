@@ -66,12 +66,13 @@ def test_explain_批量解释(monkeypatch):
 
 
 def test_plan_generate(monkeypatch):
+    # seam 是 services.plan_generator.generate_json（JSON 场景统一入口，签名 (messages, parse, **kw)）
     monkeypatch.setattr(
-        "services.plan_generator.generate",
-        lambda messages, **kw: '{"goalSummary":"本学期完成后端技术基础入门",'
+        "services.plan_generator.generate_json",
+        lambda messages, parse, **kw: parse('{"goalSummary":"本学期完成后端技术基础入门",'
         '"semesterGoals":[{"title":"掌握 Java 基础","abilityTag":"programming_basic"}],'
         '"monthlyTasks":[{"month":"2026-09","title":"完成 Java 语法学习",'
-        '"taskType":"LEARNING","estimatedHours":12}],"notes":[]}',
+        '"taskType":"LEARNING","estimatedHours":12}],"notes":[]}'),
     )
     resp = client.post("/api/v1/ai/plan/generate", json={
         "studentRef": "student_ref_8f3a",
@@ -87,10 +88,11 @@ def test_plan_generate(monkeypatch):
 
 
 def test_review_summarize(monkeypatch):
+    # seam 是 services.review_summarizer.generate_json（签名 (messages, parse, **kw)）
     monkeypatch.setattr(
-        "services.review_summarizer.generate",
-        lambda messages, **kw: '{"summary":"9 月你的编程基础快速提升。",'
-        '"suggestions":["将任务收敛到 3 条主线"]}',
+        "services.review_summarizer.generate_json",
+        lambda messages, parse, **kw: parse('{"summary":"9 月你的编程基础快速提升。",'
+        '"suggestions":["将任务收敛到 3 条主线"]}'),
     )
     resp = client.post("/api/v1/ai/review/summarize", json={
         "studentRef": "student_ref_8f3a",

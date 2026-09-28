@@ -44,7 +44,7 @@ def chat(question: str, context: dict | None = None, *, user_ref: str | None = N
     for msg in _pack_history(history):
         messages.append({"role": msg["role"], "content": mask_free_text(msg["content"], limit=_HISTORY_CONTENT_LIMIT)})
     messages.append({"role": "user", "content": user_text})
-    # max_tokens 需覆盖推理模型的 reasoning 预算，否则推理占满后 content 为空（deepseek-v4-flash 实测）
+    # max_tokens 需覆盖推理模型的 reasoning 预算，否则推理占满后 content 为空（deepseek-flash 实测）
     return generate(messages, temperature=0.7, max_tokens=2000, scene="career_chat", user_ref=user_ref)
 
 

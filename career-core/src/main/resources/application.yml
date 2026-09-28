@@ -37,6 +37,8 @@ ai:
   gateway-timeout: ${AI_GATEWAY_TIMEOUT:30}
   # 按 scene 的 max_tokens 上限（格式 scene:tokens,...；与 career-ai GATEWAY_SCENE_MAX_TOKENS 对齐，网关侧二次钳制）
   gateway-scene-max-tokens: ${AI_GATEWAY_SCENE_MAX_TOKENS:}
+  # 智能体（LangGraph）调用超时：多步工具调用耗时高于普通网关调用
+  agent-timeout: ${AI_AGENT_TIMEOUT:120}
 
 # Deprecated（2026-08-29）：直连大模型配置，仅为兼容保留，代码不再读取
 llm:

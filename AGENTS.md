@@ -14,14 +14,14 @@
 ## 服务间通信
 - 前端 → career-core（`:8080`，JWT 认证）。
 - career-core → career-ai：经 `LlmGateway`（Spring `RestClient`）调 `POST /v1/chat/completions`，`Authorization: Bearer GATEWAY_API_KEY`，带 `X-Request-Id`。
-- career-ai → DeepSeek（OpenAI 兼容 API，`https://api.deepseek.com`，模型 `deepseek-v4-flash`），经 LiteLLM `Router` 路由。
+- career-ai → DeepSeek（OpenAI 兼容 API，`https://api.deepseek.com`，模型 `deepseek-flash`），经 LiteLLM `Router` 路由。
 - **AI 调用统一走 career-ai 网关，career-core 不直连 LLM**；AI 失败时 career-core 回退规则模板。
 - 两侧各自写 `ai_call_log`（fail-open）。
 
 ## 开发环境
-- 工作目录：`D:\Zht20241287\career-planner`（Windows）。
-- 工具链：JDK 25（必须 25，否则 `class file version 69.0`）、Maven 3.9.16、MySQL 8.4、Python 3.12、Node ≥ 20。
-- 本地启动：`start-all.bat`（各服务独立窗口）或 `docker compose up`。
+- 工作目录：`/home/uio8k/career-planner`（WSL 本地盘，已搬平为单层）。
+- 工具链：JDK 17（与 `pom.xml` `java.version=17` / `Dockerfile` temurin-17 一致；JDK 25 升级已于提交 `a7fba95` 回退）、Maven 3.9.16、MySQL 8.4、Python 3.12、Node ≥ 20。
+- 本地启动：`docker compose up`，或 `cd career-core && ./mvnw -DskipTests package` 后 `java -jar target/career-core-0.0.1-SNAPSHOT.jar`。
 - Docker Compose：`mysql` + `career-ai`（内网，健康检查 `/health`）+ `app`（宿主 `:8080`）。
 - CI/CD：`.github/workflows/docker-publish.yml`（push main 自动构建并推送 Docker Hub；career-ai 镜像单独构建）。
 - 接口文档 / 契约测试：**Apifox**（`docs/openapi/career-core-apis-live.yaml`，以 Apifox 线上为准）。
